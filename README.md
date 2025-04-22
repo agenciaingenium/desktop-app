@@ -21,7 +21,7 @@
   - [Code signing](#code-signing)
 - [Development tools](#development-tools)
 - [Releases](#releases)
-- [Documentations](#documentations)
+- [Select documentation topics](#docs)
 
 ## Installation
 
@@ -69,7 +69,7 @@ $ sudo yum install clang dbus-devel gtk3-devel libnotify-devel xorg-x11-server-u
 yarn run dev
 ```
 
-### Natives modules errors 
+### Natives modules errors
 
 If for any reason you have some error with binding module you could run `npm run rebuild-all-native` to check if you still have the problem
 
@@ -90,7 +90,7 @@ If for any reason you have some error with binding module you could run `npm run
 
 #### Redux Devtools
 In order to see redux transactions and state,
-install [Redux DevTools](https://github.com/gaearon/redux-devtools) 
+install [Redux DevTools](https://github.com/gaearon/redux-devtools)
 (or the [browser extension](https://github.com/zalmoxisus/redux-devtools-extension))
 and click on `Open Remote DevTools`. Make sure `Use (custom) local server` on `localhost:8000` is activated in the settings.
 
@@ -167,11 +167,12 @@ This repository should be used as a proper monorepo. Packages that should be imp
 
 Note: you can remove artifacts and push changes over the same draft
 
-## Documentations
-- [Services](app/services/README.md)
-- [Score Engine](app/lib/score-engine/README.md)
-- [Bang Lifecyle](app/bang/README.md)
+## Docs
+
+- [Services](packages/app/src/services/README.md)
+- [Score Engine](packages/app/src/lib/score-engine/README.md)
+- [Bang Lifecyle](packages/app/src/bang/README.md)
 - [Persistence](docs/persistence.md)
 - [Webpack](docs/webpack.md)
-- [Test Auto-Update](test/auto-update/how_to_test.md)
-- [Local GraphQL](app/graphql/README.md)
+- [Test Auto-Update](packages/app/test/auto-update/how_to_test.md)
+- [Local GraphQL](packages/app/src/graphql/README.md)
