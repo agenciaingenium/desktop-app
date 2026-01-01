@@ -163,7 +163,7 @@ export default function app(state = new Map(), action) {
 
     case SET_MINIMIZE_TO_TRAY:
       return state.set('minimizeToTray', action.enabled);
-  
+
     case SET_INCLUDES_BETA_IN_UPDATES:
       return state.set('includesBetaInUpdates', action.included);
 

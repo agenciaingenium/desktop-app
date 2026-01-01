@@ -22,7 +22,7 @@ export default class MainWindowManager extends GenericWindowManager {
     }
 
     await super.create({
-      show: false,
+      show: true,
       frame: !isDarwin,
       icon: getResourceIconPath(),
       acceptFirstMouse: true,

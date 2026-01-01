@@ -227,6 +227,8 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
       defaultWidth: width - 40,
       defaultHeight: height - 40,
       file: `${sanitizedFilename}.json`,
+      // Never restore fullscreen state to avoid issues when closing in fullscreen
+      fullScreen: false,
     });
 
     return {
@@ -235,12 +237,20 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
       center: !this.stateManager.x && !this.stateManager.y,
       width: this.stateManager.width > 5 ? this.stateManager.width : 1024,
       height: this.stateManager.height > 5 ? this.stateManager.height : 728,
+      // Explicitly disable fullscreen on startup
+      fullscreen: false,
     };
   }
 
   private endInitPositionManager() {
     if (!this.stateManager) return;
     this.stateManager.manage(this.window);
+    
+    // Ensure window is not in fullscreen mode on startup
+    // This fixes the bug where closing in fullscreen causes issues
+    if (this.window.isFullScreen()) {
+      this.window.setFullScreen(false);
+    }
   }
 
   async setAlwaysOnTop(flag: boolean, level?: 'normal' | 'floating' | 'torn-off-menu' | 'modal-panel' | 'main-menu' | 'status' | 'pop-up-menu' | 'screen-saver', relativeLevel?: number) {

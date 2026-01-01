@@ -1,5 +1,5 @@
 // @ts-ignore : types
-import ECx from 'electron-chrome-extension';
+// import ECx from 'electron-chrome-extension';
 import { Extension, ExtensionEventMessage } from '../../../chrome-extensions/types';
 import { ServiceSubscription } from '../../lib/class';
 import { RPC } from '../../lib/types';
@@ -12,10 +12,10 @@ const initConfiguration = () => {
     },
   };
 
-  ECx.setConfiguration(configuration);
+  // ECx.setConfiguration(configuration);
 };
 
-const isExtensionLoaded = (extensionId: string): boolean => ECx.isLoaded(extensionId);
+const isExtensionLoaded = (extensionId: string): boolean => false; // ECx.isLoaded(extensionId);
 
 const serializeExtension = (extension: any): Extension => ({
   ...extension, ...{ location: extension.location.path },
@@ -32,28 +32,35 @@ export class ChromeExtensionsServiceImpl extends ChromeExtensionsService impleme
       return this.getExtension(extensionId);
     }
 
-    const extension = await ECx.load(extensionId);
-    return serializeExtension(extension);
+    // const extension = await ECx.load(extensionId);
+    // return serializeExtension(extension);
+    console.warn('Chrome extensions disabled in Electron 31+');
+    return null;
   }
 
   async unloadExtension(extensionId: string) {
-    return ECx.unload(extensionId);
+    // return ECx.unload(extensionId);
+    return;
   }
 
   async isUpToDate(extensionId: string) {
-    return ECx.isUpToDate(extensionId);
+    // return ECx.isUpToDate(extensionId);
+    return true;
   }
 
   async getExtension(extensionId: string) {
-    const extension = await ECx.get(extensionId);
-    return serializeExtension(extension);
+    // const extension = await ECx.get(extensionId);
+    // return serializeExtension(extension);
+    return null;
   }
 
   async dispatchEvent(event: ExtensionEventMessage) {
-    return ECx.sendEvent(event);
+    // return ECx.sendEvent(event);
+    return;
   }
 
   async addObserver(obs: RPC.ObserverNode<ChromeExtensionsServiceObserver>) {
+    /*
     if (obs.onExtensionUpdated) {
       return new ServiceSubscription(
         ECx.fetcher.on(
@@ -65,6 +72,7 @@ export class ChromeExtensionsServiceImpl extends ChromeExtensionsService impleme
         obs
       );
     }
+    */
     return ServiceSubscription.noop;
   }
 }
