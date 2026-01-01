@@ -14,7 +14,7 @@ import {
 } from 'redux-saga/effects';
 import { REHYDRATION_COMPLETE } from '../store/duck';
 import { DOM_READY, executeWebviewMethod } from '../tab-webcontents/duck';
-import { getTabWebcontentsByWebContentsId } from '../tab-webcontents/selectors';
+import { getTabWebcontentsByWebContentsId, hasAnyMountedTab } from '../tab-webcontents/selectors';
 import { setVisibility as setBangVisibility } from '../bang/duck';
 import { closeTab } from '../tabs/duck';
 import {
@@ -155,23 +155,35 @@ function* sagaToggleKbdShortcutsOverlay() {
 function* sagaLoadingScreen() {
   yield put(setLoadingScreenVisibility(true));
 
-  // we let the onboarding flow deal with removing the onbaording screen
-  yield take(REHYDRATION_COMPLETE);
-  const loggedInAndReady = yield select(isFullyReady);
+  // If we are already ready, rehydration must have happened
+  let loggedInAndReady = yield select(isFullyReady);
+
+  if (!loggedInAndReady) {
+    // Wait for rehydration or a safety timeout (5s)
+    yield race({
+      rehydrated: take(REHYDRATION_COMPLETE),
+      timeout: delay(ms('5sec'))
+    });
+    loggedInAndReady = yield select(isFullyReady);
+  }
+
   if (!loggedInAndReady) {
     yield put(setLoadingScreenVisibility(false));
     return undefined;
   }
 
-  const { domReady } = yield race({
-    domReady: take(DOM_READY),
-    timeout: delay(ms('10sec'))
-  });
+  const alreadyMounted = yield select(hasAnyMountedTab);
+  if (!alreadyMounted) {
+    const { domReady } = yield race({
+      domReady: take(DOM_READY),
+      timeout: delay(ms('10sec'))
+    });
 
-  if (domReady) {
-    // Most of the time, when 'dom-ready' is triggered, the webview is still blank,
-    // so we wait a little longer
-    yield delay(1500);
+    if (domReady) {
+      // Most of the time, when 'dom-ready' is triggered, the webview is still blank,
+      // so we wait a little longer
+      yield delay(1500);
+    }
   }
 
   yield put(setLoadingScreenVisibility(false));
@@ -195,7 +207,7 @@ function* sagaHandleDownloadDialog() {
     'download-dialog'
   );
 
-  yield takeEveryWitness(webRequestOnCompletedChannel, function*(
+  yield takeEveryWitness(webRequestOnCompletedChannel, function* (
     requestDetails
   ) {
     if (requestDetails.webContentsId) {
