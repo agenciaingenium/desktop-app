@@ -27,6 +27,8 @@ export default class MainWindowManager extends GenericWindowManager {
       icon: getResourceIconPath(),
       acceptFirstMouse: true,
       savePosition: 'main-window',
+      fullscreenable: true,
+      simpleFullscreen: false,
     });
 
     this.on('minimize', async () => {

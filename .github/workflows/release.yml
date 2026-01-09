@@ -42,7 +42,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "yarn"
       - name: Configure Node
         run: |

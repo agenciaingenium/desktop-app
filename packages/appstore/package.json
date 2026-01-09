@@ -4,7 +4,7 @@
   "description": "Station App Store",
   "homepage": "https://getstation.com",
   "bugs": "https://community.getstation.com",
-  "repository": "https://github.com/getstation/appstore.git",
+  "repository": "https://github.com/agenciaingenium/appstore.git",
   "license": "UNLICENSED",
   "author": "Joël Charles <joel@getstation.com>",
   "main": "dist/app.js",

@@ -37,6 +37,7 @@ import {
   setLoadingScreenVisibility,
   TOGGLE_PROMPT_DOWNLOAD,
   TOGGLE_KBD_SHORTCUTS,
+  TOGGLE_FULL_SCREEN,
   TOGGLE_MAXIMIZE,
   DISABLE_SSL_CERT_VERIFICATION,
 } from './duck';
@@ -138,6 +139,19 @@ function* sagaSyncPromptDownload() {
 
 function* sagaIncludeBetaInUpdates({ include }) {
   yield put(setBetaIncludedInUpdates(include));
+}
+
+function* sagaSendToggleFullScreen(action) {
+  const { windowId } = action;
+  let windowService;
+  if (windowId) {
+    windowService = yield callService('browserWindow', 'fromId', windowId);
+  } else {
+    windowService = yield callService('browserWindow', 'getFocusedWindow');
+  }
+  if (windowService) {
+    yield call([windowService, windowService.toggleFullscreen]);
+  }
 }
 
 function* sagaSendToggleMaximize() {
@@ -311,6 +325,7 @@ export default function* main(bxApp) {
     takeEveryWitness(TOGGLE_PROMPT_DOWNLOAD, sagaTogglePromptDownload),
     takeEveryWitness(INCLUDE_BETA_IN_UPDATES, sagaIncludeBetaInUpdates),
     takeEveryWitness(TOGGLE_MAXIMIZE, sagaSendToggleMaximize),
+    takeEveryWitness(TOGGLE_FULL_SCREEN, sagaSendToggleFullScreen),
     takeEveryWitness(TOGGLE_KBD_SHORTCUTS, sagaToggleKbdShortcutsOverlay),
     takeEveryWitness(CHANGE_APP_FOCUS_STATE, onChangeAppFocusState),
     takeEveryWitness(OPEN_PROCESS_MANAGER, sagaHandleOpenProcessManager),
