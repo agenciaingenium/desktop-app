@@ -1,12 +1,12 @@
 // @ts-ignore : types
 // import ECx from 'electron-chrome-extension';
-import { Extension, ExtensionEventMessage } from '../../../chrome-extensions/types';
+import { ExtensionEventMessage } from '../../../chrome-extensions/types';
 import { ServiceSubscription } from '../../lib/class';
 import { RPC } from '../../lib/types';
 import { ChromeExtensionsService, ChromeExtensionsServiceObserver } from './interface';
 
 const initConfiguration = () => {
-  const configuration = {
+  const _configuration = {
     fetcher: {
       autoUpdate: true,
     },
@@ -15,11 +15,7 @@ const initConfiguration = () => {
   // ECx.setConfiguration(configuration);
 };
 
-const isExtensionLoaded = (extensionId: string): boolean => false; // ECx.isLoaded(extensionId);
-
-const serializeExtension = (extension: any): Extension => ({
-  ...extension, ...{ location: extension.location.path },
-});
+const isExtensionLoaded = (_extensionId: string): boolean => false; // ECx.isLoaded(extensionId);
 
 export class ChromeExtensionsServiceImpl extends ChromeExtensionsService implements RPC.Interface<ChromeExtensionsService> {
   constructor(uuid?: string) {
@@ -38,28 +34,28 @@ export class ChromeExtensionsServiceImpl extends ChromeExtensionsService impleme
     return null;
   }
 
-  async unloadExtension(extensionId: string) {
+  async unloadExtension(_extensionId: string) {
     // return ECx.unload(extensionId);
     return;
   }
 
-  async isUpToDate(extensionId: string) {
+  async isUpToDate(_extensionId: string) {
     // return ECx.isUpToDate(extensionId);
     return true;
   }
 
-  async getExtension(extensionId: string) {
+  async getExtension(_extensionId: string) {
     // const extension = await ECx.get(extensionId);
     // return serializeExtension(extension);
     return null;
   }
 
-  async dispatchEvent(event: ExtensionEventMessage) {
+  async dispatchEvent(_event: ExtensionEventMessage) {
     // return ECx.sendEvent(event);
     return;
   }
 
-  async addObserver(obs: RPC.ObserverNode<ChromeExtensionsServiceObserver>) {
+  async addObserver(_obs: RPC.ObserverNode<ChromeExtensionsServiceObserver>) {
     /*
     if (obs.onExtensionUpdated) {
       return new ServiceSubscription(

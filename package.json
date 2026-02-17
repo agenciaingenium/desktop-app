@@ -28,14 +28,22 @@
     "electron": "./node_modules/.bin/electron"
   },
   "devDependencies": {
-    "rimraf": "^5.0.10"
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
+    "rimraf": "^5.0.10",
+    "typescript": "^5.4.5"
   },
-  "devEngines": {
-    "node": ">=18.0.0",
+  "resolutions": {
+    "foreground-child/cross-spawn": "^7.0.6",
+    "rimraf/glob": "^10.5.0"
+  },
+  "engines": {
+    "node": ">=22.0.0",
     "yarn": ">=4.1.0"
   },
   "volta": {
-    "node": "18.14.0",
+    "node": "22.13.1",
     "yarn": "4.1.0"
   },
   "packageManager": "yarn@4.12.0"

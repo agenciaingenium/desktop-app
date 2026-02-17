@@ -28,14 +28,17 @@ const mutateFixTsLoader = config => {
 };
 
 /**
- * minimizer should keep classnames and fnames
+ * optimize terser for smaller production bundles
  * @param config {webpack.Configuration}
  */
 const mutateFixTerser = config => {
   if (config.mode === 'production') {
     Object.assign(config.optimization.minimizer[0].options.terserOptions, {
-      keep_classnames: true,
-      keep_fnames: true
+      compress: {
+        passes: 2,
+      },
+      keep_classnames: false,
+      keep_fnames: false
     });
   }
 };
@@ -96,6 +99,7 @@ const mutateWebpackConfig = config => {
 
   if (config.mode === 'production') {
     config.plugins.push(
+      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new webpack.DefinePlugin({
         'process.env.GOOGLE_CLIENT_ID': JSON.stringify(
           process.env.GOOGLE_CLIENT_ID

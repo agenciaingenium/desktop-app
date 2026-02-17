@@ -13,7 +13,6 @@ import { ServiceSubscription } from '../../lib/class';
 import { observer } from '../../lib/helpers';
 import { RPC } from '../../lib/types';
 import { SDKv2Actions, SDKv2Selectors, SDKv2Service, SDKv2ServiceObserver } from './interface';
-import { service } from '../../lib/decorator';
 
 const bxAPIAllowedActions = [
   {
@@ -175,9 +174,6 @@ export class SDKv2ServiceImpl extends SDKv2Service implements RPC.Interface<SDKv
   }
 }
 
-const getSenderId = (e: any) => typeof e.senderId === 'number' ? e.senderId :
-  typeof e.sender.id === 'number' ? e.sender.id : 0;
-
 const initPreloadListener = (sdkv2: SDKv2ServiceImpl) => {
   ipcRenderer.on('bx-api-subscribe', async (event: Electron.Event, { senderId }: { senderId: number }, channel: SDKv2Selectors) => {
     try {
@@ -189,7 +185,7 @@ const initPreloadListener = (sdkv2: SDKv2ServiceImpl) => {
       }));
 
       // Listen for destroy event from main proxy if needed, or rely on existing mechanism
-      // For now, keeping existing logic but adapted if possible. 
+      // For now, keeping existing logic but adapted if possible.
       // Note: 'wc-destroyed' usually comes from main, we might need to forward that too if used.
       // Assuming wc-destroyed is still sent via sendTo or similar mechanism from main.
       ipcRenderer.once(`wc-destroyed-${senderId}`, () => {

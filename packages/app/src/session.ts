@@ -88,12 +88,12 @@ const getHeaderName = (headerName: string, headers?: Record<string, string[]>): 
     }
   }
   return undefined;
-}
+};
 
 export const getHeader = (headerName: string, headers?: Record<string, string[]>): any => {
   const realHeaderName = getHeaderName(headerName, headers);
   return headers && realHeaderName ? headers[realHeaderName] : undefined;
-}
+};
 
 export const setHeader = (headerName: string, headerValue: any, headers?: Record<string, string[]>): Record<string, string[]> | undefined => {
   if (headers) {
@@ -104,7 +104,7 @@ export const setHeader = (headerName: string, headerValue: any, headers?: Record
     };
   }
   return headers;
-}
+};
 
 export const getRefererForApp = (referer: string): string => {
   return referer && referer.startsWith('http://localhost') ? '' : referer;
@@ -121,25 +121,25 @@ export const enhanceSession = (session: Session) => {
   session.setUserAgent(defaultUserAgent);
 
   session.webRequest.onBeforeSendHeaders(
-      (details: OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: BeforeSendResponse) => void) => {
-        details.requestHeaders['User-Agent'] = getUserAgentForApp(details.url, session.getUserAgent());
-        details.referrer = getRefererForApp(details.referrer);
-        details.requestHeaders['Referer'] = details.referrer;
+    (details: OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: BeforeSendResponse) => void) => {
+      details.requestHeaders['User-Agent'] = getUserAgentForApp(details.url, session.getUserAgent());
+      details.referrer = getRefererForApp(details.referrer);
+      details.requestHeaders['Referer'] = details.referrer;
 
-        callback({ 
-            cancel: false, 
-            requestHeaders: details.requestHeaders 
-        });
-      }
+      callback({
+        cancel: false,
+        requestHeaders: details.requestHeaders
+      });
+    }
   );
 
   session.webRequest.onHeadersReceived(
     (details: OnHeadersReceivedListenerDetails, callback: (headersReceivedResponse: HeadersReceivedResponse) => void) => {
       const responseHeaders = details.responseHeaders;
-      
+
       if (responseHeaders) {
         delete responseHeaders['content-security-policy'];  //vk: causes "This document requires 'TrustedHTML' assignment." error. Does not allow us to modify page CSS.
-        delete responseHeaders['content-security-policy-report-only'];  
+        delete responseHeaders['content-security-policy-report-only'];
       }
 
       callback({

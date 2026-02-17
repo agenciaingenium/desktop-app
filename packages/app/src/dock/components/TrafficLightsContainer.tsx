@@ -18,8 +18,6 @@ interface State {
   focused: boolean
 }
 
-type Props = OwnProps & DispatchProps;
-
 class TrafficLightsContainer extends React.PureComponent<any, State> {
 
   public win: Electron.BrowserWindow;

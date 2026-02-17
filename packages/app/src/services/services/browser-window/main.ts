@@ -60,7 +60,6 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
     //     }
     // );
 
-
     if (options.preventNavigation) {
       this.window.webContents.on('will-navigate', event => event.preventDefault());
     }

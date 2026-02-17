@@ -1,4 +1,3 @@
-/* tslint:disable global-require, no-import-side-effect */
 import './dotenv';
 import { app, BrowserWindow, ipcMain, dialog, webContents } from 'electron';
 import log, { LevelOption } from 'electron-log';

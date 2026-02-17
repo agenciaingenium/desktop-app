@@ -32,7 +32,7 @@ import {
   UrlDispatcherProviderService,
   WebContentsOverrideProviderService,
 } from './interface';
-import { DEFAULT_BROWSER, DEFAULT_BROWSER_BACKGROUND, NEW_WINDOW } from '../../../urlrouter/constants';
+import { DEFAULT_BROWSER, DEFAULT_BROWSER_BACKGROUND } from '../../../urlrouter/constants';
 
 export class TabWebContentsServiceImpl extends TabWebContentsService implements RPC.Interface<TabWebContentsService> {
   protected webviews: Subject<Electron.WebContents>;
@@ -147,7 +147,7 @@ export class TabWebContentsServiceImpl extends TabWebContentsService implements 
     const shared = this.onNewWebviews().pipe(share());
     return new ServiceSubscription([
       this.askAutoLogin.subscribe(async (webContentsId: number) => {
-        const wc = await getWebContentsFromIdOrThrow(webContentsId);
+        await getWebContentsFromIdOrThrow(webContentsId);
 
         // vk: 18.01.2024 FIXME: TypeError: Cannot destructure property 'account' of '(intermediate value)' as it is null.
         // const { account, canAutoSubmit } = await provider.getCredentials(wc.id);
