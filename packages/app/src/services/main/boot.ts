@@ -1,4 +1,3 @@
-/* tslint:disable:no-import-side-effect */
 
 /*
 ** This file purpose is to handle startup side effects in main process

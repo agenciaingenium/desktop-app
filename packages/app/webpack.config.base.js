@@ -44,7 +44,9 @@ module.exports = (env, argv) => {
             {
               loader: 'babel-loader',
               options: {
-                presets: ['@babel/preset-env']
+                presets: [
+                  ['@babel/preset-env', { targets: { electron: '31' } }],
+                ]
               }
             }
           ]
@@ -79,15 +81,17 @@ module.exports = (env, argv) => {
             ecma: undefined,
             warnings: false,
             parse: {},
-            compress: false,
+            compress: {
+              passes: 2,
+            },
             mangle: true,
             module: false,
             output: null,
             toplevel: false,
             nameCache: null,
             ie8: false,
-            keep_classnames: true,
-            keep_fnames: true,
+            keep_classnames: false,
+            keep_fnames: false,
             safari10: false,
           },
           sourceMap: true,

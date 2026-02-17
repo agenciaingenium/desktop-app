@@ -147,7 +147,7 @@ Here is a list of tools used during the development process. Consider adding the
 
 - [Editorconfig](http://editorconfig.org/#download)
 - [ESLint](http://eslint.org/docs/user-guide/integrations#editors)
-- [TSLint](https://github.com/palantir/tslint)
+- [ESLint](https://eslint.org/)
 
 WebStorm and VSCode should be correctly configured by default.
 

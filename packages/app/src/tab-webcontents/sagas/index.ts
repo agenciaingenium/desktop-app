@@ -61,7 +61,6 @@ import sleepingSagas from './sleeping';
 import closeCurrentTabSagas from './close-current-tab';
 import ms = require('ms');
 import { ContextMenuService } from '../../services/services/menu/interface';
-import services from '../../services/servicesManager';
 
 let seenWebcontents = new Set();
 
