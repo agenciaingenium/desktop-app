@@ -37,7 +37,14 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
       - name: Build and Release
-        run: yarn build && yarn workspace station-desktop-app run release:publish
+        run: |
+          if [ -n "${CSC_LINK:-}" ] && [ -n "${CSC_KEY_PASSWORD:-}" ]; then
+            yarn build && yarn workspace station-desktop-app run release:publish
+          else
+            echo "Code signing secrets are missing/invalid; building unsigned macOS artifacts."
+            unset CSC_LINK CSC_KEY_PASSWORD CSC_NAME
+            CSC_IDENTITY_AUTO_DISCOVERY=false yarn build && yarn workspace station-desktop-app run release:publish
+          fi
 
   MacOs:
     runs-on: macos-latest
