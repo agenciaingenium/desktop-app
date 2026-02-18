@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/agenciaingenium/desktop-app/compare/1.1.1...1.1.2) (2026-02-18)
+
+
+### Bug Fixes
+
+* **build:** pin electron version for electron-builder ([afad471](https://github.com/agenciaingenium/desktop-app/commit/afad47117f9277f99a5f2ece781e1ccda7be3b8a))
+
 ## [1.1.1](https://github.com/agenciaingenium/desktop-app/compare/1.1.0...1.1.1) (2026-02-18)
 
 
