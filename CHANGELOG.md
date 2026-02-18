@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/agenciaingenium/desktop-app/compare/1.1.3...1.1.4) (2026-02-18)
+
+
+### Bug Fixes
+
+* **ci:** fallback to unsigned mac builds when signing secrets are missing ([ede1ff2](https://github.com/agenciaingenium/desktop-app/commit/ede1ff25807556c2a75b6903d1e0d55fab422c4c))
+
 ## [1.1.3](https://github.com/agenciaingenium/desktop-app/compare/1.1.2...1.1.3) (2026-02-18)
 
 
