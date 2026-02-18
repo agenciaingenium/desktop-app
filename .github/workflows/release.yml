@@ -40,7 +40,7 @@ jobs:
         run: yarn build && yarn workspace station-desktop-app run release:publish
 
   MacOs:
-    runs-on: macos-13
+    runs-on: macos-latest
     env:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
