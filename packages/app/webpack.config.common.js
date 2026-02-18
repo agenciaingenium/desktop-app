@@ -37,8 +37,10 @@ const mutateFixTerser = config => {
       compress: {
         passes: 2,
       },
-      keep_classnames: false,
-      keep_fnames: false
+      // Services registry keys rely on constructor names at runtime.
+      // Minifying class/function names can cause collisions like "browser-window:A".
+      keep_classnames: true,
+      keep_fnames: true
     });
   }
 };

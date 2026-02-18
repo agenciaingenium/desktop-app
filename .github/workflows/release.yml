@@ -1,8 +1,11 @@
 name: Release
 on:
-  push:
-    branches:
-      - release
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
 jobs:
   Linux:
     runs-on: ubuntu-latest
@@ -11,8 +14,10 @@ jobs:
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ github.event.release.tag_name }}
+      - uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: "yarn"
@@ -25,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
       - name: Build and Release
-        run: yarn release
+        run: yarn build && yarn workspace station-desktop-app run release:publish
 
   MacOs:
     runs-on: macos-13
@@ -39,8 +44,10 @@ jobs:
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ github.event.release.tag_name }}
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "yarn"
@@ -53,7 +60,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
       - name: Build and Release
-        run: yarn release
+        run: yarn build && yarn workspace station-desktop-app run release:publish
 
   Windows:
     runs-on: windows-2019
@@ -64,8 +71,10 @@ jobs:
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ github.event.release.tag_name }}
+      - uses: actions/setup-node@v4
         with:
           node-version: "18"
       - name: Configure Node
@@ -78,4 +87,4 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
       - name: Build and Release
-        run: yarn release
+        run: yarn build && yarn workspace station-desktop-app run release:publish
