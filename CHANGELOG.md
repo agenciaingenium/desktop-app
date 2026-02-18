@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/agenciaingenium/desktop-app/compare/1.1.2...1.1.3) (2026-02-18)
+
+
+### Bug Fixes
+
+* **ci:** use supported macos runner images for releases ([900b3f3](https://github.com/agenciaingenium/desktop-app/commit/900b3f39ef74fdf95a7f0e528fc34420efbb7ff6))
+
 ## [1.1.2](https://github.com/agenciaingenium/desktop-app/compare/1.1.1...1.1.2) (2026-02-18)
 
 
