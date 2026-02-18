@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/agenciaingenium/desktop-app/compare/1.1.0...1.1.1) (2026-02-18)
+
+
+### Bug Fixes
+
+* **ci:** ensure release assets workflow can be triggered ([4b3252e](https://github.com/agenciaingenium/desktop-app/commit/4b3252e77d61dff9371ffbd57d130310ab91f0b6))
+
 # [1.1.0](https://github.com/agenciaingenium/desktop-app/compare/1.0.2...1.1.0) (2026-02-18)
 
 
