@@ -21,6 +21,7 @@
   - [Code signing](#code-signing)
 - [Development tools](#development-tools)
 - [Releases](#releases)
+  - [Unsigned macOS builds](#unsigned-macos-builds)
 - [Select documentation topics](#docs)
 
 ## Installation
@@ -159,13 +160,25 @@ This repository should be used as a proper monorepo. Packages that should be imp
 
 ## Releases
 
-1. [Draft a new release](https://github.com/getstation/desktop-app/releases/new) tagged with the desired version
-2. Apply your changes on [`release`](https://github.com/getstation/desktop-app/tree/release) branch
-3. On `release` branch, bump the version with `yarn version` to the corresponding version number
-4. Let the CI build artifacts for each platform
-5. Publish the draft
+Releases are automated from `main`:
+1. Push commits to `main` using conventional commits (`fix:`, `feat:`, etc.).
+2. `Version & Release` creates the next tag and GitHub release notes.
+3. `Release` builds artifacts for each platform and uploads assets to that release.
 
-Note: you can remove artifacts and push changes over the same draft
+You can also run `Release` manually with `workflow_dispatch` and a tag (for example `1.1.3`) to rebuild/reupload assets.
+
+### Unsigned macOS builds
+
+If the project is released without Apple Developer signing/notarization, macOS may block the app on first launch.
+
+Options:
+1. Finder: right click the app -> `Open` -> confirm.
+2. Terminal:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Station.app
+spctl --add --label "Station" /Applications/Station.app
+```
 
 ## Docs
 
