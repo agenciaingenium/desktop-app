@@ -18,6 +18,8 @@ jobs:
     env:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ELECTRON_DISABLE_SANDBOX: "1"
+      ELECTRON_NO_SANDBOX: "1"
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
     steps:

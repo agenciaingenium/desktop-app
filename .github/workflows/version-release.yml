@@ -12,6 +12,9 @@ permissions:
 jobs:
   semantic-release:
     runs-on: ubuntu-latest
+    env:
+      ELECTRON_DISABLE_SANDBOX: "1"
+      ELECTRON_NO_SANDBOX: "1"
     steps:
       - uses: actions/checkout@v4
         with:
