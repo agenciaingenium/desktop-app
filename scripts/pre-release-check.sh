@@ -9,6 +9,12 @@ echo "node: $(node -v)"
 echo "yarn: $(yarn -v)"
 echo "electron: $(node -e "console.log(require('./packages/app/package.json').devDependencies.electron)")"
 
+if [[ "${CI:-}" == "true" ]] && [[ "$(uname -s)" == "Linux" ]]; then
+  export ELECTRON_DISABLE_SANDBOX=1
+  export ELECTRON_NO_SANDBOX=1
+  echo "[pre-release-check] Linux CI detected: running Electron tests with sandbox disabled"
+fi
+
 echo "[pre-release-check] Running critical stability tests"
 yarn workspace station-desktop-app test \
   test/jest/session/test-session.ts \
