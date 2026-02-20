@@ -197,3 +197,4 @@ spctl --add --label "Station" /Applications/Station.app
 - [Local GraphQL](packages/app/src/graphql/README.md)
 - [Release Smoke Checklist](docs/release-smoke-checklist.md)
 - [TypeScript Stabilization Plan](docs/typescript-stabilization-plan.md)
+- [Branch Protection Baseline](docs/branch-protection.md)

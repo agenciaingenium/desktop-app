@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,6 +16,7 @@ jobs:
     env:
       ELECTRON_DISABLE_SANDBOX: "1"
       ELECTRON_NO_SANDBOX: "1"
+      DBUS_SESSION_BUS_ADDRESS: "unix:path=/dev/null"
     steps:
       - uses: actions/checkout@v4
         with:
