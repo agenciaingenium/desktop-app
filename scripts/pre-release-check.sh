@@ -9,17 +9,26 @@ echo "node: $(node -v)"
 echo "yarn: $(yarn -v)"
 echo "electron: $(node -e "console.log(require('./packages/app/package.json').devDependencies.electron)")"
 
+TEST_CMD="yarn workspace station-desktop-app test \
+  test/jest/session/test-session.ts \
+  test/jest/tab-webcontents/test-webcontents-to-kill.ts \
+  test/jest/url-router/test-url-router.ts"
+
 if [[ "${CI:-}" == "true" ]] && [[ "$(uname -s)" == "Linux" ]]; then
   export ELECTRON_DISABLE_SANDBOX=1
   export ELECTRON_NO_SANDBOX=1
   echo "[pre-release-check] Linux CI detected: running Electron tests with sandbox disabled"
+
+  if command -v xvfb-run >/dev/null 2>&1; then
+    TEST_CMD="xvfb-run -a ${TEST_CMD}"
+    echo "[pre-release-check] Linux CI detected: running Electron tests with xvfb-run"
+  else
+    echo "[pre-release-check] WARNING: xvfb-run not found; Electron tests may fail without DISPLAY"
+  fi
 fi
 
 echo "[pre-release-check] Running critical stability tests"
-yarn workspace station-desktop-app test \
-  test/jest/session/test-session.ts \
-  test/jest/tab-webcontents/test-webcontents-to-kill.ts \
-  test/jest/url-router/test-url-router.ts
+eval "${TEST_CMD}"
 
 echo "[pre-release-check] Checking for known risky hardcodes"
 if rg -n "bx_override_user_agent" packages/app/manifests/definitions; then
