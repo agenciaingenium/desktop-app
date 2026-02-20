@@ -1,3 +1,12 @@
+## [1.1.5](https://github.com/agenciaingenium/desktop-app/compare/1.1.4...1.1.5) (2026-02-20)
+
+
+### Bug Fixes
+
+* **ci:** disable electron sandbox for linux pre-release checks ([579f7e6](https://github.com/agenciaingenium/desktop-app/commit/579f7e62a800a867ad6b7c894a77f53b424c89bc))
+* **ci:** fallback to grep when ripgrep is unavailable ([6ed1a52](https://github.com/agenciaingenium/desktop-app/commit/6ed1a52d82900d1899c041ebc88106f8bff1438c))
+* **ci:** run electron tests with xvfb in linux ([2685bae](https://github.com/agenciaingenium/desktop-app/commit/2685bae536f5eedd0775ab3fe2f915422bd9b701))
+
 ## [1.1.4](https://github.com/agenciaingenium/desktop-app/compare/1.1.3...1.1.4) (2026-02-18)
 
 
