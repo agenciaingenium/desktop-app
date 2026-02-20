@@ -20,6 +20,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ELECTRON_DISABLE_SANDBOX: "1"
       ELECTRON_NO_SANDBOX: "1"
+      DBUS_SESSION_BUS_ADDRESS: "unix:path=/dev/null"
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
     steps:

@@ -31,7 +31,8 @@
     "storybook": "storybook dev -p 6006 --config-dir ../../.storybook",
     "build:storybook": "storybook build --config-dir ../../.storybook -o dist/__storybook --quiet",
     "lint": "yarn run gql-gen && eslint --ignore-path ../../.eslintignore \"src/**/*.{ts,tsx}\" \"manifests/**/*.ts\" \"test/**/*.ts\"",
-    "test": "cross-env NODE_ENV=test NODE_OPTIONS=\"--require ../../scripts/patch-ts-jest.js\" jest --runInBand"
+    "test": "cross-env NODE_ENV=test NODE_OPTIONS=\"--require ../../scripts/patch-ts-jest.js\" jest --runInBand",
+    "typecheck:stability": "tsc -p tsconfig.stability.json --noEmit"
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"

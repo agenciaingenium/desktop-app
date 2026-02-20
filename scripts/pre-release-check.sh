@@ -22,6 +22,7 @@ echo "electron: $(node -e "console.log(require('./packages/app/package.json').de
 
 TEST_CMD="yarn workspace station-desktop-app test \
   test/jest/session/test-session.ts \
+  test/jest/session/test-session-browserwindow.ts \
   test/jest/tab-webcontents/test-webcontents-to-kill.ts \
   test/jest/url-router/test-url-router.ts"
 
@@ -40,6 +41,9 @@ fi
 
 echo "[pre-release-check] Running critical stability tests"
 eval "${TEST_CMD}"
+
+echo "[pre-release-check] Running scoped TypeScript stability check"
+yarn workspace station-desktop-app run typecheck:stability
 
 echo "[pre-release-check] Checking for known risky hardcodes"
 if search "bx_override_user_agent" packages/app/manifests/definitions; then
