@@ -8,6 +8,7 @@ export interface Classes {
   version: string,
   title: string,
   thin: string,
+  note: string,
 }
 
 export interface Props {
@@ -39,6 +40,12 @@ const styles = (theme: Theme) => ({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  note: {
+    marginTop: 8,
+    marginBottom: 10,
+    fontSize: 11,
+    opacity: 0.7,
+  },
 });
 
 @injectSheet(styles)
@@ -53,6 +60,9 @@ export default class AboutWindowVersions extends React.PureComponent<Props, {}> 
             {this.props.appName}
             <span className={classes!.thin}>version {this.props.appVersion}</span>
           </div>
+          <p className={classes!.note}>
+            Community-maintained fork
+          </p>
 
           <p className={classes!.version}>
             Electron
