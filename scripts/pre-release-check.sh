@@ -4,6 +4,17 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
+search() {
+  local pattern="$1"
+  shift
+
+  if command -v rg >/dev/null 2>&1; then
+    rg -n "$pattern" "$@"
+  else
+    grep -nER "$pattern" "$@"
+  fi
+}
+
 echo "[pre-release-check] Environment"
 echo "node: $(node -v)"
 echo "yarn: $(yarn -v)"
@@ -31,25 +42,25 @@ echo "[pre-release-check] Running critical stability tests"
 eval "${TEST_CMD}"
 
 echo "[pre-release-check] Checking for known risky hardcodes"
-if rg -n "bx_override_user_agent" packages/app/manifests/definitions; then
+if search "bx_override_user_agent" packages/app/manifests/definitions; then
   echo "[pre-release-check] ERROR: Found bx_override_user_agent in manifests."
   exit 1
 fi
 
-if rg -n "Chrome/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" \
+if search "Chrome/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" \
   packages/app/src/session.ts \
   packages/app/manifests/definitions; then
   echo "[pre-release-check] ERROR: Found hardcoded Chrome version."
   exit 1
 fi
 
-if rg -n "targets:\s*\{\s*electron:\s*'?[0-9]+'?\s*\}" packages/app/webpack.config.base.js; then
+if search "targets:\s*\{\s*electron:\s*'?[0-9]+'?\s*\}" packages/app/webpack.config.base.js; then
   echo "[pre-release-check] ERROR: Found hardcoded webpack Electron target."
   exit 1
 fi
 
 echo "[pre-release-check] Verifying About window exposes runtime versions"
-if ! rg -n "process\\.versions\\.electron|process\\.versions\\.chrome" \
+if ! search "process\\.versions\\.electron|process\\.versions\\.chrome" \
   packages/app/src/about-window/components/AboutWindowVersions.tsx >/dev/null; then
   echo "[pre-release-check] ERROR: About window does not expose Electron/Chromium versions."
   exit 1
