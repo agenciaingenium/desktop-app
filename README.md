@@ -165,6 +165,13 @@ Releases are automated from `main`:
 2. `Version & Release` creates the next tag and GitHub release notes.
 3. `Release` builds artifacts for each platform and uploads assets to that release.
 
+### Naming and versioning
+
+- Product name remains `Station`.
+- About window app version is sourced from `packages/app/package.json` (build metadata).
+- Public release numbering follows semantic-release tags from the repository root (for example `1.1.5`).
+- This project is currently maintained as a community fork.
+
 You can also run `Release` manually with `workflow_dispatch` and a tag (for example `1.1.3`) to rebuild/reupload assets.
 
 Before publishing a release candidate or production release, run:
