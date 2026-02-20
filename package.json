@@ -19,7 +19,8 @@
     "release": "yarn clean && yarn workspaces foreach --all --topological run release",
     "dev": "yarn workspaces foreach --all --topological run dev",
     "lint": "yarn workspaces foreach --all --topological run lint",
-    "test": "yarn workspaces foreach --all run test"
+    "test": "yarn workspaces foreach --all run test",
+    "pre-release:check": "bash ./scripts/pre-release-check.sh"
   },
   "workspaces": [
     "packages/*"

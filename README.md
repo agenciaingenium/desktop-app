@@ -167,6 +167,12 @@ Releases are automated from `main`:
 
 You can also run `Release` manually with `workflow_dispatch` and a tag (for example `1.1.3`) to rebuild/reupload assets.
 
+Before publishing a release candidate or production release, run:
+
+```bash
+yarn pre-release:check
+```
+
 ### Unsigned macOS builds
 
 If the project is released without Apple Developer signing/notarization, macOS may block the app on first launch.
@@ -189,3 +195,5 @@ spctl --add --label "Station" /Applications/Station.app
 - [Webpack](docs/webpack.md)
 - [Test Auto-Update](packages/app/test/auto-update/how_to_test.md)
 - [Local GraphQL](packages/app/src/graphql/README.md)
+- [Release Smoke Checklist](docs/release-smoke-checklist.md)
+- [TypeScript Stabilization Plan](docs/typescript-stabilization-plan.md)

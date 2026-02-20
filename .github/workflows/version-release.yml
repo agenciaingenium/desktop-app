@@ -22,6 +22,8 @@ jobs:
           cache: yarn
       - name: Install dependencies
         run: yarn install --immutable
+      - name: Pre-release stability checks
+        run: yarn pre-release:check
       - name: Semantic release
         run: npx semantic-release
         env:
