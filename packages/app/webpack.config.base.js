@@ -4,6 +4,10 @@
 
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
+const appPkg = require('./package.json');
+
+const electronVersion = appPkg.devDependencies?.electron || appPkg.dependencies?.electron || '31';
+const electronTarget = (electronVersion.match(/\d+/) || ['31'])[0];
 
 module.exports = (env, argv) => {
   /**
@@ -45,7 +49,7 @@ module.exports = (env, argv) => {
               loader: 'babel-loader',
               options: {
                 presets: [
-                  ['@babel/preset-env', { targets: { electron: '31' } }],
+                  ['@babel/preset-env', { targets: { electron: electronTarget } }],
                 ]
               }
             }
