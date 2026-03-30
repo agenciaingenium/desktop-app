@@ -23,6 +23,8 @@ jobs:
         with:
           node-version: "18"
           cache: "yarn"
+      - name: Sync app version with release tag
+        run: node ./scripts/sync-release-version.js "${GITHUB_REF_NAME}"
       # See https://github.com/nodejs/node-gyp/blob/main/docs/Force-npm-to-use-global-node-gyp.md
       # https://github.com/nodejs/node-gyp/blob/main/docs/Updating-npm-bundled-node-gyp.md
       # - name: Update node-gyp
@@ -66,6 +68,8 @@ jobs:
           npm install -g npm@8  
           npm install -g node-gyp@latest
           npm config set node_gyp $(npm prefix -g)/lib/node_modules/node-gyp/bin/node-gyp.js
+      - name: Sync app version with release tag
+        run: node ./scripts/sync-release-version.js "${GITHUB_REF_NAME}"
       - name: Install dependencies
         run: yarn install --immutable
       - name: Build and Release
@@ -91,6 +95,9 @@ jobs:
       - uses: actions/setup-node@master
         with:
           node-version: "18"
+      - name: Sync app version with release tag
+        shell: powershell
+        run: node .\scripts\sync-release-version.js "$env:GITHUB_REF_NAME"
       - name: Configure Node
         shell: powershell
         run: |
