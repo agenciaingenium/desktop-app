@@ -10,6 +10,9 @@ on:
         required: true
         type: string
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 permissions:
   contents: write
 jobs:
@@ -80,10 +83,17 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
       - name: Build and Release
-        run: yarn build && yarn workspace station-desktop-app run release:publish
+        run: |
+          if [ -n "${CSC_LINK:-}" ] && [ -n "${CSC_KEY_PASSWORD:-}" ]; then
+            yarn build && yarn workspace station-desktop-app run release:publish
+          else
+            echo "Apple signing secrets are missing/invalid; building unsigned macOS artifacts."
+            unset CSC_LINK CSC_KEY_PASSWORD CSC_NAME AC_USERNAME AC_PASSWORD AC_TEAM_ID
+            CSC_IDENTITY_AUTO_DISCOVERY=false yarn build && yarn workspace station-desktop-app run release:publish
+          fi
 
   Windows:
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
