@@ -170,6 +170,7 @@ Releases are automated from `main`:
 - Product name remains `Station`.
 - About window app version is sourced from `packages/app/package.json` (build metadata).
 - Public release numbering follows semantic-release tags from the repository root (for example `1.1.5`).
+- Release workflows rewrite `packages/app/package.json` in CI to match the active tag before publishing artifacts.
 - This project is currently maintained as a community fork.
 
 You can also run `Release` manually with `workflow_dispatch` and a tag (for example `1.1.3`) to rebuild/reupload assets.
