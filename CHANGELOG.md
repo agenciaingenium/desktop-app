@@ -1,3 +1,10 @@
+## [1.1.6](https://github.com/agenciaingenium/desktop-app/compare/1.1.5...1.1.6) (2026-03-30)
+
+
+### Bug Fixes
+
+* **ci:** add fallback for unsigned macOS builds and upgrade runner images ([a846768](https://github.com/agenciaingenium/desktop-app/commit/a8467682f28fa18160637687c7d654e0d7e851e3))
+
 ## [1.1.5](https://github.com/agenciaingenium/desktop-app/compare/1.1.4...1.1.5) (2026-02-20)
 
 
