@@ -27,9 +27,13 @@ export const asNativeImage = memoize((url: string): Promise<Electron.NativeImage
 
 export function getDoNotDisturb(): boolean {
   if (process.platform === 'win32') {
-    const { getFocusAssist } = require('windows-focus-assist');
-    const focusAssist: string = getFocusAssist().name;
-    return focusAssist == 'PRIORITY_ONLY' || focusAssist == 'ALARMS_ONLY';
+    try {
+      const { getFocusAssist } = require('windows-focus-assist');
+      const focusAssist: string = getFocusAssist().name;
+      return focusAssist == 'PRIORITY_ONLY' || focusAssist == 'ALARMS_ONLY';
+    } catch (error) {
+      return false;
+    }
   }
 
   if (process.platform === 'darwin') {
