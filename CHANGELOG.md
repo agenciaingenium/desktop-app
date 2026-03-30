@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/agenciaingenium/desktop-app/compare/1.1.6...1.1.7) (2026-03-30)
+
+
+### Bug Fixes
+
+* **os-notification:** add safe fallback for Windows focus assist detection and remove unused dependency ([c6de09f](https://github.com/agenciaingenium/desktop-app/commit/c6de09fe4958407a684b7839d06a5dbb4510658f))
+
 ## [1.1.6](https://github.com/agenciaingenium/desktop-app/compare/1.1.5...1.1.6) (2026-03-30)
 
 
