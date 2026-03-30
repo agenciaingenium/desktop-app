@@ -1,3 +1,10 @@
+## [1.1.8](https://github.com/agenciaingenium/desktop-app/compare/1.1.7...1.1.8) (2026-03-30)
+
+
+### Bug Fixes
+
+* **ci:** add fallback for unsigned Windows builds in release workflows ([ece2bc9](https://github.com/agenciaingenium/desktop-app/commit/ece2bc9334dca746a97e6ac200ed6e25df8c9488))
+
 ## [1.1.7](https://github.com/agenciaingenium/desktop-app/compare/1.1.6...1.1.7) (2026-03-30)
 
 
