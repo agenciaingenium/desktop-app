@@ -1,5 +1,3 @@
-import { ipcRenderer } from 'electron';
-import * as remote from '@electron/remote';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
@@ -20,14 +18,13 @@ configureStore().then(store => {
   render(store);
 }).catch(handleError());
 
-const currentWindow = remote.getCurrentWindow();
-currentWindow.on('blur', (event, command) => {
-  currentWindow.close();
+const unsubscribeBlur = window.station.window.onBlur(() => {
+  window.station.window.close();
 });
 document.addEventListener('keydown', event => {
   switch (event.key) {
     case 'Escape':
-      currentWindow.close();
+      window.station.window.close();
       break;
   }
 });
@@ -45,7 +42,7 @@ const render = (store) => {
     , document.getElementById('root')
   );
 
-  ipcRenderer.send('bx-ready-to-show');
+  window.station.ipc.send('bx-ready-to-show');
 };
 
 if (module.hot) { 

@@ -1,11 +1,9 @@
 import * as Immutable from 'immutable';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 
-import { ThemeTypes as Theme } from '@getstation/theme';
+import { theme } from '@getstation/theme';
 import AddPasswordManager from './components/AddPasswordManager';
 import ConfigurePasswordManager from './components/ConfigurePasswordManager';
 import ListPasswordManagers from './components/ListPasswordManagers';
@@ -14,13 +12,17 @@ import Providers from './providers/';
 import { getConfigurationProcess, getPasswordManager, getProviderJS } from './selectors';
 import { PasswordManager, Provider } from './types';
 
-interface Classes {
-  container: string,
-  title: string,
-}
+const containerStyle: React.CSSProperties = {
+  padding: 20,
+  borderTop: '1px solid rgba(255, 255, 255, .1)',
+};
+
+const titleStyle: React.CSSProperties = {
+  ...theme.fontMixin(12, 'bold'),
+  marginBottom: 15,
+};
 
 export interface Props {
-  classes?: Classes,
   configurationProcess: AddPasswordManagerAction,
   canConfigure: boolean,
   canAddPasswordManager: boolean,
@@ -35,20 +37,9 @@ export interface Props {
 export interface OverridableProps {
 }
 
-@injectSheet((theme: Theme) => ({
-  container: {
-    padding: 20,
-    borderTop: '1px solid rgba(255, 255, 255, .1)',
-  },
-  title: {
-    ...theme.fontMixin(12, 'bold'),
-    marginBottom: 15,
-  },
-}))
 class PasswordManagerSubdockImpl extends React.PureComponent<Props & OverridableProps, {}> {
   render() {
     const {
-      classes,
       canConfigure,
       configurationProcess,
       canAddPasswordManager,
@@ -63,8 +54,8 @@ class PasswordManagerSubdockImpl extends React.PureComponent<Props & Overridable
     const providers = Object.values(Providers);
 
     return (
-      <div className={classes!.container}>
-        <div className={classes!.title}>Password Managers</div>
+      <div style={containerStyle}>
+        <div style={titleStyle}>Password Managers</div>
 
         { canConfigure &&
         <ConfigurePasswordManager

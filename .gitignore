@@ -57,3 +57,12 @@ yalc.lock
 # Generated files
 **/*generated.ts
 **/*generated.tsx
+
+# Environment files (may contain secrets)
+.env
+.env.*
+!.env.example
+
+# Dev artifacts
+errors
+.claude/

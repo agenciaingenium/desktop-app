@@ -4,9 +4,9 @@ import NotificationsSDKProvider from './NotificationsSDKProvider';
 
 declare interface NotificationsSDKConsumer {
   intercept(event: 'new', listener: (e: Event, action: NewNotificationAction) => any): this
-  intercept(event: 'show', listener: () => any): this // TODO
-  intercept(event: 'click', listener: () => any): this // TODO
-  intercept(event: 'close', listener: () => any): this // TODO
+  intercept(event: 'show', listener: () => any): this
+  intercept(event: 'click', listener: () => any): this
+  intercept(event: 'close', listener: () => any): this
 }
 
 class NotificationsSDKConsumer {

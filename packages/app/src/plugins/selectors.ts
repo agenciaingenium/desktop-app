@@ -15,10 +15,14 @@ export const getPersistedSlackTeamMetadata = (state: StationState, manifestURL: 
 export const getGDriveTokens = (state: StationState, manifestURL: string): Immutable.Map<string, any> | undefined =>
   state.getIn(['servicesData', manifestURL, 'tokens']);
 
-// TODO make this dynamic
 export const hasGDriveTokens = createSelector(
   (state: StationState) => getGDriveTokens(state, GDRIVE_MANIFEST_URL),
   tokens => tokens ? tokens.size > 0 : false
+);
+
+export const hasServiceTokens = (manifestURL: string) => createSelector(
+  (state: StationState) => state.getIn(['servicesData', manifestURL, 'tokens']) as any,
+  (tokens: any) => tokens ? tokens.size > 0 : false
 );
 
 export const getPlugins = (state: StationState): any => state.get('plugins');

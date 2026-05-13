@@ -1,6 +1,6 @@
 import { IconSymbol, Style } from '@getstation/theme';
 import { take } from 'redux-saga/effects';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import { Action } from 'redux';
 import { RPC } from '../services/lib/types';
 import { AlertDialogProviderService } from '../services/services/tab-webcontents/interface';
@@ -17,7 +17,7 @@ export class AlertDialogProviderServiceImpl extends AlertDialogProviderService i
   }
 
   async show(webContentsId: number, { message, title }: { message: string, title: string }) {
-    const id = `dialog-${shortid.generate()}`;
+    const id = `dialog-${nanoid()}`;
     const state = this.store.getState();
 
     const twc = getTabWebcontentsByWebContentsId(state, webContentsId);

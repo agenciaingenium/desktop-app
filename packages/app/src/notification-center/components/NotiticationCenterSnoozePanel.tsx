@@ -1,46 +1,25 @@
+import { theme } from '@getstation/theme';
 import * as React from 'react';
-import injectSheet from 'react-jss';
 import NotificationCenterSnoozePanelItem from './NotiticationCenterSnoozePanelItem';
 import { minutesBeforeHeightAm } from '../utils';
 
-export interface Classes {
-  container: string,
-  title: string,
-  list: string,
-}
-
 export interface Props {
-  classes?: Classes,
   handleSnooze: (duration: string) => any,
 }
 
-const styles = (theme: any) => ({
-  container: {
-    backgroundColor: 'white',
-    borderRadius: 4,
-    boxShadow: '1px 1px 5px 0px rgba(50, 50, 50, 0.75)',
-    padding: [6, 10],
-    minWidth: '100px',
-    marginTop: 5,
-  },
-  title: {
-    color: theme.colors.gray.dark,
-    fontWeight: 700,
-  },
-  list: {
-    marginTop: 6,
-  },
-});
-
-@injectSheet(styles)
 class NotificationCenterSnoozePanel extends React.PureComponent<Props, {}> {
   render() {
-    const { classes } = this.props;
-
     return (
-      <div className={classes!.container}>
-        <span className={classes!.title}>Do Not Disturb for</span>
-        <ul className={classes!.list}>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: 4,
+        boxShadow: '1px 1px 5px 0px rgba(50, 50, 50, 0.75)',
+        padding: '6px 10px',
+        minWidth: 100,
+        marginTop: 5,
+      }}>
+        <span style={{ color: theme.colors.gray.dark, fontWeight: 700 }}>Do Not Disturb for</span>
+        <ul style={{ marginTop: 6 }}>
           <NotificationCenterSnoozePanelItem
             handleClick={() => this.props.handleSnooze('21min')}
             duration="20 minutes"

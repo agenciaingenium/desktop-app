@@ -14,7 +14,7 @@ interface Props {
   isDragging: boolean,
 }
 
-const layerStyles = {
+const layerStyles: React.CSSProperties = {
   position: 'absolute',
   pointerEvents: 'none',
   zIndex: 999999,

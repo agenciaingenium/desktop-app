@@ -1,20 +1,10 @@
-import { Icon, IconSymbol, ThemeTypes } from '@getstation/theme';
+import { Icon, IconSymbol, theme } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import * as classNames from 'classnames';
 import AppIcon from './AppIcon';
 import { ActivityEntry } from '../../activity/queries@local.gql.generated';
 
-interface Classes {
-  container: string,
-  recentApplicationIcon: string,
-  recentApplicationArrow: string,
-  hoverIcon: string,
-}
-
 interface Props {
-  classes?: Classes,
   onMouseEnter: () => any,
   onMouseLeave: () => any,
   onClickIcon: () => any,
@@ -22,63 +12,63 @@ interface Props {
   innerRef?: (ref: HTMLElement | null) => void;
 }
 
-const styles = (theme: ThemeTypes) => ({
-  container: {
-    ...theme.mixins.size(25),
-    position: 'relative',
-    margin: '12px auto 8px',
-    borderRadius: 100,
-    opacity: 0.6,
-    filter: 'grayscale(60%)',
-    transition: '300ms',
-    '&:hover': {
-      opacity: 1,
-      filter: 'grayscale(20%)',
-    },
-    '&:hover $hoverIcon': {
-      opacity: 1,
-    },
-    '&:hover $recentApplicationArrow': {
-      opacity: 1,
-    },
-  },
-  recentApplicationIcon: {
-    ...theme.mixins.size(25),
-    borderRadius: 100,
-    transition: 'filter 300ms cubic-bezier(0.37, 1.21, 0.89, 0.87)',
-  },
-  recentApplicationArrow: {
-    ...theme.mixins.size(33),
-    borderRadius: 100,
-    position: 'absolute',
-    top: -6,
-    left: -7,
-    opacity: .6,
-  },
-  hoverIcon: {
-    ...theme.mixins.size('100%'),
-    ...theme.mixins.flexbox.containerCenter,
-    position: 'absolute',
-    top: 0,
-    borderRadius: 100,
-    backgroundColor: 'rgba(0, 0, 0, .3)',
-    opacity: 0,
-    transition: 'opacity 300ms cubic-bezier(0.37, 1.21, 0.89, 0.87)',
-    cursor: 'pointer',
-  },
-});
+const containerBaseStyle: React.CSSProperties = {
+  ...theme.mixins.size(25),
+  position: 'relative',
+  margin: '12px auto 8px',
+  borderRadius: 100,
+  opacity: 0.6,
+  filter: 'grayscale(60%)',
+  transition: '300ms',
+};
 
-@injectSheet(styles)
-export default class RecentDockIcon extends React.PureComponent<Props, {}> {
+const recentApplicationArrowStyle: React.CSSProperties = {
+  ...theme.mixins.size(33),
+  borderRadius: 100,
+  position: 'absolute',
+  top: -6,
+  left: -7,
+  opacity: 0.6,
+};
+
+const hoverIconStyle: React.CSSProperties = {
+  ...theme.mixins.size('100%'),
+  ...theme.mixins.flexbox.containerCenter,
+  position: 'absolute',
+  top: 0,
+  borderRadius: 100,
+  backgroundColor: 'rgba(0, 0, 0, .3)',
+  transition: 'opacity 300ms cubic-bezier(0.37, 1.21, 0.89, 0.87)',
+  cursor: 'pointer',
+};
+
+export default class RecentDockIcon extends React.PureComponent<Props, { hovered: boolean }> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hovered: false };
+  }
+
   render() {
-    const { classes, recentApplication, onMouseEnter, onMouseLeave, onClickIcon, innerRef } = this.props;
+    const { recentApplication, onMouseEnter, onMouseLeave, onClickIcon, innerRef } = this.props;
+    const { hovered } = this.state;
+
+    const containerStyle: React.CSSProperties = {
+      ...containerBaseStyle,
+      ...(hovered ? { opacity: 1, filter: 'grayscale(20%)' } : {}),
+    };
+
+    const arrowVisibleStyle: React.CSSProperties = {
+      ...recentApplicationArrowStyle,
+      ...(hovered ? { opacity: 1 } : {}),
+    };
 
     return (
       <div
         ref={innerRef}
-        className={classNames(classes!.container, 'appcues-subdock-recent')}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
+        className={classNames('appcues-subdock-recent')}
+        style={containerStyle}
+        onMouseEnter={() => { this.setState({ hovered: true }); onMouseEnter(); }}
+        onMouseLeave={() => { this.setState({ hovered: false }); onMouseLeave(); }}
         onClick={onClickIcon}
       >
         {recentApplication &&
@@ -91,7 +81,13 @@ export default class RecentDockIcon extends React.PureComponent<Props, {}> {
           </>
         }
 
-        <Icon className={classes!.recentApplicationArrow} symbolId={IconSymbol.RECENT_ARROW} size={33} color={'#FFF'} />
+        <Icon style={arrowVisibleStyle} symbolId={IconSymbol.RECENT_ARROW} size={33} color={'#FFF'} />
+
+        {hovered &&
+          <span style={{ ...hoverIconStyle, opacity: 1 }}>
+            <Icon symbolId={IconSymbol.CROSS} size={12} color={'#FFF'} />
+          </span>
+        }
       </div>
     );
   }

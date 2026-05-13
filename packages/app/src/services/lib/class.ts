@@ -10,7 +10,7 @@ import { getRequestMethod, serviceFullURI } from './helpers';
 import { serialize, unserialize } from './serialization';
 import { Endpoint, EndpointMap, IServiceBase, RPC, ServiceBaseConstructorOptions, SubscriptionConstructorParam } from './types';
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 const d = require('debug')('service:utils:class');
 
 const getRequestsMetadata = (constructor: Function | undefined): EndpointMap => {

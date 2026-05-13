@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DragSource, DragSourceMonitor, DropTarget } from 'react-dnd';
+import { DragSource, DropTarget } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { findDOMNode } from 'react-dom';
 import { compose } from 'react-apollo';
@@ -40,14 +40,8 @@ interface DndProps {
   isDragging: boolean,
 }
 
-interface DropResult {
-  type: 'DND_DOCK',
-  [k: string]: any,
-}
-
 type Props = OwnProps & InjectedProps & DndProps;
 
-// TODO : Unplug : Is this still needed ? It was doing something only on DropResult.type = DND_SHORTCUT_RACK
 const dockAppSource = {
   beginDrag(props: Props) {
     return {
@@ -56,11 +50,6 @@ const dockAppSource = {
       index: props.index,
       tabTitle: props.tabTitle,
     };
-  },
-  endDrag(props: Props, monitor: DragSourceMonitor) {
-    const dropResult: DropResult = monitor.getDropResult();
-
-    if (!dropResult) return;
   },
 };
 

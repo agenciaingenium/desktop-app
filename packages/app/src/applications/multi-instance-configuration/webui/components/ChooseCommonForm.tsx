@@ -1,17 +1,48 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-import { styles, StylesType } from './styles';
 
 const isBlank = require('is-blank') as (v: any) => boolean;
+
+const STYLE = {
+  help: {
+    marginBottom: 17,
+    fontSize: 13,
+    fontWeight: 600,
+  } as React.CSSProperties,
+  input: {
+    flexGrow: 1,
+    paddingBottom: 5,
+    color: 'white',
+    backgroundColor: 'transparent',
+    border: 0,
+    borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+  } as React.CSSProperties,
+  largeInput: {
+    width: 220,
+  } as React.CSSProperties,
+  subContainer: {
+    marginTop: 20,
+  } as React.CSSProperties,
+  navigationLink: {
+    marginTop: 20,
+    cursor: 'pointer',
+  } as React.CSSProperties,
+  primaryButton: {
+    width: '100%',
+    padding: '10px 12px',
+    border: 0,
+    borderRadius: 4,
+    cursor: 'pointer',
+    color: '#fff',
+    fontWeight: 600,
+    background: 'linear-gradient(120deg, #2B91BA, #4B99CF)',
+  } as React.CSSProperties,
+};
 
 export interface Props {
   placeholder?: string,
   domainSuffix: string,
   help?: string,
   onSubmit: (subdomain: string) => void,
-  classes?: StylesType,
   withNavigationLink?: boolean,
   onClickNavigate?: () => void,
   navigateWording?: string,
@@ -23,7 +54,6 @@ interface State {
   subdomainValue: string,
 }
 
-@injectSheet(styles)
 export default class ChooseCommonForm extends React.PureComponent<Props, State> {
 
   static defaultProps = {
@@ -58,19 +88,18 @@ export default class ChooseCommonForm extends React.PureComponent<Props, State> 
   }
 
   render() {
-    const classes = this.props.classes!;
     return (
       <div>
-        <div className={classes.help}>
+        <div style={STYLE.help}>
           {this.props.help}
         </div>
         <form onSubmit={this.onFormSubmit}>
           <input
             tabIndex={-1}
-            className={classNames(
-              classes.input,
-              this.props.largeInput ? classes.largeInput : '',
-            )}
+            style={{
+              ...STYLE.input,
+              ...(this.props.largeInput ? STYLE.largeInput : null),
+            }}
             type="text"
             autoFocus={true}
             placeholder={this.props.placeholder}
@@ -84,15 +113,15 @@ export default class ChooseCommonForm extends React.PureComponent<Props, State> 
           {this.props.withNavigationLink &&
             <div
               title={this.props.navigateHint}
-              className={classNames(classes.subContainer, classes.withPointer)}
+              style={STYLE.navigationLink}
               onClick={this.props.onClickNavigate}
             >
               {`👉${this.props.navigateWording}`}
             </div>
           }
 
-          <div className={classes.subContainer}>
-            <button className={classes.primaryButton} type="submit">
+          <div style={STYLE.subContainer}>
+            <button style={STYLE.primaryButton} type="submit">
               Let's go!
             </button>
           </div>

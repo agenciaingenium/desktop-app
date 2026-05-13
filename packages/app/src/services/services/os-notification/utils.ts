@@ -28,10 +28,12 @@ export const asNativeImage = memoize((url: string): Promise<Electron.NativeImage
 export function getDoNotDisturb(): boolean {
   if (process.platform === 'win32') {
     try {
+      /* webpackIgnore: true */
       const { getFocusAssist } = require('windows-focus-assist');
       const focusAssist: string = getFocusAssist().name;
       return focusAssist == 'PRIORITY_ONLY' || focusAssist == 'ALARMS_ONLY';
     } catch (error) {
+      console.warn('[os-notification] windows-focus-assist not available:', error);
       return false;
     }
   }

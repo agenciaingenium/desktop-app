@@ -1,6 +1,4 @@
 
-console.log('>>>>>> WebView inject start');
-
 // nanoid (copy from https://github.com/ai/nanoid/blob/main/non-secure/index.js)
 const urlAlphabet = 'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict';
 

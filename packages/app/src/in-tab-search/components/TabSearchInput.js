@@ -1,64 +1,63 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import injectSheet from 'react-jss';
-import { Icon, IconSymbol } from '@getstation/theme';
+import { Icon, IconSymbol, theme } from '@getstation/theme';
 
-@injectSheet(theme => ({
-  container: {
-    borderRadius: `0 0 0 ${theme.$borderRadius}`,
-    display: 'flex',
-    height: '34px !important',
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    zIndex: theme.$zIndexUltime,
-    backgroundColor: props => theme.mixinDarkenColor(props.themeColors[0])
-  },
-  searchIcon: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    ...theme.avatarMixin('24px'),
-    margin: '5px',
-  },
-  input: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    borderRadius: `0 0 0 ${theme.$borderRadius}`,
-    height: '20px',
-    marginTop: '7px',
-    padding: '0 45px 0 4px',
-    width: '220px',
-    color: 'rgba(255, 255, 255, 0.6)',
-    caretColor: 'rgba(255, 255, 255, 0.6)',
-    ...theme.fontMixin(14),
-    '&::selection': {
-      background: 'white'
-    }
-  },
-  number: {
-    position: 'absolute',
-    right: '34px',
-    marginTop: '9px',
-    height: '20px',
-    lineHeight: '20px',
-    color: 'rgba(255, 255, 255, 0.2)',
-    ...theme.fontMixin(12)
-  },
-  closeIcon: {
-    margin: '5px'
-  }
-}))
+const containerStyle = (themeColors) => ({
+  borderRadius: `0 0 0 ${theme.$borderRadius}`,
+  display: 'flex',
+  height: '34px !important',
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  zIndex: theme.$zindexUltime,
+  backgroundColor: theme.mixinDarkenColor(themeColors[0]),
+});
+
+const searchIconStyle = {
+  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  ...theme.avatarMixin('24px'),
+  margin: '5px',
+};
+
+const inputStyle = {
+  backgroundColor: 'transparent',
+  border: 'none',
+  borderRadius: `0 0 0 ${theme.$borderRadius}`,
+  height: '20px',
+  marginTop: '7px',
+  padding: '0 45px 0 4px',
+  width: '220px',
+  color: 'rgba(255, 255, 255, 0.6)',
+  caretColor: 'rgba(255, 255, 255, 0.6)',
+  ...theme.fontMixin(14),
+};
+
+const numberStyle = {
+  position: 'absolute',
+  right: '34px',
+  marginTop: '9px',
+  height: '20px',
+  lineHeight: '20px',
+  color: 'rgba(255, 255, 255, 0.2)',
+  ...theme.fontMixin(12),
+};
+
+const closeIconStyle = {
+  margin: '5px',
+};
+
 export default class TabSearchInput extends PureComponent {
   static propTypes = {
     searchString: PropTypes.string,
     resultsInfo: PropTypes.shape({
       activeMatchOrdinal: PropTypes.number,
-      matchesCount: PropTypes.number
+      matchesCount: PropTypes.number,
     }),
     onSearchStringChange: PropTypes.func,
     onFindNext: PropTypes.func,
     onClose: PropTypes.func,
     inputRef: PropTypes.object,
-    classes: PropTypes.object,
+    themeColors: PropTypes.array,
   };
 
   handleKeyDown = (e) => {
@@ -78,17 +77,18 @@ export default class TabSearchInput extends PureComponent {
   }
 
   render() {
-    const { resultsInfo, classes } = this.props;
+    const { resultsInfo, themeColors } = this.props;
     return (
-      <div className={classes.container}>
+      <div style={containerStyle(themeColors)}>
         <Icon
           color="rgba(255, 255, 255, 0.6)"
           size={24}
           symbolId={IconSymbol.SEARCH}
-          className={classes.searchIcon}
+          style={searchIconStyle}
         />
         <input
-          className={classes.input}
+          className="tab-search-input"
+          style={inputStyle}
           type="text"
           onKeyDown={this.handleKeyDown}
           value={this.props.searchString}
@@ -96,13 +96,13 @@ export default class TabSearchInput extends PureComponent {
           ref={this.props.inputRef}
         />
         { resultsInfo &&
-          <span className={classes.number}>{resultsInfo.activeMatchOrdinal} of {resultsInfo.matchesCount}</span>
+          <span style={numberStyle}>{resultsInfo.activeMatchOrdinal} of {resultsInfo.matchesCount}</span>
         }
         <Icon
           symbolId={IconSymbol.CROSS}
           size={24}
           color="rgba(255, 255, 255, 0.6)"
-          className={classes.closeIcon}
+          style={closeIconStyle}
           onClick={this.props.onClose}
         />
       </div>

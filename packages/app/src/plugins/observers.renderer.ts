@@ -15,8 +15,8 @@ const pluginsToServiceIds = (plugins: Immutable.Map<string, any>) => {
 /**
  * @deprecated
  */
-const getManifestURLFromServiceId = (plugins: Immutable.Map<string, any>, serviceId: string) => {
-  return plugins.findKey(p => p.get('serviceId') === serviceId);
+const getManifestURLFromServiceId = (plugins: Immutable.Map<string, any>, serviceId: string): string => {
+  return plugins.findKey(p => p.get('serviceId') === serviceId) || '';
 };
 
 /**

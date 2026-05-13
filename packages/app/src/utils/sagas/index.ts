@@ -17,7 +17,7 @@ import {
   throttle,
 } from 'redux-saga/effects';
 import { Observable } from 'rxjs';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import { logger } from '../../api/logger';
 import { ERROR, error, ErrorAction, FIN, fin, FinAction } from '../../plugins/duck';
 import { observer } from '../../services/lib/helpers';
@@ -174,7 +174,7 @@ export function takeEveryWithAck(pattern: Pattern | TakeableChannel, worker: Fun
 export function wrapAck(action: any) {
   return {
     ...action,
-    __ack_id: shortid.generate(),
+    __ack_id: nanoid(),
   };
 }
 

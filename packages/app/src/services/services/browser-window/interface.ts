@@ -14,7 +14,8 @@ export type BrowserWindowServiceConstructorOptions =
 
 @service('browser-window')
 export class BrowserWindowService extends ServiceBase implements RPC.Interface<BrowserWindowService> {
-  // TODO the `id` of a BrowserWindow never changes. -> Find a way to cache first call on Node
+  // Note: BrowserWindow IDs are immutable once created, but caching the RPC result
+  // would require tracking the window lifecycle to invalidate on close.
   // @ts-ignore
   getId(): Promise<number> {}
   // @ts-ignore

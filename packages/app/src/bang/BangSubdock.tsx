@@ -100,28 +100,28 @@ class BangSubdockImpl extends React.PureComponent<Props> {
     }
   }
 
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
     this.setFlatItems(this.getFlatItems());
+    if (this.input) {
+      this.input.focus();
+      this.input.selectAll();
+    }
   }
 
   componentWillUnmount() {
     this.props.setHighlightedItemId(undefined);
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
+  componentDidUpdate(prevProps: Props) {
     const items = this.flatItems;
-    const nextItems = this.getFlatItems(nextProps);
+    const nextItems = this.getFlatItems(this.props);
 
-    // compare the list of ids
-    // if they changed we highlight the first item
     const itemIds = Immutable.Set(items.map(getId));
     const nextItemIds = Immutable.Set(nextItems.map(getId));
     if (!nextItemIds.equals(itemIds)) {
       this.setFlatItems(nextItems);
     }
-  }
 
-  componentDidUpdate(prevProps: Props) {
     const prevVisibleAndFocus = prevProps.isVisible && prevProps.focus;
     const visibleAndFocus = this.props.isVisible && this.props.focus;
     // on get visible, focus
@@ -134,13 +134,6 @@ class BangSubdockImpl extends React.PureComponent<Props> {
     // on get hidden, blur
     if (prevVisibleAndFocus && !visibleAndFocus) {
       if (this.input) this.input.blur();
-    }
-  }
-
-  componentDidMount() {
-    if (this.input) {
-      this.input.focus();
-      this.input.selectAll();
     }
   }
 

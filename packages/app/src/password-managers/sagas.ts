@@ -225,8 +225,6 @@ function* loadAccountsFlow(): SagaIterator {
       logger.notify(e);
     }
   }
-
-  if (step === AccountsStep.Loaded) { }
 }
 
 function* addPasswordManagerFlow(): SagaIterator {

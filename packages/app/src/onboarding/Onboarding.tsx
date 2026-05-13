@@ -1,6 +1,5 @@
 import { GradientType, InjectedProps as withGradientProps, withGradient } from '@getstation/theme';
 import { withApollo, WithApolloClient } from 'react-apollo';
-import * as remote from '@electron/remote';
 import * as Immutable from 'immutable';
 // @ts-ignore: no declaration file
 import { validate as validateEmail } from 'isemail';
@@ -73,18 +72,22 @@ interface State {
 }
 
 class OnboardingImpl extends React.PureComponent<Props, State> {
-  public win: Electron.BrowserWindow;
+  private unsubscribeFocus: (() => void) | null = null;
+  private unsubscribeBlur: (() => void) | null = null;
 
   constructor(props: Props) {
     super(props);
 
-    this.win = remote.getCurrentWindow();
-
     this.state = {
-      isWindowFocused: this.win.isFocused(),
+      isWindowFocused: false,
       searchInputValue: '',
       currentSearchedApplicationsResult: null,
     };
+
+    // Get initial focus state (async)
+    window.station.window.isFocused().then((focused) => {
+      this.setState({ isWindowFocused: focused });
+    });
 
     this.updateEmails = this.updateEmails.bind(this);
     this.handleSearchInputValue = this.handleSearchInputValue.bind(this);
@@ -95,16 +98,13 @@ class OnboardingImpl extends React.PureComponent<Props, State> {
   }
 
   componentDidMount() {
-    this.onFocus = () => {
+    this.unsubscribeFocus = window.station.window.onFocus(() => {
       this.setState({ isWindowFocused: true });
-    };
+    });
 
-    this.onBlur = () => {
+    this.unsubscribeBlur = window.station.window.onBlur(() => {
       this.setState({ isWindowFocused: false });
-    };
-
-    this.win.on('focus', this.onFocus);
-    this.win.on('blur', this.onBlur);
+    });
   }
 
   async componentDidUpdate(_: Props, prevState: State) {
@@ -132,8 +132,8 @@ class OnboardingImpl extends React.PureComponent<Props, State> {
   }
 
   componentWillUnmount() {
-    this.win.removeListener('focus', this.onFocus);
-    this.win.removeListener('blur', this.onBlur);
+    if (this.unsubscribeFocus) this.unsubscribeFocus();
+    if (this.unsubscribeBlur) this.unsubscribeBlur();
   }
 
   onFocus() { }
@@ -166,15 +166,17 @@ class OnboardingImpl extends React.PureComponent<Props, State> {
   }
 
   handleCloseWindow() {
-    remote.getCurrentWindow().close();
+    window.station.window.close();
   }
 
   handleMinimizeWindow() {
-    this.win.minimize();
+    window.station.window.minimize();
   }
 
   handleExpandWindow() {
-    this.win.setFullScreen(!this.win.isFullScreen());
+    window.station.window.isFullScreen().then((isFullScreen) => {
+      window.station.window.setFullScreen(!isFullScreen);
+    });
   }
 
   render() {

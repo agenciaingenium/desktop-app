@@ -1,24 +1,48 @@
-import { Button, SearchInput, ServiceActionType, Size, theme } from '@getstation/theme';
+import { Button, SearchInput, Size, theme } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { MinimalApplication } from '../../applications/graphql/withApplications';
-import Application from '../../applications/components/Application';
+import Application, { ApplicationActionType } from '../../applications/components/Application';
 
-export interface Classes {
-  container: string,
-  title: string,
-  smallSubtitle: string,
-  subtitle: string,
-  appsContainer: string,
-  appsContainerContainer: string,
-  buttonsContainer: string,
-  hideOverlay: string,
-  noResults: string,
-}
+const containerStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
+  alignItems: 'flex-start',
+  padding: '0 50px 0 50px',
+};
+
+const titleStyle: React.CSSProperties = {
+  margin: '10px 0',
+  ...theme.titles.h1,
+  color: theme.colors.gray.dark,
+};
+
+const appsContainerStyle: React.CSSProperties = {
+  width: '100%',
+  height: 300,
+  marginTop: 20,
+  marginBottom: 20,
+  display: 'grid',
+  gridTemplateColumns: '50% 50%',
+  gridTemplateRows: '20% 20% 20% 20% 20%',
+};
+
+const subtitleStyle: React.CSSProperties = {
+  ...theme.titles.h3,
+  color: theme.colors.gray.middle,
+  marginBottom: 40,
+};
+
+const noResultsStyle: React.CSSProperties = {
+  width: 390,
+  marginTop: 15,
+  textAlign: 'center',
+  ...theme.fontMixin(16),
+  lineHeight: '25px',
+  color: theme.colors.gray.dark,
+};
 
 interface Props {
-  classes?: Classes,
   applications: MinimalApplication[],
   selectedApplications: (MinimalApplication & { position?: DOMRect })[],
   onHandleApplicationSelect: (
@@ -31,55 +55,6 @@ interface Props {
   isLoading: boolean,
 }
 
-@injectSheet({
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    alignItems: 'flex-start',
-    padding: [0, 50, 0, 50],
-  },
-  title: {
-    margin: [10, 0],
-    ...theme.titles.h1,
-    color: theme.colors.gray.dark,
-  },
-  appsContainer: {
-    width: '100%',
-    height: 300,
-    marginTop: 20,
-    marginBottom: 20,
-    display: 'grid',
-    gridTemplateColumns: '50% 50%',
-    gridTemplateRows: '20% 20% 20% 20% 20%',
-  },
-  smallSubtitle: {
-    ...theme.titles.h3,
-    color: theme.colors.gray.middle,
-    margin: [20, 0, 20, 10],
-    fontStyle: 'italic',
-    ...theme.fontMixin(12, 500),
-    visibility: ({ selectedApplications }: Props) => selectedApplications.length > 2 ? 'hidden' : 'initial',
-  },
-  subtitle: {
-    ...theme.titles.h3,
-    color: theme.colors.gray.middle,
-    marginBottom: 40,
-  },
-  buttonsContainer: {
-    marginTop: 10,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  noResults: {
-    width: 390,
-    marginTop: 15,
-    textAlign: 'center',
-    ...theme.fontMixin(16),
-    lineHeight: '25px',
-    color: theme.colors.gray.dark,
-  },
-})
 export default class OnboardingStepAppStore extends React.PureComponent<Props> {
   constructor(props: Props) {
     super(props);
@@ -93,13 +68,22 @@ export default class OnboardingStepAppStore extends React.PureComponent<Props> {
 
   render() {
     const {
-      classes, applications, onValidSubmit, searchInputValue, handleSearchInputValue,
+      applications, onValidSubmit, searchInputValue, handleSearchInputValue,
       selectedApplications, isLoading,
     } = this.props;
 
+    const smallSubtitleStyle: React.CSSProperties = {
+      ...theme.titles.h3,
+      color: theme.colors.gray.middle,
+      margin: '20px 0 20px 10px',
+      fontStyle: 'italic',
+      ...theme.fontMixin(12, 500),
+      visibility: selectedApplications.length > 2 ? 'hidden' : 'initial',
+    };
+
     return (
-      <div className={classes!.container}>
-        <h1 className={classes!.title}>
+      <div style={containerStyle}>
+        <h1 style={titleStyle}>
           Select your most used applications
         </h1>
 
@@ -109,10 +93,10 @@ export default class OnboardingStepAppStore extends React.PureComponent<Props> {
           onChange={handleSearchInputValue}
         />
 
-        <div className={classes!.appsContainer}>
+        <div style={appsContainerStyle}>
           {applications.length === 0 &&
-            <div className={classes!.noResults}>
-              <p>Can’t find your app?</p>
+            <div style={noResultsStyle}>
+              <p>Can't find your app?</p>
               <p>You can request it later in the app store.</p>
             </div>
           }
@@ -123,7 +107,7 @@ export default class OnboardingStepAppStore extends React.PureComponent<Props> {
               application={app}
               onAdd={this.handleApplicationSelect}
               actionType={selectedApplications.find((a: MinimalApplication) =>
-                a.id === app.id) ? ServiceActionType.Remove : ServiceActionType.Add
+                a.id === app.id) ? ApplicationActionType.Remove : ApplicationActionType.Add
               }
               getIconRef={true}
             />
@@ -131,7 +115,7 @@ export default class OnboardingStepAppStore extends React.PureComponent<Props> {
           }
         </div>
 
-        <p className={classes!.subtitle}>
+        <p style={subtitleStyle}>
           {selectedApplications.length > 14 && 'You have selected 15 apps. '}Don't worry, you can pick more later!
         </p>
 
@@ -139,7 +123,7 @@ export default class OnboardingStepAppStore extends React.PureComponent<Props> {
           Start Station
         </Button>
 
-        <p className={classes!.smallSubtitle}>Select at least 3 apps</p>
+        <p style={smallSubtitleStyle}>Select at least 3 apps</p>
       </div>
     );
   }

@@ -9,7 +9,9 @@ import operatorsAliases from './operatorsAliases';
 const isRenderer = process.type === 'renderer';
 
 export const getDatabaseDir = () => {
-  const userDataPath = (isRenderer ? require('@electron/remote').app : app).getPath('userData');
+  const userDataPath = isRenderer
+    ? (window as any).station.app.getPath('userData')
+    : app.getPath('userData');
   const p = path.join(userDataPath, 'db');
   mkdirp.sync(p);
   return p;

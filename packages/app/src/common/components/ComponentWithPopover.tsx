@@ -1,10 +1,8 @@
-import { ThemeTypes as Theme } from '@getstation/theme';
+import { theme } from '@getstation/theme';
 import PopperJS from 'popper.js';
 import * as React from 'react';
 // @ts-ignore: no declaration file
 import ClickOutside from 'react-click-outside';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { Manager, Popper, Reference } from 'react-popper';
 // @ts-ignore: no declaration file
 import ReactResizeDetector from 'react-resize-detector';
@@ -21,30 +19,12 @@ export interface OwnProps {
   overlay?: boolean,
 }
 
-export interface StateProps {
-  classes?: {
-    overlay: string,
-  }
-}
-
-type Props = OwnProps & StateProps;
-
 export interface State {
   showPopper: boolean
 }
 
-const styles = (theme: Theme) => ({
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: theme.dock.size,
-    backgroundColor: 'rgba(0, 0, 0, .25)',
-  },
-});
+type Props = OwnProps;
 
-@injectSheet(styles)
 export default class ComponentWithPopover extends React.PureComponent<Props, State> {
 
   static defaultProps = {
@@ -102,7 +82,14 @@ export default class ComponentWithPopover extends React.PureComponent<Props, Sta
 
           {overlay && showPopper &&
           <div
-            className={this.props.classes!.overlay}
+            style={{
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: theme.dock.size,
+              backgroundColor: 'rgba(0, 0, 0, .25)',
+            }}
             onClick={this.handleClickOutside}
           />
           }

@@ -175,7 +175,7 @@ export class SDKv2ServiceImpl extends SDKv2Service implements RPC.Interface<SDKv
 }
 
 const initPreloadListener = (sdkv2: SDKv2ServiceImpl) => {
-  ipcRenderer.on('bx-api-subscribe', async (event: Electron.Event, { senderId }: { senderId: number }, channel: SDKv2Selectors) => {
+  ipcRenderer.on('bx-api-subscribe', async (_event: Electron.Event, { senderId }: { senderId: number }, channel: SDKv2Selectors) => {
     try {
       const subscription = await sdkv2.addObserver(channel, observer({
         on(result: any) {
@@ -196,7 +196,7 @@ const initPreloadListener = (sdkv2: SDKv2ServiceImpl) => {
     }
   });
 
-  ipcRenderer.on('bx-api-perform', (event: Electron.Event, { senderId }: { senderId: number }, channel: SDKv2Selectors, payload?: any) => {
+  ipcRenderer.on('bx-api-perform', (_event: Electron.Event, { senderId }: { senderId: number }, channel: SDKv2Selectors, payload?: any) => {
     console.log(`[DEBUG] worker.ts: received bx-api-perform from senderId=${senderId}, channel=${channel}`);
     sdkv2.callAction(channel, payload)
       .then(result => {

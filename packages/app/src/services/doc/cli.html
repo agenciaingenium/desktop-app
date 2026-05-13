@@ -6,29 +6,27 @@
 <body>
 <div id="container"></div>
 <script>
-  const remote = require('@electron/remote');
-  const fs = require('fs');
+  // CLI window uses contextBridge (window.station) for IPC
+  const mmds = window.station.getGlobal('sharedObject').mmds;
+  const container = document.querySelector("#container");
 
   mermaid.initialize({
     theme: 'default',
   });
 
-  const mmds = remote.getGlobal('sharedObject').mmds;
-  const container = document.querySelector("#container");
-
   const generateSVG = (input) => {
     const output = input.split('.').slice(0, -1).join('.') + '.svg';
 
-    container.innerHTML = fs.readFileSync(input, 'utf-8');
+    container.innerHTML = window.station.fs.readFileSync(input, 'utf-8');
     container.removeAttribute('data-processed');
     window.mermaid.init(undefined, container);
-    fs.writeFileSync(output, container.innerHTML);
+    window.station.fs.writeFileSync(output, container.innerHTML);
   };
 
   document.addEventListener(
     'DOMContentLoaded', () => {
       mmds.forEach(generateSVG);
-      remote.app.exit();
+      window.station.app.exit();
     },
     false
   );

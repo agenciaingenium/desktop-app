@@ -1,17 +1,9 @@
 import { Icon, IconSymbol, roundedBackground, Tooltip } from '@getstation/theme';
 import * as React from 'react';
-import * as classNames from 'classnames';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-
-export type Classes = {
-  iconWrapper: string,
-  icon: string,
-};
 
 export type Props = {
   className?: string,
-  classes?: Classes,
+  style?: React.CSSProperties,
   symbolId: IconSymbol,
   onClick: (e: React.MouseEvent<Element>) => void,
   size?: number,
@@ -20,31 +12,32 @@ export type Props = {
   tooltipPlacement?: string,
 };
 
-const styles = () => ({
-  iconWrapper: {
-    display: 'flex',
-    height: 24,
-    width: 24,
-    opacity: 0.5,
-    marginLeft: 5,
-    '&:hover': {
-      ...roundedBackground('rgba(255,255,255,0.2)'),
-      opacity: 1,
-    },
-  },
-  icon: {
-    display: 'flex',
-  },
-});
+class SubdockButton extends React.PureComponent<Props, { hovered: boolean }> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hovered: false };
+  }
 
-@injectSheet(styles)
-class SubdockButton extends React.PureComponent<Props> {
   renderIcon() {
-    const { classes, size, onClick, symbolId, className: upperClassName } = this.props;
+    const { size, onClick, symbolId, className: upperClassName, style: upperStyle } = this.props;
+    const { hovered } = this.state;
     return (
-      <span className={classNames(classes!.iconWrapper, upperClassName)}>
+      <span
+        className={upperClassName}
+        style={{
+          ...upperStyle,
+          display: 'flex',
+          height: 24,
+          width: 24,
+          opacity: hovered ? 1 : 0.5,
+          marginLeft: 5,
+          ...(hovered ? roundedBackground('rgba(255,255,255,0.2)') : {}),
+        }}
+        onMouseEnter={() => this.setState({ hovered: true })}
+        onMouseLeave={() => this.setState({ hovered: false })}
+      >
         <Icon
-          className={classes!.icon}
+          style={{ display: 'flex' }}
           size={size}
           symbolId={symbolId}
           onClick={onClick}

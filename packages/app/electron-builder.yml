@@ -4,8 +4,9 @@ publish:
   provider: 'github'
 
 asar: true
-asarUnpack: 
+asarUnpack:
   - 'node_modules/**/*.{node,dll}'
+  - 'node_modules/uuid/**/*'
 
 afterPack: '../../scripts/after-pack.js'
 # afterSign: '../../scripts/notarize.js'

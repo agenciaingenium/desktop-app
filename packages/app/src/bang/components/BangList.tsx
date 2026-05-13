@@ -1,4 +1,4 @@
-import { ThemeTypes } from '@getstation/theme';
+import { theme } from '@getstation/theme';
 import * as classNames from 'classnames';
 // @ts-ignore: no declaration file
 import * as scrollIntoView from 'dom-scroll-into-view';
@@ -6,27 +6,12 @@ import * as scrollIntoView from 'dom-scroll-into-view';
 import * as isBlank from 'is-blank';
 import * as React from 'react';
 import { findDOMNode } from 'react-dom';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { EMPTY_SECTION, flattenResults, sectionsAlwaysExpanded } from '../api';
 import { SearchResultSerialized, SearchSectionSerialized } from '../duck';
 import { findItemById, getId } from '../helpers/utils';
 import BangItem from './BangItem';
 
 const throttle = require('lodash.throttle');
-
-interface Classes {
-  list: string;
-  lastOpened: string;
-  section: string;
-  withResults: string;
-  category: string;
-  results: string;
-  loading: string;
-  expandSection: string;
-  expandSectionIcon: string;
-  resultsCount: string;
-}
 
 interface CollapseSections {
   [sectionName: string]: { collapsed: boolean };
@@ -37,14 +22,13 @@ interface State {
 }
 
 export interface Props {
-  classes?: Classes;
-  forEmptyQuery: boolean;
-  items: SearchSectionSerialized[];
-  historyItems: SearchResultSerialized[];
-  highlightedItemId?: string;
-  onItemClick: (id: string, position: number) => void;
-  onResetHighlightedItem: () => void;
-  onCollapseSection: () => void;
+  forEmptyQuery: boolean,
+  items: SearchSectionSerialized[],
+  historyItems: SearchResultSerialized[],
+  highlightedItemId?: string,
+  onItemClick: (id: string, position: number) => void,
+  onResetHighlightedItem: () => void,
+  onCollapseSection: () => void,
 }
 
 const shouldShowSection = (item: SearchSectionSerialized) =>
@@ -69,89 +53,61 @@ const itemIsCollapsed = (
   collapseSections[item.category].collapsed &&
   !itemIsInTopHits(item);
 
-@injectSheet((theme: ThemeTypes) => ({
-  list: {
-    flex: 1,
-    overflowY: 'auto',
-  },
-  lastOpened: {
-    margin: [15, 20, 10],
-    color: 'rgba(255, 255, 255, .4)',
-    ...theme.fontMixin(11, 600),
-  },
-  section: {
-    marginBottom: 12,
-    '&.withResults': {
-      backgroundColor: 'rgba(0,0,0,0.15)',
-    },
-  },
-  category: {
-    padding: [6, 20],
-    color: 'rgba(255,255,255,0.5)',
-    textTransform: 'uppercase',
-    fontSize: '.8em',
-    display: 'flex',
-    flexFlow: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    '&.clickable': {
-      cursor: 'pointer',
-    },
-  },
-  results: {
-    marginTop: 15,
-    '&.collapsed': {
-      height: 0,
-      overflow: 'hidden',
-    },
-  },
-  loading: {
-    animationDuration: '2s',
-    animationFillMode: 'forwards',
-    animationIterationCount: 'infinite',
-    animationName: 'bangLoading',
-    animationTimingFunction: 'ease-in-out',
-    opacity: 0.3,
-    marginRight: 5,
-  },
-  expandSection: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  expandSectionIcon: {
-    fill: '#fff',
-    fillOpacity: '0.5',
-    transform: 'rotate(90deg)',
-    transitionProperty: 'transform',
-    transitionDuration: '25ms',
-    '&.collapsed': {
-      transform: 'rotate(0deg)',
-    },
-  },
-  resultsCount: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: '50%',
-    textAlign: 'center',
-    color: 'rgba(255,255,255,0.8)',
-    width: 20,
-    height: 20,
-    paddingTop: 2,
-  },
-  '@keyframes bangLoading': {
-    '0%': {
-      backgroundPosition: '10% 0%',
-      opacity: 0.3,
-    },
-    '50%': {
-      backgroundPosition: '91% 100%',
-      opacity: 0.5,
-    },
-    '100%': {
-      backgroundPosition: '10% 0%',
-      opacity: 0.3,
-    },
-  },
-}))
+// Inline styles
+
+const listStyle: React.CSSProperties = {
+  flex: 1,
+  overflowY: 'auto',
+};
+
+const lastOpenedStyle: React.CSSProperties = {
+  margin: '15px 20px 10px',
+  color: 'rgba(255, 255, 255, .4)',
+  ...theme.fontMixin(11, 600),
+};
+
+const sectionBaseStyle: React.CSSProperties = {
+  marginBottom: 12,
+};
+
+const categoryStyle: React.CSSProperties = {
+  padding: '6px 20px',
+  color: 'rgba(255,255,255,0.5)',
+  textTransform: 'uppercase',
+  fontSize: '.8em',
+  display: 'flex',
+  flexFlow: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+};
+
+const resultsBaseStyle: React.CSSProperties = {
+  marginTop: 15,
+};
+
+const loadingStyle: React.CSSProperties = {
+  animationDuration: '2s',
+  animationFillMode: 'forwards',
+  animationIterationCount: 'infinite',
+  animationName: 'bangLoading',
+  animationTimingFunction: 'ease-in-out',
+  opacity: 0.3,
+  marginRight: 5,
+};
+
+const expandSectionStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+};
+
+const expandSectionIconStyle: React.CSSProperties = {
+  fill: '#fff',
+  fillOpacity: '0.5',
+  transform: 'rotate(90deg)',
+  transitionProperty: 'transform',
+  transitionDuration: '25ms',
+};
+
 export default class BangList extends React.PureComponent<Props, State> {
   private highlightedItemComponent: Element | null;
 
@@ -176,31 +132,28 @@ export default class BangList extends React.PureComponent<Props, State> {
     });
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    const { forEmptyQuery } = nextProps;
-    if (forEmptyQuery) return;
-    if (!this.state) return;
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    const { forEmptyQuery } = this.props;
+    if (!forEmptyQuery && this.state && prevProps.items !== this.props.items) {
+      const { collapseSections } = this.state;
 
-    const { collapseSections } = this.state;
-
-    const nextCollapseSectionsState = nextProps.items.reduce(
-      (collapseSectionsNewState, item) => {
-        if (
-          collapseSections[item.sectionName] &&
-          !collapseSections[item.sectionName].collapsed
-        ) {
+      const nextCollapseSectionsState = this.props.items.reduce(
+        (collapseSectionsNewState, item) => {
+          if (
+            collapseSections[item.sectionName] &&
+            !collapseSections[item.sectionName].collapsed
+          ) {
+            return collapseSectionsNewState;
+          }
+          collapseSectionsNewState[item.sectionName] = { collapsed: true };
           return collapseSectionsNewState;
-        }
-        collapseSectionsNewState[item.sectionName] = { collapsed: true };
-        return collapseSectionsNewState;
-      },
-      {},
-    );
+        },
+        {},
+      );
 
-    this.updateCollapsedSections(nextCollapseSectionsState);
-  }
+      this.updateCollapsedSections(nextCollapseSectionsState);
+    }
 
-  componentDidUpdate(_: Props, prevState: State) {
     const highlightedItem = getHighlightedItem(this.props);
     if (!highlightedItem) return;
 
@@ -213,7 +166,6 @@ export default class BangList extends React.PureComponent<Props, State> {
       return;
     }
 
-    const { forEmptyQuery } = this.props;
     const highlightedItemIsCollapsed = itemIsCollapsed(
       highlightedItem,
       this.state.collapseSections
@@ -264,7 +216,6 @@ export default class BangList extends React.PureComponent<Props, State> {
   }
 
   renderSectionTitle(item: SearchSectionSerialized) {
-    const { classes } = this.props;
     const clickable =
       !sectionAlwaysExpanded(item) && item.results && item.results.length > 0;
     const collapsed = this.isCollapsedResults(item);
@@ -273,12 +224,13 @@ export default class BangList extends React.PureComponent<Props, State> {
 
     return (
       <h4
-        className={classNames(classes!.category, { clickable, collapsed })}
+        className={classNames('bang-category', { clickable, collapsed })}
+        style={categoryStyle}
         onClick={() => this.toggleCollapse(item)}
       >
         {item.sectionName} {showResultPart && ` (${item.results!.length})`}
-        <div className={classes!.expandSection}>
-          {item.loading && <span className={classes!.loading}>loading</span>}
+        <div style={expandSectionStyle}>
+          {item.loading && <span style={loadingStyle}>loading</span>}
 
           {showResultPart && <span>{this.renderArrow(item)}</span>}
         </div>
@@ -287,13 +239,12 @@ export default class BangList extends React.PureComponent<Props, State> {
   }
 
   renderArrow(item: SearchSectionSerialized) {
-    const { classes } = this.props;
+    const collapsed = this.isCollapsedResults(item);
 
     return (
       <svg
-        className={classNames(classes!.expandSectionIcon, {
-          collapsed: this.isCollapsedResults(item),
-        })}
+        className={classNames('bang-expand-icon', { collapsed })}
+        style={expandSectionIconStyle}
         xmlns="http://www.w3.org/2000/svg"
         width="15"
         height="15"
@@ -318,7 +269,6 @@ export default class BangList extends React.PureComponent<Props, State> {
         imgUrl={item.imgUrl}
         type={item.type}
         themeColor={item.themeColor!}
-        // todo change all `highlighted` by `selected`
         selected={highlighted}
         ref={(itemComp: Element) => {
           if (highlighted) this.highlightedItemComponent = itemComp;
@@ -329,22 +279,22 @@ export default class BangList extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { classes, items, historyItems, forEmptyQuery } = this.props;
+    const { items, historyItems, forEmptyQuery } = this.props;
 
     return (
-      <div className={classes!.list}>
+      <div style={listStyle}>
         {forEmptyQuery ? (
           <>
             <>
-              <div className={classes!.lastOpened}>CURRENT</div>
+              <div style={lastOpenedStyle}>CURRENT</div>
               {historyItems.length > 0
                 ? this.renderItem(historyItems[0], 0)
                 : null}
             </>
 
-            <div className={classes!.lastOpened}>RECENTS</div>
-            <div className={classNames(classes!.section)}>
-              <div className={classNames(classes!.results)}>
+            <div style={lastOpenedStyle}>RECENTS</div>
+            <div style={sectionBaseStyle}>
+              <div style={resultsBaseStyle}>
                 {historyItems.map((result, position) => {
                   if (forEmptyQuery && position === 0) return null;
                   return this.renderItem(result, position);
@@ -356,9 +306,10 @@ export default class BangList extends React.PureComponent<Props, State> {
           items.some(i => i.sectionKind === 'top-hits') &&
           items.filter(shouldShowSection).map(item => (
             <div
-              className={classNames(classes!.section, {
-                withResults: item.sectionName !== EMPTY_SECTION,
+              className={classNames('bang-section', {
+                'with-results': item.sectionName !== EMPTY_SECTION,
               })}
+              style={sectionBaseStyle}
               key={item.sectionName}
             >
               {item.sectionName === EMPTY_SECTION
@@ -367,9 +318,10 @@ export default class BangList extends React.PureComponent<Props, State> {
 
               {!this.isCollapsedResults(item) && (
                 <div
-                  className={classNames(classes!.results, {
+                  className={classNames('bang-results', {
                     collapsed: this.isCollapsedResults(item),
                   })}
+                  style={resultsBaseStyle}
                 >
                   {item.results
                     ? item.results.map((result, position) => {

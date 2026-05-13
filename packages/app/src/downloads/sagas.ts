@@ -1,4 +1,4 @@
-import * as remote from '@electron/remote';
+import { shell } from 'electron';
 import { SagaIterator } from 'redux-saga';
 import { all, call, put, select } from 'redux-saga/effects';
 import { SET_DOWNLOAD_FOLDER, setDefaultDownloadFolder, setDownloadFolder } from '../app/duck';
@@ -132,7 +132,7 @@ function* handleChangeDownloadFolderSaga(): SagaIterator {
 
 function* handleRevealPathInFinderSaga({ path }: revealPathInFinderAction): SagaIterator {
   if (path) {
-    yield call([remote.shell, 'openPath'], path);
+    yield call([shell, 'openPath'], path);
   }
 }
 

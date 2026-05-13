@@ -63,7 +63,7 @@ abstract class AbstractStateProxy<T> {
 /**
  * This class is a helper to load/save simple state elements like 'app'
  */
-export class SingletonStateProxy<S extends Sequelize.Instance<any>, T extends SingletonProxy<S> = SingletonProxy<S>>
+export class SingletonStateProxy<S extends Sequelize.Model<any, any>, T extends SingletonProxy<S> = SingletonProxy<S>>
   extends AbstractStateProxy<Immutable.Map<string, any>> implements StateProxy<Immutable.Map<string, any>> {
 
   protected aclass: { new(): T };
@@ -126,7 +126,7 @@ export class SingletonStateProxy<S extends Sequelize.Instance<any>, T extends Si
 /**
  * This class is a helper to load/save ordered list state elements like 'dock'
  */
-export class ListStateProxy<S extends Sequelize.Instance<any>, T extends ListProxy<S> = ListProxy<S>>
+export class ListStateProxy<S extends Sequelize.Model<any, any>, T extends ListProxy<S> = ListProxy<S>>
   extends AbstractStateProxy<Immutable.List<any>> implements StateProxy<Immutable.List<any>> {
 
   protected aclass: { new(): T };
@@ -170,7 +170,7 @@ export class ListStateProxy<S extends Sequelize.Instance<any>, T extends ListPro
 /**
  * This class is a helper to load/save map state elements like 'applications'
  */
-export class MapStateProxy<S extends Sequelize.Instance<any>, T extends MapProxy<S> = MapProxy<S>>
+export class MapStateProxy<S extends Sequelize.Model<any, any>, T extends MapProxy<S> = MapProxy<S>>
   extends AbstractStateProxy<Immutable.Map<string, any>> implements StateProxy<Immutable.Map<string, any>> {
 
   protected aclass: { new(): T };
@@ -266,7 +266,7 @@ export class MapStateProxy<S extends Sequelize.Instance<any>, T extends MapProxy
 /**
  * This class is a helper to load/save key/value map state elements like 'serviceData[...]'
  */
-export class KeyValueStateProxy<S extends Sequelize.Instance<any>, T extends KeyValueProxy<S> = KeyValueProxy<S>>
+export class KeyValueStateProxy<S extends Sequelize.Model<any, any>, T extends KeyValueProxy<S> = KeyValueProxy<S>>
   extends AbstractStateProxy<Immutable.Map<string, any>> implements StateProxy<Immutable.Map<string, any>> {
 
   protected aclass: { new(): T };

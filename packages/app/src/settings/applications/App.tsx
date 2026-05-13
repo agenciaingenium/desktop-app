@@ -1,10 +1,8 @@
-import { Hint, IconSymbol, Size, Switcher, TEXT, ThemeTypes as Theme, Tooltip, ButtonIcon, Style } from '@getstation/theme';
+import { Hint, IconSymbol, Size, Switcher, TEXT, theme, Tooltip, ButtonIcon, Style } from '@getstation/theme';
 import * as classNames from 'classnames';
-import { Iterable, List } from 'immutable';
+import { List } from 'immutable';
 import * as React from 'react';
 import { compose } from 'react-apollo';
-// @ts-ignore no declaration file
-import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { oc } from 'ts-optchain';
@@ -27,24 +25,6 @@ import { Extension, Instance, Instances } from './types';
 import ExtensionInfos from './components/ExtensionInfos';
 import { pure } from 'recompose';
 
-interface Classes {
-  item: string,
-  highlightedItem: string,
-  header: string,
-  appIcon: string,
-  appTitle: string,
-  appVersion: string,
-  subtitle: string,
-  extensionInfosWrapper: string,
-  descriptionWrapper: string,
-  description: string,
-  instancesContainer: string,
-  addInstance: string,
-  buttonRemoveAllContainer: string,
-  buttonRemoveAll: string,
-  listInstances: string,
-}
-
 type DefaultProps = {
   highlighted: boolean,
   alwaysLoaded: boolean,
@@ -61,7 +41,6 @@ type DefaultProps = {
 };
 
 type OwnProps = DefaultProps & {
-  classes?: Classes,
   manifestURL: string,
 
   attachAppRef: (node: HTMLDivElement) => any,
@@ -97,68 +76,50 @@ interface State {
   removeAction: () => any
 }
 
-@injectSheet((theme: Theme) => ({
-  item: {
-    marginBottom: 20,
-    padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.10)',
-    borderRadius: 6,
-    transition: [
-      ['background-color', '300ms', 'ease-in'],
-    ],
-  },
-  highlightedItem: {
-    backgroundColor: 'rgba(255, 255, 255, 0.50)',
-    transition: [
-      ['background-color', '300ms', 'ease-out'],
-    ],
-  },
-  header: {
-    display: 'flex',
-    width: '100%',
-    alignItems: 'center',
-    paddingBottom: 20,
-  },
-  appIcon: {
-    width: 35,
-    height: 35,
-    borderRadius: 100,
-    marginRight: 5,
-  },
-  appTitle: {
-    ...theme.titles.h2,
-    marginLeft: 10,
-    marginRight: 20,
-  },
-  appVersion: {
-    marginBottom: '-2.5px',
-  },
-  subtitle: {
-    ...theme.fontMixin(12, 600),
-    margin: [20, 0, 10],
-  },
-  extensionInfosWrapper: {},
-  descriptionWrapper: {
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-  description: {},
-  instancesContainer: {
-    margin: [20, 0],
-  },
-  addInstance: {
-    maxWidth: 300,
-  },
-  buttonRemoveAllContainer: {
-    marginLeft: 'auto',
-  },
-  buttonRemoveAll: {
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-  },
-  listInstances: {
-    marginBottom: '20px',
-  },
-}))
+const itemStyle: React.CSSProperties = {
+  marginBottom: 20,
+  padding: 20,
+  backgroundColor: 'rgba(255, 255, 255, 0.10)',
+  borderRadius: 6,
+  transition: 'background-color 300ms ease-in',
+};
+
+const highlightedItemStyle: React.CSSProperties = {
+  backgroundColor: 'rgba(255, 255, 255, 0.50)',
+  transition: 'background-color 300ms ease-out',
+};
+
+const headerStyle: React.CSSProperties = {
+  display: 'flex',
+  width: '100%',
+  alignItems: 'center',
+  paddingBottom: 20,
+};
+
+const appTitleStyle: React.CSSProperties = {
+  ...theme.titles.h2,
+  marginLeft: 10,
+  marginRight: 20,
+};
+
+const subtitleStyle: React.CSSProperties = {
+  ...theme.fontMixin(12, 600),
+  margin: '20px 0 10px',
+};
+
+const descriptionWrapperStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+};
+
+const instancesContainerStyle: React.CSSProperties = {
+  margin: '20px 0',
+};
+
+const buttonRemoveAllStyle: React.CSSProperties = {
+  backgroundColor: 'rgba(0, 0, 0, 0.25)',
+};
+
 class AppImpl extends React.PureComponent<Props, State> {
   static defaultProps: DefaultProps = {
     highlighted: false,
@@ -169,7 +130,7 @@ class AppImpl extends React.PureComponent<Props, State> {
     applicationThemeColor: '',
     applicationCxExtensionId: undefined,
     instanceWording: 'instance',
-    instances: Iterable([]),
+    instances: List([]),
     extensions: [],
     useInstanceLogoInDock: false,
     applications: List([]),
@@ -218,7 +179,6 @@ class AppImpl extends React.PureComponent<Props, State> {
 
   render() {
     const {
-      classes,
       highlighted,
       alwaysLoaded,
       alwaysLoadedByDefault,
@@ -252,7 +212,8 @@ class AppImpl extends React.PureComponent<Props, State> {
       <div
         ref={attachAppRef}
         key={manifestURL}
-        className={classNames(classes!.item, { [classes!.highlightedItem]: highlighted })}
+        className={classNames('settings-app-item', { highlighted })}
+        style={highlighted ? { ...itemStyle, ...highlightedItemStyle } : itemStyle}
       >
         {(removeApplication || instancesToRemove.count() > 0) &&
           <RemoveModalConfirmation
@@ -265,23 +226,23 @@ class AppImpl extends React.PureComponent<Props, State> {
           />
         }
 
-        <div className={classes!.header}>
+        <div style={headerStyle}>
           <AppIcon
             imgUrl={applicationIcon}
             themeColor={applicationThemeColor}
           />
 
-          <div className={classes!.appTitle}>
+          <div style={appTitleStyle}>
             {applicationName}
           </div>
           <Tooltip
-            className={classes!.buttonRemoveAllContainer}
+            style={{ marginLeft: 'auto' }}
             tooltip={'Remove app'}
             offset="-2, 12"
             placement={'left'}
           >
             <ButtonIcon
-              className={classes!.buttonRemoveAll}
+              style={buttonRemoveAllStyle}
               iconColor="white"
               btnStyle={Style.SECONDARY}
               symbolId={IconSymbol.TRASH}
@@ -292,7 +253,7 @@ class AppImpl extends React.PureComponent<Props, State> {
         </div>
 
         {extensionState &&
-          <div className={classes!.extensionInfosWrapper}>
+          <div>
             <ExtensionInfos
               extensionState={extensionState}
               onCheckForUpdate={onExtensionCheckForUpdate}
@@ -300,8 +261,8 @@ class AppImpl extends React.PureComponent<Props, State> {
           </div>
         }
 
-        <div className={classes!.instancesContainer}>
-          <div className={classes!.listInstances} >
+        <div style={instancesContainerStyle}>
+          <div style={{ marginBottom: '20px' }} >
             <ListInstances
               applications={applications}
               manifestURL={manifestURL}
@@ -325,12 +286,12 @@ class AppImpl extends React.PureComponent<Props, State> {
           onExtensionToggle={onExtensionToggle}
         />
 
-        <div className={classes!.subtitle}>
+        <div style={subtitleStyle}>
           DOCK ICON
         </div>
 
-        <div className={classes!.descriptionWrapper} >
-          <div className={classes!.description}>
+        <div style={descriptionWrapperStyle} >
+          <div>
             When available, use {instanceWording} logo in the dock
           </div>
 
@@ -341,14 +302,14 @@ class AppImpl extends React.PureComponent<Props, State> {
           />
         </div>
 
-        <div className={classes!.subtitle}>
+        <div style={subtitleStyle}>
           <Hint tooltip="By default, Station puts to sleep unused applications in order to preserve memory and prevent slow-downs.">
             BACKGROUND ACTIVITY
           </Hint>
         </div>
 
-        <div className={classes!.descriptionWrapper}>
-          <div className={classes!.description}>
+        <div style={descriptionWrapperStyle}>
+          <div>
             Keep {applicationName} active in background to receive calls and notifications.
           </div>
           <div>
@@ -391,7 +352,7 @@ const App = compose(
             applicationThemeColor: manifest.theme_color(),
             applicationCxExtensionId: manifest.cxExtensionId(),
             instanceWording: manifest.bx_multi_instance_config!.instance_wording(),
-            instances: Iterable(instances()),
+            instances: List(instances()),
             extensions: extensions(),
             useInstanceLogoInDock: settings.instanceLogoInDock(),
           };
@@ -403,7 +364,7 @@ const App = compose(
   withCheckForUpdatesApplicationMutation({
     props: ({ mutate, ownProps }) => ({
       checkForUpdatesApplication: () =>
-        // @ts-ignore manifestURL exists on ownPropsw
+        // @ts-ignore manifestURL exists on ownpropsw
         mutate && mutate({ variables: { manifestURL: ownProps.manifestURL } }),
     }),
   }),

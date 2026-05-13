@@ -1,8 +1,6 @@
-import { ThemeTypes as Theme } from '@getstation/theme';
+import { theme } from '@getstation/theme';
 import * as Immutable from 'immutable';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { CSSTransition } from 'react-transition-group';
 import { bindActionCreators, Dispatch } from 'redux';
@@ -20,31 +18,27 @@ import {
 import NotificationCenterBody from './NotificationCenterBody';
 import { getSnoozeDuration, getSnoozeStartedOn } from './selectors';
 
+const infoBoxStyle: React.CSSProperties = {
+  margin: '10px 10px 0 10px',
+  padding: 10,
+  ...theme.fontMixin(10),
+  backgroundColor: 'rgba(255, 255, 255, .2)',
+  borderRadius: 3,
+  color: 'rgba(255, 255, 255, .6)',
+};
+
 export interface Props {
   markAllAsRead: () => MarkAllAsReadAction,
   snooze: (duration: string) => SetSnoozeDurationAction,
   resetSnooze: () => ResetSnoozeDurationAction,
   currentSnoozeDuration?: string,
   currentSnoozeStartedOn?: number,
-  classes?: {
-    infoBox: string,
-  }
 }
 
-@injectSheet((theme: Theme) => ({
-  infoBox: {
-    margin: [10, 10, 0, 10],
-    padding: 10,
-    ...theme.fontMixin(10),
-    backgroundColor: 'rgba(255, 255, 255, .2)',
-    borderRadius: 3,
-    color: 'rgba(255, 255, 255, .6)',
-  },
-}))
 class NotificationCenterSubdockContentImpl extends React.PureComponent<Props, {}> {
   render() {
     const {
-      classes, snooze, resetSnooze, currentSnoozeDuration, currentSnoozeStartedOn,
+      snooze, resetSnooze, currentSnoozeDuration, currentSnoozeStartedOn,
     } = this.props;
     const syncWithOS = currentSnoozeDuration === SYNC_WITH_OS;
 
@@ -59,7 +53,7 @@ class NotificationCenterSubdockContentImpl extends React.PureComponent<Props, {}
         />
 
         {syncWithOS &&
-        <div className={classes!.infoBox}>
+        <div style={infoBoxStyle}>
           To receive notifications, Switch off Do Not Disturb mode in {osName}.
         </div>
         }

@@ -12,19 +12,18 @@ export class ExtendedAppMetricsServiceImpl extends ExtendedAppMetricsService imp
   async getAppMetricsSummary() {
     await app.whenReady();
     const appMetrics = app.getAppMetrics();
-    // TODO: See https://electronjs.org/docs/api/process#processgetprocessmemoryinfo
-    // to replace deprecated behaviour.
-    // const appMetricsMemoryMB = appMetrics.map(m => ((m as any).memory.workingSetSize / 1024));
+
+    const appMetricsMemoryKB = appMetrics.map(m => m.memory.workingSetSize);
 
     const systemMemoryInfo = process.getSystemMemoryInfo();
 
     return {
       freeMemoryMB: (systemMemoryInfo.free / 1024),
       processCount: appMetrics.length,
-      // processMemorySumMB: sum(appMetricsMemoryMB),
-      // processMemoryMaxMB: Math.max(...appMetricsMemoryMB),
-      // processMemoryMinMB: Math.min(...appMetricsMemoryMB),
-      // processMemoryAvgMB: mean(appMetricsMemoryMB),
+      processMemorySumMB: appMetricsMemoryKB.reduce((a, b) => a + b, 0) / 1024,
+      processMemoryMaxMB: Math.max(...appMetricsMemoryKB) / 1024,
+      processMemoryMinMB: Math.min(...appMetricsMemoryKB) / 1024,
+      processMemoryAvgMB: appMetricsMemoryKB.reduce((a, b) => a + b, 0) / appMetricsMemoryKB.length / 1024,
     };
   }
 }

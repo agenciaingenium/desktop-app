@@ -1,6 +1,7 @@
-import { app, BrowserWindow, shell, WebContents, HandlerDetails } from 'electron';
+import { app, BrowserWindow, webContents, HandlerDetails } from 'electron';
 
 import { isDarwin } from '../../../utils/process';
+import { openExternal } from '../../../utils/shell';
 import { RPC } from '../../lib/types';
 import { BrowserWindowManagerService, BrowserWindowServiceConstructorOptions, BrowserWindowManagerProviderService } from './interface';
 import { BrowserWindowServiceImpl } from './main';
@@ -31,7 +32,7 @@ export class BrowserWindowManagerServiceImpl extends BrowserWindowManagerService
     app.on('browser-window-created', (_e, bw) => {
       bw.on('closed', closeAppIfAllWindowsClosed);
       bw.webContents.setWindowOpenHandler((details: HandlerDetails) => {
-        shell.openExternal(details.url);
+        openExternal(details.url);
         return { action: 'deny' };
       });
     });
@@ -54,13 +55,13 @@ export class BrowserWindowManagerServiceImpl extends BrowserWindowManagerService
 
   async fromId(browserWindowId: number) {
     const bw = BrowserWindow.fromId(browserWindowId);
-    return this.getServiceFromBrowserWindow(bw);
+    return this.getServiceFromBrowserWindow(bw!);
   }
 
   async fromWebContentsId(webContentsId: number) {
-    const wc = WebContents.fromId(webContentsId);
+    const wc = webContents.fromId(webContentsId);
     const bw = BrowserWindow.fromWebContents(wc);
-    return this.getServiceFromBrowserWindow(bw);
+    return this.getServiceFromBrowserWindow(bw!);
   }
 
   async setWorkerBrowserWindow(worker: BrowserWindow) {

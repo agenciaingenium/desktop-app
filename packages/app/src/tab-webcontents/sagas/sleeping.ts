@@ -1,7 +1,7 @@
 import log from 'electron-log';
 import { SagaIterator } from 'redux-saga';
 import { all, call, getContext, put, select } from 'redux-saga/effects';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import { BrowserXAppWorker } from '../../app-worker';
 import { MAIN_APP_READY } from '../../app/duck';
 import { getApplicationsSettings } from '../../application-settings/selectors';
@@ -49,7 +49,7 @@ function* checkSleepyTabs(): SagaIterator {
   const sleepNotif = yield select(getSleepNotification);
 
   if (!sleepNotif && mountedTabsToKill.size > 0) {
-    const notificationId = `notif/${shortid.generate()}`;
+    const notificationId = `notif/${nanoid()}`;
     const wording = mountedTabsToKill.size > 1 ? `${mountedTabsToKill.size} unused apps` : `an unused app`;
     const props = {
       title: 'Station',

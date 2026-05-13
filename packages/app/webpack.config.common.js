@@ -105,9 +105,6 @@ const mutateWebpackConfig = config => {
       new webpack.DefinePlugin({
         'process.env.GOOGLE_CLIENT_ID': JSON.stringify(
           process.env.GOOGLE_CLIENT_ID
-        ),
-        'process.env.GOOGLE_CLIENT_SECRET': JSON.stringify(
-          process.env.GOOGLE_CLIENT_SECRET
         )
       })
     );

@@ -1,5 +1,9 @@
-const ipc = require('electron').ipcRenderer;
+const { IPC, createSender, createListener, injectIntoPage } = require('./preload-api');
 const { fillInput } = require('./utils');
+
+const sendGetCredentials = createSender(IPC.AUTOLOGIN_GET_CREDENTIALS);
+const sendDisplayRemoveLink = createSender(IPC.AUTOLOGIN_DISPLAY_REMOVE_LINK);
+const onValueRetrieved = createListener(IPC.AUTOLOGIN_VALUE_RETRIEVED);
 
 let currentForm;
 let formFilled = false;
@@ -11,10 +15,9 @@ const loginPageForm = document => Array.from(document.querySelectorAll('form'))
   .filter(form => isLoginForm(form))[0];
 
 const isLoginForm = form => isVisible(form) &&
-  hasSubmitButton &&
+  hasSubmitButton(form) &&
   hasPasswordField(form) &&
   hasOnlyNecessaryFields(form);
-
 
 const isVisible = form => form.style.display !== 'none' && !form.hasAttribute('hidden');
 const hasSubmitButton = form => Boolean(form.querySelector('input[type="submit"]') ||
@@ -28,7 +31,7 @@ const hasOnlyNecessaryFields = form => Array.from(form
 // Logger
 
 const getCredentials = () => {
-  if (!formFilled) ipc.send('autologin-get-credentials');
+  if (!formFilled) sendGetCredentials();
 };
 
 const fillCurrentForm = (login, canAutoSubmit) => {
@@ -76,22 +79,34 @@ const triggerSubmitButton = submitButton => {
     }
   }
 };
+
 // Banner remove link
 
 const displayRemoveLinkBanner = () => {
   if (!bannerRemoveLinkDisplayed) {
     bannerRemoveLinkDisplayed = true;
-    ipc.send('autologin-display-removeLinkBanner');
+    sendDisplayRemoveLink();
   }
 };
 
-// Events
+// Register API for contextBridge
+const api = {
+  getCredentials,
+  fillCurrentForm,
+  displayRemoveLinkBanner: () => {
+    bannerRemoveLinkDisplayed = true;
+    sendDisplayRemoveLink();
+  },
+};
 
-ipc.on('autologin-value-retrieved', (e, login, autoSubmit) => {
+// Events - listen for credential values from main process
+// createListener strips the event object, so callback receives args directly
+onValueRetrieved((login, autoSubmit) => {
   if (currentForm) return fillCurrentForm(login, autoSubmit);
 });
 
-document.addEventListener('DOMContentLoaded', e => {
+// DOM event listeners (DOM APIs are shared across contexts)
+document.addEventListener('DOMContentLoaded', () => {
   currentForm = loginPageForm(document);
 
   if (!currentForm) {
@@ -108,7 +123,7 @@ document.addEventListener('DOMContentLoaded', e => {
   }
 }, false);
 
-document.addEventListener('focusin', e => {
+document.addEventListener('focusin', (e) => {
   const { target } = e;
 
   if (currentForm && currentForm.hasChildNodes(target) && formFilled) {
@@ -130,3 +145,5 @@ document.addEventListener('focusin', e => {
     if (isLoginForm(form)) return getCredentials();
   }
 }, false);
+
+module.exports = { api };

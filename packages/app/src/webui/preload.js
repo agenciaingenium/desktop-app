@@ -10,16 +10,6 @@ if (parse(window.location.href).protocol === 'station:') {
   const handler = handlers.find(h => h.hostname === hostname);
 
   if (handler && handler.hostname === 'multi-instance-configurator') {
-    // const services = require('../services/servicesManager').default;
-
     module.filename = handler.filePath;
-
-    //vk: FIXME it has to be rewrited somehow
-
-
-    // window.bx = {
-    //   ...window.bx,
-    //   manifest: services.manifest,
-    // };
   }
 }

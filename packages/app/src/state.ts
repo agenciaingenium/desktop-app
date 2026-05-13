@@ -37,7 +37,7 @@ export type StationRawState = {
   servicesData: StationServicesData;
   orderedTabs: StationAllOrderedTabs;
   orderedFavorites: StationAllOrderedFavorites;
-  // TODO
+  // These state slices still need proper type definitions
   downloads: any;
   dlToaster: any[];
   auto_update: any;

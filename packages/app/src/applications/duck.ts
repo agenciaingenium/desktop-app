@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import {
   RequestForApplicationNotifications,
   RequestForApplicationNotificationsStep,
@@ -224,7 +224,7 @@ export const createApplication = (
   installContext?: InstallContext,
   doNotNavigateTo = false,
 ): CreateApplicationAction => {
-  const applicationId = shortid.generate();
+  const applicationId = nanoid();
 
   return {
     type: CREATE_APPLICATION,

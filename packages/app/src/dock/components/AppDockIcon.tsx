@@ -1,30 +1,13 @@
 import * as React from 'react';
-// @ts-ignore no declaration file
-import injectSheet from 'react-jss';
 import * as classNames from 'classnames';
-import * as shortid from 'shortid';
-
-interface Classes {
-  anchor: string,
-  appDockIcon: string,
-  imageLowOpacity: string,
-  SVGIcon: string,
-  appDockIconActive: string,
-  iconBg: string,
-  scaleUpAnimation: string,
-}
+import { nanoid } from 'nanoid';
 
 export interface OwnProps {
-  classes?: Classes,
   applicationId: string,
   active?: boolean,
   badge?: string | number | null,
   isInstanceLogoInDockIcon?: boolean,
   logoURL?: string,
-  /**
-   * If passed to `true`, when the `AppDockIcon` will
-   * get a little animation.
-   */
   dramaticEnter?: boolean,
   onOverStateChange?: (newState: boolean) => void,
   onClick?: () => void,
@@ -41,53 +24,12 @@ interface GraphQLProps {
 
 type Props = OwnProps & GraphQLProps;
 
-@injectSheet({
-  anchor: {
-    display: 'block',
-    marginLeft: '2px',
-    cursor: 'default',
-  },
-  appDockIcon: {
-    display: 'block',
-    '&:hover:not($appDockIconActive)': {
-      '& $iconBg': { fillOpacity: 0.2 },
-    },
-    '&:hover': {
-      '& $SVGIcon': { fillOpacity: 1 },
-    },
-    '&$appDockIconActive': {
-      '& $iconBg': { fillOpacity: 1 },
-      '& $SVGIcon': { fillOpacity: 1 },
-    },
-    paddingTop: '8px',
-    '&$scaleUpAnimation': {
-      animation: 'app-dock-icon-scale-up .5s cubic-bezier(0.2, 0, 0, 1)',
-    },
-  },
-  imageLowOpacity: {
-    opacity: 0.4,
-  },
-  SVGIcon: {
-    fill: '#fff',
-    fillOpacity: 0.6,
-    transition: 'all 250ms ease-out',
-    transform: 'scale(0.7)',
-  },
-  appDockIconActive: {},
-  scaleUpAnimation: {},
-  iconBg: {
-    fill: '#fff',
-    fillOpacity: 0.1,
-    '&:not($appDockIconActive)': {
-      transition: 'all 250ms ease-out',
-    },
-  },
-  '@keyframes app-dock-icon-scale-up': {
-    '0%': { transform: 'scale(0)' },
-    '90%': { transform: 'scale(1.1)' },
-    '100%': { transform: 'scale(1)' },
-  },
-})
+const anchorStyle: React.CSSProperties = {
+  display: 'block',
+  marginLeft: '2px',
+  cursor: 'default',
+};
+
 export class AppDockIcon extends React.PureComponent<Props> {
   static defaultProps = {
     active: false,
@@ -99,8 +41,8 @@ export class AppDockIcon extends React.PureComponent<Props> {
   private readonly secondaryLogo: string;
   constructor(props: Props) {
     super(props);
-    this.primaryLogo = `logo-primary-${shortid.generate()}`;
-    this.secondaryLogo = `logo-secondary-${shortid.generate()}`;
+    this.primaryLogo = `logo-primary-${nanoid()}`;
+    this.secondaryLogo = `logo-secondary-${nanoid()}`;
   }
 
   handleMouseEnter = () => this.props.onOverStateChange!(true);
@@ -108,11 +50,11 @@ export class AppDockIcon extends React.PureComponent<Props> {
   handleMouseLeave = () => this.props.onOverStateChange!(false);
 
   renderSurroundingLink(element: JSX.Element): JSX.Element {
-    const { classes, onClick, onRightClick, iconRef } = this.props;
+    const { onClick, onRightClick, iconRef } = this.props;
     return (
       <div ref={iconRef}>
         <a
-          className={classes!.anchor}
+          style={anchorStyle}
           onClick={onClick}
           onContextMenu={onRightClick}
           onMouseEnter={this.handleMouseEnter}
@@ -125,7 +67,7 @@ export class AppDockIcon extends React.PureComponent<Props> {
   }
 
   renderDefs() {
-    const { active, classes, logoURL, isInstanceLogoInDockIcon, iconURL } = this.props;
+    const { active, logoURL, isInstanceLogoInDockIcon, iconURL } = this.props;
     return (
       <defs>
         <filter id="grayscale">
@@ -135,7 +77,7 @@ export class AppDockIcon extends React.PureComponent<Props> {
           iconURL &&
           <pattern id={this.primaryLogo} width="100%" height="100%" x="0%">
             <image
-              className={(active || isInstanceLogoInDockIcon) ? '' : classes!.imageLowOpacity}
+              className={(active || isInstanceLogoInDockIcon) ? '' : 'image-low-opacity'}
               filter={(active || isInstanceLogoInDockIcon) ? '' : 'url(#grayscale)'}
               href={iconURL}
               width={isInstanceLogoInDockIcon ? '12' : '30'}
@@ -147,7 +89,7 @@ export class AppDockIcon extends React.PureComponent<Props> {
           logoURL &&
           <pattern id={this.secondaryLogo} width="100%" height="100%" x="0%">
             <image
-              className={(active || !isInstanceLogoInDockIcon) ? '' : classes!.imageLowOpacity}
+              className={(active || !isInstanceLogoInDockIcon) ? '' : 'image-low-opacity'}
               filter={(active || !isInstanceLogoInDockIcon) ? '' : 'url(#grayscale)'}
               href={logoURL}
               width={isInstanceLogoInDockIcon ? '30' : '12'}
@@ -160,13 +102,13 @@ export class AppDockIcon extends React.PureComponent<Props> {
   }
 
   renderIconsBackground() {
-    const { classes, isInstanceLogoInDockIcon, logoURL } = this.props;
+    const { isInstanceLogoInDockIcon, logoURL } = this.props;
     const position = {
       x: isInstanceLogoInDockIcon ? 2 : 27,
       y: isInstanceLogoInDockIcon ? -2 : 21,
     };
     return (
-      <g className={classes!.iconBg}>
+      <g className="icon-bg">
         <rect width="34" height="34" x="6" y="0" rx="17" />
         {logoURL && <rect width="16" height="16" {...position} rx="8" fill="#fff" />}
       </g>
@@ -245,10 +187,10 @@ export class AppDockIcon extends React.PureComponent<Props> {
   }
 
   render() {
-    const { classes, loading, active, dramaticEnter } = this.props;
-    const svgClassName = classNames(classes!.appDockIcon, {
-      [classes!.appDockIconActive]: active,
-      [classes!.scaleUpAnimation]: dramaticEnter,
+    const { loading, active, dramaticEnter } = this.props;
+    const svgClassName = classNames('app-dock-icon', {
+      active,
+      'scale-up-animation': dramaticEnter,
     });
 
     if (loading) return null;

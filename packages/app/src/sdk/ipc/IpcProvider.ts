@@ -1,5 +1,5 @@
 import { ipc } from '@getstation/sdk';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import { Subject } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { handleError } from '../../services/api/helpers';
@@ -18,7 +18,7 @@ const consumersWeakMap = new WeakMap<ipc.IpcConsumer, SDKIpcProviderInterface>()
 export default class IpcProvider extends AbstractProvider<ipc.IpcConsumer> {
 
   addConsumer(consumer: ipc.IpcConsumer) {
-    const sourceId = `consumer-${shortid.generate()}`;
+    const sourceId = `consumer-${nanoid()}`;
     super.pushConsumer(consumer);
 
     // Set communication channels

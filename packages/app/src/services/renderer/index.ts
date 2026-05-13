@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron';
 import { ElectronIpcRendererDuplex } from '../../utils/stream-ipc-proxy';
 import rpcchannel, { RPCChannel } from 'stream-json-rpc';
 
@@ -37,7 +36,7 @@ export const getMainPeerHandler = () => {
 };
 
 export const getWorkerPeerHandler = () => {
-  const workerWebContentsId = ipcRenderer.sendSync('get-worker-contents-id-sync');
+  const workerWebContentsId = window.station.ipc.sendSync('get-worker-contents-id-sync');
   const duplex = new ElectronIpcRendererDuplex(workerWebContentsId, servicesDuplexNamespace);
   const channel: RPCChannel = rpcchannel(duplex, {
     forwardErrors: true, // !isPackaged,

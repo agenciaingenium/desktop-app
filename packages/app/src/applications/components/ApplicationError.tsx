@@ -1,18 +1,10 @@
-import { Button, Style, ThemeTypes as Theme } from '@getstation/theme';
+import { Button, Style } from '@getstation/theme';
 // @ts-ignore: no declaration file
 import * as networkErrors from 'chromium-net-errors';
 import Maybe from 'graphql/tsutils/Maybe';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-
-export interface Classes {
-  container: string,
-  button: string,
-}
 
 export interface Props {
-  classes?: Classes,
   crashed: boolean,
   errorCode: any,
   errorDescription: any,
@@ -21,18 +13,6 @@ export interface Props {
   tabUrl: string,
 }
 
-const styles = (_theme: Theme) => ({
-  container: {
-    color: 'white',
-    textAlign: 'center',
-  },
-  button: {
-    width: '100%',
-    marginTop: 20,
-  },
-});
-
-@injectSheet(styles)
 export default class ApplicationLoadingContainer extends React.PureComponent<Props, {}> {
   hasError = () => {
     if (this.props.crashed) return true;
@@ -59,17 +39,17 @@ export default class ApplicationLoadingContainer extends React.PureComponent<Pro
   }
 
   render() {
-    const { classes, applicationName } = this.props;
+    const { applicationName } = this.props;
 
     return (
-      <div className={classes!.container}>
+      <div style={{ color: 'white', textAlign: 'center' }}>
         { this.hasError() &&
           <div>
             <div>We can't load {applicationName}...</div>
             {this.renderErrorMessage()}
             <Button
               btnStyle={Style.SECONDARY}
-              className={classes!.button}
+              className={{ width: '100%', marginTop: 20 }}
               onClick={() => this.handleReloadClick()}
             >
               Try reloading

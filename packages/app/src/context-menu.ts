@@ -5,9 +5,9 @@ import {
   Menu,
   MenuItem,
   MenuItemConstructorOptions,
-  shell,
 } from 'electron';
 import { EventEmitter } from 'events';
+import { openExternal } from './utils/shell';
 import { isPackaged } from './utils/env';
 import { serializedKeyboardEvent } from './services/services/menu/helpers';
 import uuid = require('uuid');
@@ -63,21 +63,21 @@ export default class ContextMenu extends EventEmitter {
         label: 'Cut',
         // needed because of macOS limitation:
         // https://github.com/electron/electron/issues/5860
-        role: can('Cut') ? 'cut' : '',
+        role: can('Cut') ? 'cut' : undefined,
         enabled: can('Cut'),
         visible: props.isEditable,
       },
       {
         id: 'copy',
         label: 'Copy',
-        role: can('Copy') ? 'copy' : '',
+        role: can('Copy') ? 'copy' : undefined,
         enabled: can('Copy'),
         visible: props.isEditable || hasText,
       },
       {
         id: 'paste',
         label: 'Paste',
-        role: editFlags.canPaste ? 'paste' : '',
+        role: editFlags.canPaste ? 'paste' : undefined,
         enabled: editFlags.canPaste,
         visible: props.isEditable,
       },
@@ -161,7 +161,7 @@ export default class ContextMenu extends EventEmitter {
           id: 'openLinkInDefaultBrowser',
           label: 'Open Link In Default Browser',
           click() {
-            shell.openExternal(props.linkURL);
+            openExternal(props.linkURL);
           },
         },
         {

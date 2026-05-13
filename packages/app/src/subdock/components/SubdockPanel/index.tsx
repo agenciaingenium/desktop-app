@@ -96,7 +96,6 @@ class SubdockPanel extends React.PureComponent<Props, State> {
 
     const { reducedTabs, reducedFavorites } = reduceTabsAndFavorites(tabs, favorites);
 
-    // TODO: use jss
     return (
       <div className="l-subdock__panel l-subdock__panel--active">
         { tabApplicationHome &&

@@ -1,21 +1,12 @@
 import { Button, Size } from '@getstation/theme';
 import ms = require('ms');
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import {
   withGetAutoUpdateStatus, withCheckForUpdatesMutation, withQuitAndInstallMutation,
 } from './queries@local.gql.generated';
 import { compose } from 'redux';
 
-export interface Classes {
-  checking: string,
-  info: string,
-  updateButton: string,
-}
-
 export interface Props {
-  classes?: Classes,
   isDownloadingUpdate: boolean,
   isCheckingUpdate: boolean,
   isUpdateAvailable: boolean,
@@ -28,37 +19,31 @@ export interface State {
   justCheckedForUpdate: boolean,
 }
 
-const styles = () => ({
-  checking: {
-    display: 'inline-block',
-    position: 'relative',
-    top: 2,
-    width: 10,
-    height: 10,
-    marginRight: 5,
-    borderRadius: '100%',
-    backgroundColor: 'transparent',
-    border: '2px solid white',
-    animation: '3s ease-in-out 0s infinite checking',
-  },
-  '@keyframes checking': {
-    '0%': { transform: 'scale(0.8)' },
-    '50%': { transform: 'scale(1.3)' },
-    '100%': { transform: 'scale(0.8)' },
-  },
-  info: {
-    marginTop: 5,
-    fontSize: 11,
-    color: 'rgba(#FFF, .5)',
-    textAlign: 'center',
-  },
-  updateButton: {
-    minWidth: '200px',
-    marginTop: 2,
-  },
-});
+const updateButtonStyle: React.CSSProperties = {
+  minWidth: 200,
+  marginTop: 2,
+};
 
-@injectSheet(styles)
+const checkingStyle: React.CSSProperties = {
+  display: 'inline-block',
+  position: 'relative' as const,
+  top: 2,
+  width: 10,
+  height: 10,
+  marginRight: 5,
+  borderRadius: '100%',
+  backgroundColor: 'transparent',
+  border: '2px solid white',
+  animation: '3s ease-in-out 0s infinite checking',
+};
+
+const infoStyle: React.CSSProperties = {
+  marginTop: 5,
+  fontSize: 11,
+  color: 'rgba(255, 255, 255, .5)',
+  textAlign: 'center' as const,
+};
+
 class SettingsUpdatesButton extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -68,8 +53,8 @@ class SettingsUpdatesButton extends React.PureComponent<Props, State> {
     };
   }
 
-  UNSAFE_componentWillReceiveProps(newProps: any) {
-    if (this.props.isCheckingUpdate && !newProps.isCheckingUpdate) {
+  componentDidUpdate(prevProps: any) {
+    if (prevProps.isCheckingUpdate && !this.props.isCheckingUpdate) {
       this.setState({ justCheckedForUpdate: true });
 
       setTimeout(
@@ -80,12 +65,10 @@ class SettingsUpdatesButton extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { classes } = this.props;
-
     if (this.props.isCheckingUpdate) {
       return (
-        <Button className={classes!.updateButton} btnSize={Size.SMALL} disabled={this.props.isCheckingUpdate}>
-          <span className={classes!.checking} />
+        <Button style={updateButtonStyle} btnSize={Size.SMALL} disabled={this.props.isCheckingUpdate}>
+          <span style={checkingStyle} />
           {this.props.isDownloadingUpdate ? 'Downloading...' : 'Checking...'}
         </Button>
       );
@@ -94,11 +77,11 @@ class SettingsUpdatesButton extends React.PureComponent<Props, State> {
     if (this.props.isUpdateAvailable) {
       return (
         <div>
-          <Button className={classes!.updateButton} btnSize={Size.SMALL} onClick={this.props.quitAndInstall} download={true}>
+          <Button style={updateButtonStyle} btnSize={Size.SMALL} onClick={this.props.quitAndInstall} download={true}>
             Quit to install the latest version
           </Button>
 
-          <p className={classes!.info}>New version available ({this.props.releaseName})</p>
+          <p style={infoStyle}>New version available ({this.props.releaseName})</p>
         </div>
       );
     }
@@ -106,18 +89,18 @@ class SettingsUpdatesButton extends React.PureComponent<Props, State> {
     if (!this.props.isUpdateAvailable && this.state.justCheckedForUpdate) {
       return (
         <div>
-          <Button className={classes!.updateButton} btnSize={Size.SMALL} onClick={this.props.checkForUpdates}>
+          <Button style={updateButtonStyle} btnSize={Size.SMALL} onClick={this.props.checkForUpdates}>
             No new updates
           </Button>
 
-          <p className={classes!.info}>You have the most recent version</p>
+          <p style={infoStyle}>You have the most recent version</p>
         </div>
 
       );
     }
 
     return (
-      <Button className={classes!.updateButton} btnSize={Size.SMALL} onClick={this.props.checkForUpdates}>
+      <Button style={updateButtonStyle} btnSize={Size.SMALL} onClick={this.props.checkForUpdates}>
         Check for updates
       </Button>
     );

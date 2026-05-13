@@ -55,7 +55,7 @@ export function tabWebcontentsToKill(
   // We ignore `alwaysLoaded` if we want this to remain efficient
   const seatsAvailable = STATION_MAX_ACTIVE_TABS - whiteListTabsVisible.size;
 
-  let tabsAllowedToStay: Immutable.Iterable<any, any> = Immutable.Set();
+  let tabsAllowedToStay: Immutable.Collection<any, any> = Immutable.Set();
   if (seatsAvailable > 0) {
     tabsAllowedToStay = mountedTabs
       .subtract(whiteListTabsAlwaysLoadedOrVisible)

@@ -27,20 +27,9 @@ export default class SnoozeDuration extends React.PureComponent<Props, State> {
     this.tick = this.tick.bind(this);
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    this.update(nextProps);
-  }
-
-  UNSAFE_componentWillMount() {
-    this.update(this.props);
-  }
-
-  update(props: Props) {
+  static getDerivedStateFromProps(props: Props) {
     if (!props.snoozeEndDate) {
-      this.setState({
-        content: '',
-      });
-      return;
+      return { content: '' };
     }
     const diff = moment(props.snoozeEndDate).diff(new Date());
     const msDiff = millisec(diff);
@@ -64,11 +53,11 @@ export default class SnoozeDuration extends React.PureComponent<Props, State> {
       content = `for <1min`;
     }
 
-    this.setState({ content });
+    return { content };
   }
 
   tick() {
-    this.update(this.props);
+    this.setState(SnoozeDuration.getDerivedStateFromProps(this.props));
   }
 
   render() {

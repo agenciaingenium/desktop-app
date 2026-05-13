@@ -1,4 +1,3 @@
-import * as remote from '@electron/remote';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
@@ -20,42 +19,44 @@ interface State {
 
 class TrafficLightsContainer extends React.PureComponent<any, State> {
 
-  public win: Electron.BrowserWindow;
+  private unsubscribeFocus: (() => void) | null = null;
+  private unsubscribeBlur: (() => void) | null = null;
 
   constructor(props: any) {
     super(props);
 
-    this.win = remote.getCurrentWindow();
-
     this.state = {
-      focused: this.win.isFocused(),
+      focused: false,
     };
+
+    // Check initial focus state
+    window.station.window.isFocused().then((focused) => {
+      this.setState({ focused });
+    });
 
     this.handleClose = this.handleClose.bind(this);
     this.handleMinimize = this.handleMinimize.bind(this);
     this.handleExpand = this.handleExpand.bind(this);
   }
 
-  onFocus() { }
-
-  onBlur() { }
-
   componentDidMount() {
-    this.onFocus = () => {
+    this.unsubscribeFocus = window.station.window.onFocus(() => {
       this.setState({ focused: true });
-    };
+    });
 
-    this.onBlur = () => {
+    this.unsubscribeBlur = window.station.window.onBlur(() => {
       this.setState({ focused: false });
-    };
+    });
 
-    this.win.on('focus', this.onFocus);
-    this.win.on('blur', this.onBlur);
+    // Re-check focus state after listeners are registered
+    window.station.window.isFocused().then((focused) => {
+      this.setState({ focused });
+    });
   }
 
   componentWillUnmount() {
-    this.win.removeListener('focus', this.onFocus);
-    this.win.removeListener('blur', this.onBlur);
+    if (this.unsubscribeFocus) this.unsubscribeFocus();
+    if (this.unsubscribeBlur) this.unsubscribeBlur();
   }
 
   handleClose() {
@@ -63,12 +64,14 @@ class TrafficLightsContainer extends React.PureComponent<any, State> {
   }
 
   handleMinimize() {
-    return this.win.minimize();
+    window.station.window.minimize();
   }
 
   handleExpand() {
-    this.win.focus();
-    this.win.setFullScreen(!this.win.isFullScreen());
+    window.station.window.focus();
+    window.station.window.isFullScreen().then((isFullScreen) => {
+      window.station.window.setFullScreen(!isFullScreen);
+    });
   }
 
   render() {

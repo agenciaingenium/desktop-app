@@ -3,8 +3,8 @@ import { BxAppManifest } from './bxAppManifest';
 import { oc } from 'ts-optchain';
 import { BX_PROTOCOL } from '../../webui/const';
 
-export const getPresets = (manifest?: BxAppManifest) => {
-  return oc(manifest).bx_multi_instance_config.presets([]);
+export const getPresets = (manifest?: BxAppManifest): Preset[] => {
+  return oc(manifest).bx_multi_instance_config.presets([]) as Preset[];
 };
 
 export const isOnlyOnPremise = (presets: Preset[]) => {

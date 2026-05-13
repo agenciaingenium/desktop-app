@@ -6,12 +6,6 @@ import { RPC } from '../../lib/types';
 import { ChromeExtensionsService, ChromeExtensionsServiceObserver } from './interface';
 
 const initConfiguration = () => {
-  const _configuration = {
-    fetcher: {
-      autoUpdate: true,
-    },
-  };
-
   // ECx.setConfiguration(configuration);
 };
 

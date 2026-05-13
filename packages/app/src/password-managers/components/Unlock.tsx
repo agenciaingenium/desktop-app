@@ -1,16 +1,9 @@
 import { Input, InputType, Modal } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { UnlockStep } from '../duck';
 import { PasswordManager } from '../types';
 
-export interface Classes {
-  body: string,
-}
-
 export interface Props {
-  classes?: Classes,
   process: any,
   passwordManager: PasswordManager,
   onUnlock: (passwordManager: PasswordManager, payload: any) => void,
@@ -23,14 +16,6 @@ export interface State {
   masterPassword: string,
 }
 
-@injectSheet(() => ({
-  body: {
-    paddingBottom: '0 !important',
-    '& input': {
-      marginBottom: 0,
-    },
-  },
-}))
 export default class Unlock extends React.PureComponent<Props, State> {
   constructor(args: Props) {
     super(args);
@@ -42,10 +27,10 @@ export default class Unlock extends React.PureComponent<Props, State> {
     this.handleKeyUp = this.handleKeyUp.bind(this);
   }
 
-  UNSAFE_componentWillUpdate(nextProps: Readonly<Props>) {
-    const { process: { step } } = this.props;
+  componentDidUpdate(prevProps: Readonly<Props>) {
+    const { process: { step } } = prevProps;
 
-    if (step === UnlockStep.Test && nextProps.process.step === UnlockStep.Error) {
+    if (step === UnlockStep.Test && this.props.process.step === UnlockStep.Error) {
       this.setState({ masterPassword: '' });
     }
   }
@@ -68,7 +53,7 @@ export default class Unlock extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { process, classes, providerName, applicationName, onCancel } = this.props;
+    const { process, providerName, applicationName, onCancel } = this.props;
 
     return (
       <Modal
@@ -77,7 +62,7 @@ export default class Unlock extends React.PureComponent<Props, State> {
         onCancel={onCancel}
         onContinue={this.onUnlock}
         continueContent={'Submit'}
-        classNameModalBody={classes!.body}
+        classNameModalBody="unlock-body"
         isLoading={[UnlockStep.Test, UnlockStep.Finish].includes(process.step)}
       >
         <Input

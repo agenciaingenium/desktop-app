@@ -1,13 +1,11 @@
 /* eslint-disable global-require, import/first */
 import './utils/stat-cache';
 import './dotenv';
-import { webFrame, ipcRenderer } from 'electron';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ApolloProvider } from 'react-apollo';
 import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
-import { BrowserXThemeProvider } from '@getstation/theme';
 import './theme/css/app.global.css';
 import '../../../node_modules/font-awesome/css/font-awesome.min.css';
 import { handleError } from './services/api/helpers';
@@ -22,8 +20,8 @@ import { BxNotification } from './notification-center/webview-preload';
 
 window.Notification = BxNotification;
 
-// prevent app pinch zomming
-webFrame.setVisualZoomLevelLimits(1, 1);
+// prevent app pinch zooming - use the station bridge
+window.station.webFrame.setVisualZoomLevelLimits(1, 1);
 
 if (process.env.STATION_REACT_PERF) {
   try {
@@ -63,13 +61,11 @@ const render = (store) => {
       <ActionsBusReactContext.Provider value={{ actionsBus }}>
         <ApolloProvider client={apolloClient}>
           <ApolloHooksProvider client={apolloClient}>
-            <BrowserXThemeProvider>
-              <ReduxBasedGradientProvider>
-                <ConsoleErrorBoundary>
-                  <App />
-                </ConsoleErrorBoundary>
-              </ReduxBasedGradientProvider>
-            </BrowserXThemeProvider>
+            <ReduxBasedGradientProvider>
+              <ConsoleErrorBoundary>
+                <App />
+              </ConsoleErrorBoundary>
+            </ReduxBasedGradientProvider>
           </ApolloHooksProvider>
         </ApolloProvider>
       </ActionsBusReactContext.Provider>
@@ -77,7 +73,7 @@ const render = (store) => {
     document.getElementById('root')
   );
 
-  ipcRenderer.send('bx-ready-to-show');
+  window.station.ipc.send('bx-ready-to-show');
 };
 
 if (module.hot) {

@@ -1,7 +1,4 @@
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-import { createStyles, ThemeTypes } from '@getstation/theme';
 import { DragLayer } from 'react-dnd';
 import AppDockIcon from './components/ConnectedAppDockIcon';
 
@@ -20,24 +17,7 @@ interface OwnProps {
   isDragging: boolean,
 }
 
-type Props = OuterProps & OwnProps & { classes: {
-  container: string,
-  title: string,
-}};
-
-const styles = (theme: ThemeTypes) => createStyles({
-  container: {
-    position: 'absolute',
-    pointerEvents: 'none',
-    zIndex: 100,
-    left: 0,
-    top: 0,
-  },
-  title: {
-    width: 220,
-    ...theme.mixins.ellipsis(1),
-  },
-});
+type Props = OuterProps & OwnProps;
 
 function getItemStyles(props: Props) {
   const { currentOffset } = props;
@@ -54,15 +34,6 @@ function getItemStyles(props: Props) {
     alignItems: 'center',
     transform: transform,
     WebkitTransform: transform,
-
-    // Uncomment for the expanded state
-    // color: 'rgba(60, 80, 93, 0.5)',
-    // backgroundColor: currentOffset.x > 40 ? '#e6e8eb' : 'initial',
-    // borderRadius: 100,
-    // width: currentOffset.x > 40 ? 280 : 49,
-    // height: 49,
-    // transition: 'width 250ms ease-in-out, background-color 250ms ease-in-out',
-    // boxShadow: currentOffset.x > 40 && '2px 2px 6px #BBB',
   };
 }
 
@@ -94,7 +65,7 @@ class DockIconDragLayer extends React.PureComponent<Props> {
     }
   }
   render() {
-    const { classes, item, isDragging, itemType } = this.props;
+    const { item, isDragging, itemType } = this.props;
 
     if (itemType !== 'APP_DOCK_APP') {
       return null;
@@ -104,19 +75,22 @@ class DockIconDragLayer extends React.PureComponent<Props> {
     }
 
     return (
-      <div className={classes.container}>
+      <div style={{
+        position: 'absolute',
+        pointerEvents: 'none',
+        zIndex: 100,
+        left: 0,
+        top: 0,
+      }}>
         <div style={getItemStyles(this.props)}>
           <AppDockIcon
             applicationId={item.applicationId}
             active={true}
           />
-
-          {/* Uncomment for the expanded state */}
-          {/*<p className={classes.title}>{item.tabTitle}</p>*/}
         </div>
       </div>
     );
   }
 }
 
-export default injectSheet(styles)(DockIconDragLayer) as React.ComponentType<OwnProps>;
+export default DockIconDragLayer as React.ComponentType<OwnProps>;

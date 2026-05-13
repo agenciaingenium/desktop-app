@@ -1,7 +1,7 @@
 import { IconSymbol, Style } from '@getstation/theme';
 import { SagaIterator } from 'redux-saga';
 import { all, call, getContext, put, select } from 'redux-saga/effects';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 
 import { getManifestOrTimeout } from '../applications/api';
 import { dispatchUrl, uninstallApplication } from '../applications/duck';
@@ -20,7 +20,7 @@ import {
 } from './duck';
 
 export function* optOutConfirmationFlow(applicationId: string, manifestURL: string): SagaIterator {
-  const id = `dialog-${shortid.generate()}`;
+  const id = `dialog-${nanoid()}`;
   const tab = yield select(getHomeTab, applicationId);
 
   const bxApp = yield getContext('bxApp');

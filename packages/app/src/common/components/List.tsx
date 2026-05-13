@@ -1,43 +1,33 @@
-import { ThemeTypes } from '@getstation/theme';
-import { Iterable } from 'immutable';
+import { Collection } from 'immutable';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
+import { fontMixin } from '../../utils/fontMixin';
 import ListItem, { ListItemType } from './ListItem';
 
-interface Classes {
-  container: string,
-  title: string,
-  itemsWrapper: string,
-}
-
-type Props = {
-  classes?: Classes,
-  title?: string,
-  iconSize?: number,
-  items: Iterable<number, ListItemType>,
+const STYLE = {
+  container: {} as React.CSSProperties,
+  title: {
+    ...fontMixin(12, 600),
+    margin: '20px 0 10px',
+    textTransform: 'uppercase' as const,
+  },
+  itemsWrapper: {} as React.CSSProperties,
 };
 
-@injectSheet((theme: ThemeTypes) => ({
-  container: {
-  },
-  title: {
-    ...theme.fontMixin(12, 600),
-    margin: [20, 0, 10],
-    textTransform: 'uppercase',
-  },
-  itemsWrapper: {
-  },
-}))
+type Props = {
+  title?: string,
+  iconSize?: number,
+  items: Collection<number, ListItemType>,
+};
+
 export default class List extends React.PureComponent<Props, {}> {
   render() {
-    const { classes, title, items, iconSize } = this.props;
+    const { title, items, iconSize } = this.props;
 
     return (
-      <div className={classes!.container}>
-        {title && <div className={classes!.title}>{title}</div>}
+      <div style={STYLE.container}>
+        {title && <div style={STYLE.title}>{title}</div>}
 
-        <ul className={classes!.itemsWrapper}>
+        <ul style={STYLE.itemsWrapper}>
           { items.map((item: ListItemType) =>
             <ListItem key={item.id} iconSize={iconSize} item={item} />
           )}

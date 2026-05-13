@@ -30,7 +30,7 @@ export type Section = SearchSectionSerialized;
 export type SectionsOrganizer = Transformer<Section[]>;
 
 /* --- The filter part ------------------------------------------------------------------------- */
-const isLoaded: Predicate<Section> = propEq('loading', false);
+const isLoaded: Predicate<Section> = propEq('loading', false) as Predicate<Section>;
 const hasNoResult: Predicate<Section> = compose(isEmptyArray, getSectionResults);
 
 const filterSearchResults: SectionsOrganizer = reject(

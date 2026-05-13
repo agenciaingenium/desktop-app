@@ -39,7 +39,7 @@ function hasEmptyHistory(webContentsId?: number) {
   if (!webContentsId) return true;
   try {
     return !webContents.fromId(webContentsId).canGoBack;
-  } catch (e) { }
+  } catch (e) { console.warn('[download] Error checking canGoBack:', e); }
   return true;
 }
 

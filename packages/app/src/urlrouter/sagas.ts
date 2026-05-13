@@ -1,5 +1,5 @@
-import * as remote from '@electron/remote';
 import log from 'electron-log';
+import { openExternal } from '../utils/shellRenderer';
 import { SagaIterator } from 'redux-saga';
 import { all, call, delay, fork, getContext, put, race, select, take } from 'redux-saga/effects';
 import { getApplicationManifestURL } from '../applications/get';
@@ -109,14 +109,14 @@ function* triggerCorrespondingAction(
       break;
     case URLRouterAction.DEFAULT_BROWSER:
       if (!options || !options.loadInBackground) {
-        remote.shell.openExternal(url);
+        openExternal(url);
       }
       else {
         services.browserWindow.getFocusedWindow()
           .then(lastFocusedWindow => {
             if (lastFocusedWindow) {
               lastFocusedWindow.setAlwaysOnTop(true)
-                .then(() => remote.shell.openExternal(url)
+                .then(() => openExternal(url)
                   .then(() => setTimeout(() => {
                     lastFocusedWindow.show();
                     lastFocusedWindow.setAlwaysOnTop(false);
@@ -127,7 +127,7 @@ function* triggerCorrespondingAction(
             }
             else {
               log.info('Focused window is empty');
-              remote.shell.openExternal(url);
+              openExternal(url);
             }
           });
       }

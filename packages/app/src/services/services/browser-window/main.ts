@@ -1,13 +1,16 @@
 import { BrowserWindow, ipcMain, screen } from 'electron';
-import * as remoteMain from '@electron/remote/main';
 import * as windowStateKeeper from 'electron-window-state';
 import { fromEvent } from 'rxjs';
+import * as path from 'path';
 import { NotificationProps } from '../../../notification-center/types';
 import { ServiceSubscription } from '../../lib/class';
 import { RPC } from '../../lib/types';
 import { BrowserWindowService, BrowserWindowServiceConstructorOptions, BrowserWindowServiceObserver } from './interface';
 
 const noop = () => {};
+
+// Preload script path for the main renderer (enables contextBridge)
+const mainPreloadPath = path.join(__dirname, 'static/preload/main-preload.js');
 
 export class BrowserWindowServiceImpl extends BrowserWindowService implements RPC.Interface<BrowserWindowService> {
 
@@ -17,48 +20,29 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
   constructor(options: BrowserWindowServiceConstructorOptions) {
     super();
     const positionOptions = this.startInitPositionManager(options.savePosition);
+
+    // If the caller explicitly requests contextIsolation, inject the preload script
+    // and enforce nodeIntegration: false. Otherwise, preserve legacy behavior.
+    const callerWebPrefs = options.webPreferences || {};
+    const usePreload = callerWebPrefs.contextIsolation === true;
+
+    const webPreferences = usePreload
+      ? {
+          ...callerWebPrefs,
+          preload: mainPreloadPath,
+          contextIsolation: true,
+          nodeIntegration: false,
+        }
+      : callerWebPrefs;
+
     this.window = new BrowserWindow({
       ...positionOptions,
       ...options,
+      webPreferences,
     });
 
-    remoteMain.enable(this.window.webContents);
-
-    // app.on(
-    //     'web-contents-created',
-    //     (event: Event, webContents: WebContents) => {
-    //         require('electron-log').info(`CC [ ${webContents.id} ] ${process.type} ${webContents.getURL()}`);
-    //         remoteMain.enable(webContents);
-    //     }
-    // );
-
-    // this.window.webContents.on(
-    //     'did-attach-webview', 
-    //     (event: Event, webContents: WebContents) => {
-    //       require('electron-log').info(`BB [ ${webContents.id} ] ${process.type} ${webContents.getURL()}`);
-    //       remoteMain.enable(webContents);
-    //         // const all = webContents.getAllWebContents();
-    //         // all.forEach((item) => {
-    //         //     remoteMain.enable(item);
-    //         // });
-    //     }
-    // );
-
-    // this.window.webContents.on(
-    //   'will-attach-webview', 
-    //   (event: Event, webPreferences: Electron.WebPreferences /*, params: Record<string, string> */) => {
-    //       webPreferences.nodeIntegration = true;
-    //       webPreferences.nodeIntegrationInSubFrames = true;
-    //       webPreferences.nodeIntegrationInWorker = true;
-    //       webPreferences.webSecurity = false;
-    //       const all = webContents.getAllWebContents();
-    //       all
-    //         .forEach(wc => {
-    //             require('electron-log').info(`AA [ ${wc.id} ] ${process.type} ${wc.getURL()}`);
-    //             // remoteMain.enable(wc);
-    //         });
-    //     }
-    // );
+    // NOTE: @electron/remote has been removed from the project. Renderer code
+    // uses window.station.* API (exposed via contextBridge in main-preload.js).
 
     if (options.preventNavigation) {
       this.window.webContents.on('will-navigate', event => event.preventDefault());

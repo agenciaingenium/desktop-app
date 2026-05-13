@@ -9,10 +9,10 @@ export const isApplicationStoreTooltipDisabled = (state: StationState): boolean 
   state.getIn(['onboarding', 'appStoreTooltipDisabled'], false);
 
 export const getSleepNotification = (state: Immutable.Map<string, any>): number | undefined =>
-  state.getIn(['onboarding', 'sleepNotification']);
+  state.getIn(['onboarding', 'sleepNotification']) as number | undefined;
 
 export const getLastInvitationColleagueDate = (state: Immutable.Map<string, any>): number | undefined =>
-  state.getIn(['onboarding', 'lastInvitationColleagueDate']);
+  state.getIn(['onboarding', 'lastInvitationColleagueDate']) as number | undefined;
 
 export const isVisible = createSelector(
   isDone,

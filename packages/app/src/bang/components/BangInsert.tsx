@@ -1,66 +1,42 @@
 import { Button, Size, Style } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import gDriveIcon from '../../static/bang/googledrive.svg';
 
-interface Classes {
-  container: string,
-  item: string,
-  itemDescription: string,
-  itemCTA: string,
-  kbShortcut: string,
-  gdriveIcon: string,
-  gdriveDesc: string,
-}
-
 export interface Props {
-  classes?: Classes,
   isGDriveConnected: boolean,
   onGDriveConnect: () => any,
 }
 
-@injectSheet(() => ({
-  container: {
-    left: '5%',
-    top: 'calc(50% - 26px)',
-    display: 'flex',
-    width: '90%',
-    flexDirection: 'column',
-    margin: 'auto',
-    color: 'white',
-  },
-  item: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: [15, 0],
-    padding: 10,
-    backgroundColor: 'rgba(0, 0, 0, .1)',
-    fontSize: 11,
-    borderRadius: 100,
-    border: '1px solid rgba(255, 255, 255, .1)',
-  },
-  itemDescription: {
-    flexGrow: 1,
-    textAlign: 'center',
-    lineHeight: 1.5,
-  },
-  itemCTA: {
-    flexShrink: 0,
-  },
-  kbShortcut: {
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    padding: [3, 8],
-    borderRadius: 10,
-  },
-  gdriveIcon: {
-    width: 30,
-  },
-  gdriveDesc: {
-    margin: [0, 10],
-  },
-}))
+const containerStyle: React.CSSProperties = {
+  left: '5%',
+  top: 'calc(50% - 26px)',
+  display: 'flex',
+  width: '90%',
+  flexDirection: 'column',
+  margin: 'auto',
+  color: 'white',
+};
+
+const itemStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  margin: '15px 0',
+  padding: 10,
+  backgroundColor: 'rgba(0, 0, 0, .1)',
+  fontSize: 11,
+  borderRadius: 100,
+  border: '1px solid rgba(255, 255, 255, .1)',
+};
+
+const gdriveIconStyle: React.CSSProperties = {
+  width: 30,
+};
+
+const gdriveDescStyle: React.CSSProperties = {
+  margin: '0 10px',
+};
+
 export default class BangInsert extends React.PureComponent<Props> {
 
   constructor(props: Props) {
@@ -68,17 +44,17 @@ export default class BangInsert extends React.PureComponent<Props> {
   }
 
   renderGDriveTooltip() {
-    const { classes, onGDriveConnect } = this.props;
+    const { onGDriveConnect } = this.props;
 
     return (
-      <div className={classes!.item}>
-  
-        <img className={classes!.gdriveIcon} src={gDriveIcon} />
+      <div style={itemStyle}>
 
-        <p className={classes!.gdriveDesc}>Access Google Docs and Sheets with the Quick Switch</p>
+        <img style={gdriveIconStyle} src={gDriveIcon} />
+
+        <p style={gdriveDescStyle}>Access Google Docs and Sheets with the Quick Switch</p>
 
         <Button
-          className={classes!.itemCTA}
+          style={{ flexShrink: 0 }}
           onClick={onGDriveConnect}
           btnSize={Size.SMALL}
           btnStyle={Style.SECONDARY}
@@ -90,10 +66,10 @@ export default class BangInsert extends React.PureComponent<Props> {
   }
 
   render() {
-    const { classes, isGDriveConnected } = this.props;
+    const { isGDriveConnected } = this.props;
 
     return (
-      <div className={classes!.container}>
+      <div style={containerStyle}>
         {!isGDriveConnected &&
           this.renderGDriveTooltip()
         }

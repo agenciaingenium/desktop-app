@@ -1,16 +1,17 @@
 /* eslint-disable no-underscore-dangle */
-import { Menu, shell } from 'electron';
+import { Menu } from 'electron';
 import { EventEmitter } from 'events';
 import { SHORTCUTS } from '../../../keyboard-shortcuts';
 import { isDarwin } from '../../../utils/process';
+import { openExternal } from '../../../utils/shell';
 import { serializedKeyboardEvent } from './helpers';
 
 const openFaq = () => {
-  shell.openExternal('https://github.com/getstation/desktop-app/wiki/FAQ');
+  openExternal('https://github.com/getstation/desktop-app/wiki/FAQ');
 };
 
 const openPrivacyPolicies = () => {
-  shell.openExternal('https://github.com/getstation/desktop-app/wiki/FAQ#-data--privacy');
+  openExternal('https://github.com/getstation/desktop-app/wiki/FAQ#-data--privacy');
 };
 
 export class BrowserXMenuManager extends EventEmitter {

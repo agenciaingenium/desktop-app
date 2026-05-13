@@ -1,8 +1,6 @@
 import { Icon, IconSymbol } from '@getstation/theme';
 import * as classNames from 'classnames';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import {
   getNotificationBody,
   getNotificationDateFromNow,
@@ -12,41 +10,18 @@ import {
 } from '../../notifications/get';
 import { ImmutableNotification } from '../../notifications/types';
 
-export interface Classes {
-  item: string,
-  markAsReadIcon: string,
-  iconWrapper: string,
-}
-
 export interface Props {
-  classes?: Classes,
   notification: ImmutableNotification,
   markAsRead(notificationId: string): void,
   toggleVisibility(): any,
   onNotificationClick(notificationId: string): void
 }
 
-@injectSheet({
-  iconWrapper: {
-    display: 'inline-block',
-    width: 24,
-    height: 24,
-  },
-  markAsReadIcon: {
-    visibility: 'hidden',
-    borderRadius: '50%',
-    '&:hover': {
-      fill: 'white !important',
-      backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    },
-  },
-  item: {
-    '&:hover $markAsReadIcon': {
-      visibility: 'visible',
-    },
-  },
-})
-class NotificationItem extends React.PureComponent<Props, {}> {
+class NotificationItem extends React.PureComponent<Props, { hovered: boolean }> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hovered: false };
+  }
 
   handleClickMarkAsRead = (e: React.MouseEvent<any>) => {
     const notificationId = getNotificationId(this.props.notification);
@@ -62,17 +37,20 @@ class NotificationItem extends React.PureComponent<Props, {}> {
   }
 
   render() {
-    const { notification, classes } = this.props;
+    const { notification } = this.props;
+    const { hovered } = this.state;
     const body = getNotificationBody(notification);
 
     return (
       <div
         className={classNames(
-          classes!.item,
           'l-notification-item',
           { 'l-notification-item-compact': !isNotificationFull(notification) })
         }
+        style={{ cursor: 'default' }}
         onClick={this.handleClick}
+        onMouseEnter={() => this.setState({ hovered: true })}
+        onMouseLeave={() => this.setState({ hovered: false })}
       >
         <div className="l-notification-item__container">
           <div className="l-notification-item__content">
@@ -88,11 +66,16 @@ class NotificationItem extends React.PureComponent<Props, {}> {
             <span>{getNotificationDateFromNow(notification)}</span>
           </div>
         </div>
-        <span className={classes!.iconWrapper}>
+        <span style={{ display: 'inline-block', width: 24, height: 24 }}>
           <Icon
-            className={classes!.markAsReadIcon}
+            style={{
+              visibility: hovered ? 'visible' : 'hidden',
+              borderRadius: '50%',
+              fill: hovered ? 'white' : undefined,
+              backgroundColor: hovered ? 'rgba(255, 255, 255, 0.3)' : undefined,
+            }}
             symbolId={IconSymbol.CHECKMARK}
-            onClick={this.handleClickMarkAsRead}
+            onClick={this.handleClickMarkAsRead as any}
             size="24px"
             color={'rgba(255, 255, 255, 0.6)'}
           />

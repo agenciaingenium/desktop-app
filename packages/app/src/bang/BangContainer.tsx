@@ -10,15 +10,8 @@ import BangSubdock from './BangSubdock';
 import { SearchPaneClosedVia, setVisibility, toggleVisibility } from './duck';
 import { isVisible as getIsBangVisible } from './selectors';
 import * as classNames from 'classnames';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-
-interface Classes {
-  bangIcon: string,
-}
 
 export interface OwnProps {
-  classes?: Classes,
   onQuit: () => void,
 }
 
@@ -33,11 +26,6 @@ export interface DispatchProps {
 
 export type Props = OwnProps & StateProps & DispatchProps;
 
-@injectSheet(() => ({
-  bangIcon: {
-    opacity: .6,
-  },
-}))
 class BangContainerImpl extends React.PureComponent<Props> {
   constructor(props: Props) {
     super(props);
@@ -54,7 +42,7 @@ class BangContainerImpl extends React.PureComponent<Props> {
   }
 
   render() {
-    const { classes, isBangVisible, toggleBangVisibility } = this.props;
+    const { isBangVisible, toggleBangVisibility } = this.props;
     // remove the whitespace between ⌘ and T
     const kbd = SHORTCUTS.bang.kbd.replace(/\s/g, '');
     const toolTipText = `Quick switch  ${kbd}`;
@@ -65,11 +53,12 @@ class BangContainerImpl extends React.PureComponent<Props> {
         onRequestClose={this.hide}
       >
         <NativeAppDockIcon
-          className={classNames('appcues-bang-input', classes!.bangIcon)}
+          className={classNames('appcues-bang-input')}
           iconSymbolId={IconSymbol.SEARCH}
           onClick={toggleBangVisibility}
           tooltip={isBangVisible ? undefined : toolTipText}
           size={Size.BIG}
+          style={{ opacity: 0.6 }}
         />
         <ModalWrapper onClickOutside={this.hide} backgroundOverlay={false}>
           <BangSubdock onQuit={this.props.onQuit} />

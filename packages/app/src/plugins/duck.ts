@@ -13,6 +13,10 @@ export type SET_SERVICE_DATA_VALUE = 'browserX/plugins/SET_SERVICE_DATA_VALUE';
 export const SET_SERVICE_DATA_VALUE = 'browserX/plugins/SET_SERVICE_DATA_VALUE';
 export type SET_SERVICE_DATA_VALUE_METADATA = 'browserX/plugins/SET_SERVICE_DATA_VALUE_METADATA';
 export const SET_SERVICE_DATA_VALUE_METADATA = 'browserX/plugins/SET_SERVICE_DATA_VALUE_METADATA';
+export type REMOVE_SERVICE_DATA_VALUE = 'browserX/plugins/REMOVE_SERVICE_DATA_VALUE';
+export const REMOVE_SERVICE_DATA_VALUE = 'browserX/plugins/REMOVE_SERVICE_DATA_VALUE';
+export type CLEAR_SERVICE_DATA = 'browserX/plugins/CLEAR_SERVICE_DATA';
+export const CLEAR_SERVICE_DATA = 'browserX/plugins/CLEAR_SERVICE_DATA';
 
 // Types
 export type PluginValueMedata = {
@@ -32,6 +36,14 @@ export type SetServiceDataValueMetadataAction = {
   type: SET_SERVICE_DATA_VALUE_METADATA,
   serviceId: string, key: string, metadata: PluginValueMedata,
 };
+export type RemoveServiceDataValueAction = {
+  type: REMOVE_SERVICE_DATA_VALUE,
+  serviceId: string, key: string,
+};
+export type ClearServiceDataAction = {
+  type: CLEAR_SERVICE_DATA,
+  serviceId: string,
+};
 export type PluginsActions =
   FinAction |
   ErrorAction |
@@ -40,7 +52,9 @@ export type PluginsActions =
 
 export type ServiceDataActions =
   SetServiceDataValueAction |
-  SetServiceDataValueMetadataAction;
+  SetServiceDataValueMetadataAction |
+  RemoveServiceDataValueAction |
+  ClearServiceDataAction;
 
 // Action creators
 export const fin = (id: any): FinAction => ({
@@ -65,6 +79,12 @@ export const setServiceDataValueMetadata =
   (serviceId: string, key: string, metadata: PluginValueMedata): SetServiceDataValueMetadataAction => ({
     type: SET_SERVICE_DATA_VALUE_METADATA, serviceId, key, metadata,
   });
+export const removeServiceDataValue = (serviceId: string, key: string): RemoveServiceDataValueAction => ({
+  type: REMOVE_SERVICE_DATA_VALUE, serviceId, key,
+});
+export const clearServiceData = (serviceId: string): ClearServiceDataAction => ({
+  type: CLEAR_SERVICE_DATA, serviceId,
+});
 
 export default function plugin(state: Immutable.Map<string, any> = Immutable.Map(), action: PluginsActions) {
   switch (action.type) {
@@ -93,6 +113,16 @@ export function serviceDataReducer(state: Immutable.Map<string, any> = Immutable
     case SET_SERVICE_DATA_VALUE_METADATA: {
       const { serviceId, key, metadata } = action;
       return state.setIn([serviceId, '__metadata', key], Immutable.fromJS(metadata));
+    }
+
+    case REMOVE_SERVICE_DATA_VALUE: {
+      const { serviceId, key } = action;
+      return state.deleteIn([serviceId, key]);
+    }
+
+    case CLEAR_SERVICE_DATA: {
+      const { serviceId } = action;
+      return state.delete(serviceId);
     }
 
     default:

@@ -23,7 +23,6 @@ const mapStateToProps = (state) => ({
 
 const getOrderKey = (tab) => `${getTabApplicationId(tab)}/${getTabId(tab)}`;
 
-// TODO remove the connect with redux or move to containers
 @connect(mapStateToProps)
 class ApplicationScene extends React.PureComponent {
   static propTypes = {
@@ -90,7 +89,6 @@ class ApplicationScene extends React.PureComponent {
 
     return (
       <div className={classNames('l-webview')}>
-        {/* TODO: Migrate to JSS */}
         <div
           style={{
             position: 'relative',

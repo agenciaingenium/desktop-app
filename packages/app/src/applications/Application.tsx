@@ -6,7 +6,6 @@ import * as slack from 'slack';
 import { GradientType, withGradient } from '@getstation/theme';
 import ElectronWebview from '../common/components/ElectronWebview';
 import * as classNames from 'classnames';
-import { clipboard } from 'electron';
 import Maybe from 'graphql/tsutils/Maybe';
 // @ts-ignore
 import * as throttle from 'lodash.throttle';
@@ -80,7 +79,7 @@ const webviewMethods: WebviewMethods = {
   'go-back': (webview) => webview.isReady() && webview.goBack(),
   'go-forward': (webview) => webview.isReady() && webview.goForward(),
   'toggle-dev-tools': (webview) => webview.isReady() && toggleDevTools(webview),
-  'copy-url-to-clipboard': (webview) => webview.isReady() && clipboard.write({
+  'copy-url-to-clipboard': (webview) => webview.isReady() && window.station.clipboard.write({
     bookmark: webview.getTitle(),
     text: webview.getURL(),
   }),
@@ -197,13 +196,13 @@ class ApplicationImpl extends React.PureComponent {
     return ([-105, -106, -109, -130].includes(this.props.errorCode));
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    if (getTabId(nextProps.tab) !== getTabId(this.props.tab)) {
+  componentDidUpdate(prevProps: Props) {
+    if (getTabId(this.props.tab) !== getTabId(prevProps.tab)) {
       this.detachBus(); // bus will be automatically re-attached in the next render
     }
 
-    if (nextProps.isOnline
-      && !this.props.isOnline
+    if (this.props.isOnline
+      && !prevProps.isOnline
       && this.shouldReloadAfterConnectionLoss()
     ) {
       this.props.onLoadingError(null, null);
@@ -389,22 +388,8 @@ class ApplicationImpl extends React.PureComponent {
     this.webView = wv;
     if (this.webView && this.webView.view) {
       const webview = this.webView.view;
-      console.log('[App Debug] setWebviewRef for', this.props.legacyServiceId);
-      if (this.props.legacyServiceId === 'slack') {
-        webview.addEventListener('did-attach', () => {
-          console.log('[App Debug] Webview Attached for Slack');
-          webview.openDevTools();
-        });
-
-      }
 
       webview.addEventListener('dom-ready', () => {
-        console.log('[App Debug] DOM Ready for', this.props.legacyServiceId);
-        if (this.props.legacyServiceId === 'slack') {
-          webview.addEventListener('console-message', (e: any) => {
-            console.log('[Slack Console]', e.message);
-          });
-        }
         webview.addEventListener('did-navigate-in-page', (e: any) => this.handleDidNavigateInPage(e));
         webview.addEventListener('did-navigate', (e: any) => this.handleDidNavigate(e));
         webview.addEventListener('ipc-message', (e: any) => this.handleIPCMessage(e));
@@ -487,7 +472,7 @@ class ApplicationImpl extends React.PureComponent {
           onDidFailLoad={this.handleDidFailLoad}
           onDomReady={this.handleDomReady}
           onCrashed={this.handleWebcontentsCrashed}
-          webpreferences={`allowRunningInsecureContent=true,nativeWindowOpen=${useNativeWindowOpen},contextIsolation=true,nodeIntegration=true`}
+          webpreferences={`allowRunningInsecureContent=false,nativeWindowOpen=${useNativeWindowOpen},contextIsolation=true,nodeIntegration=false`}
         />
 
       </div>

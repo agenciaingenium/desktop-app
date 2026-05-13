@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import { map, omit } from 'ramda';
 
 const removeFavoriteIds = map(omit(['favoriteId']));
 
 const createTabFromFavorite = (favorite) => ({
   ...favorite,
-  tabId: `${favorite.applicationId}/${shortid.generate()}`,
+  tabId: `${favorite.applicationId}/${nanoid()}`,
   lastActivityAt: null,
   isApplicationHome: 0,
   createdAt: String(new Date()),

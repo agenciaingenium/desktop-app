@@ -10,11 +10,12 @@ import { BrowserWindowManagerServiceImpl } from './services/services/browser-win
 import services from './services/servicesManager';
 import { getUrlToLoad } from './utils/dev';
 import { isPackaged } from './utils/env';
-import * as remoteMain from '@electron/remote/main';
+import { registerStationIpcHandlers } from './main/ipc-handlers';
 
 bootServices(); // all side effects related to services (in main process)
 
-remoteMain.initialize();
+// Register station preload bridge IPC handlers
+registerStationIpcHandlers();
 
 const loadWorker = () => {
   const worker = new BrowserWindow({
@@ -26,14 +27,15 @@ const loadWorker = () => {
        */
       webSecurity: false,
       allowRunningInsecureContent: false,
+      // Worker uses nodeIntegration for Redux state sync and IPC.
+      // Migrating worker to contextIsolation requires refactoring shared-redux duplex.
       contextIsolation: false,
+      sandbox: false,
     },
     width: 0,
     height: 0,
     show: false,
   });
-
-  remoteMain.enable(worker.webContents);
 
   // Used by other renderers
   (global as any).worker = Object.freeze({
@@ -61,12 +63,10 @@ const loadWorker = () => {
 
   // Proxy for bx-api communication (replacing deprecating ipcRenderer.sendTo)
   ipcMain.on('bx-api-perform', (event, channel, payload) => {
-    console.log(`[DEBUG] main.ts: bx-api-perform from senderId=${event.sender.id}, channel=${channel}`);
     worker.webContents.send('bx-api-perform', { senderId: event.sender.id }, channel, payload);
   });
 
   ipcMain.on('bx-api-subscribe', (event, channel) => {
-    console.log(`[DEBUG] main.ts: bx-api-subscribe from senderId=${event.sender.id}, channel=${channel}`);
     worker.webContents.send('bx-api-subscribe', { senderId: event.sender.id }, channel);
   });
 
@@ -74,10 +74,8 @@ const loadWorker = () => {
   // IMPORTANT: We include the original sender's ID so the target renderer knows who to reply to.
   // The format is: targetWebContents.send(channel, { __senderId: originalSenderId }, ...data)
   ipcMain.on('bx-api-response', (event, targetId, channel, ...args) => {
-    console.log(`[DEBUG] bx-api-response: from=${event.sender.id}, targetId=${targetId}, channel=${channel}, argsCount=${args.length}`);
     const targetWebContents = webContents.fromId(targetId);
     if (targetWebContents) {
-      console.log(`[DEBUG] Forwarding to webContents ${targetId} on channel ${channel} with senderId=${event.sender.id}`);
       // Include the original sender's webContentsId so the target can reply back
       targetWebContents.send(channel, { __senderId: event.sender.id }, ...args);
     } else {
@@ -88,19 +86,27 @@ const loadWorker = () => {
   return worker;
 };
 
+const cliPreloadPath = path.join(__dirname, 'static/preload/cli-preload.js');
+
 const loadCliWindow = async (command: string) => {
   await app.whenReady();
   const bw = new BrowserWindow({
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
       backgroundThrottling: false,
-      contextIsolation: false,
+      contextIsolation: true,
+      sandbox: false,
+      preload: cliPreloadPath,
     },
     width: 0,
     height: 0,
     show: false,
   });
-  remoteMain.enable(bw.webContents);
+
+  // Share command-line arguments with the CLI renderer via global
+  (global as any).sharedObject = {
+    mmds: process.argv.filter(x => x.endsWith('.mmd')),
+  };
 
   await bw.loadURL(getUrlToLoad('cli.html'));
 
@@ -175,8 +181,7 @@ const installDevToolsExtensions = async () => {
   // Apollo Client Developer Tools
   //  await ECx.load('jdkknkkbebbapilgoeccciglkfbmbnfm');
 
-  // TODO: not working as it
-  // Redux DevTools
+  // Redux DevTools (not currently functional)
   // await ECx.load('lmhkpmbekcpmknklioeibfkpmmfibljd');
 };
 

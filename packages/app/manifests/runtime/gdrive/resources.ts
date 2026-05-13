@@ -2,7 +2,6 @@ import { resources, SDK } from '@getstation/sdk';
 
 import { Credentials } from 'google-auth-library/build/src/auth/credentials';
 import memoizee = require('memoizee');
-import allSettled = require('promise.allsettled');
 import { EMPTY, Observable } from 'rxjs';
 
 import { idExtractor } from './activity';
@@ -19,7 +18,7 @@ const getMetadataHandler = memoizee(
         const getFileFromClients = () => Array.from(clients.values())
           .map(c => c.getFile(resourceId));
 
-        const responses = await allSettled(getFileFromClients());
+        const responses = await Promise.allSettled(getFileFromClients());
         const fulfilledResponse = responses.find(res => res.status === 'fulfilled');
 
         if (fulfilledResponse) {

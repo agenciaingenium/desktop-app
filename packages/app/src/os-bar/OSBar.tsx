@@ -1,17 +1,9 @@
 import * as classNames from 'classnames';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import DockNavigationButtons from '../dock-navigation/components/DockNavigationButtons';
 import TrafficLightsContainer from '../dock/components/TrafficLightsContainer';
 
-export interface Classes {
-  container: string,
-  navigation: string,
-}
-
 export interface Props {
-  classes?: Classes,
   themeGradient: string,
   title: string,
   onDoubleClick: () => any,
@@ -22,16 +14,14 @@ export interface Props {
   onGoForward?: () => any,
 }
 
-const styles = () => ({
-  container: {
-    backgroundColor: 'transparent',
-  },
-  navigation: {
-    margin: [-2, 0, -0, 10],
-  },
-});
+const CONTAINER_STYLE: React.CSSProperties = {
+  backgroundColor: 'transparent',
+};
 
-@injectSheet(styles)
+const NAVIGATION_STYLE: React.CSSProperties = {
+  margin: '-2px 0 0 10px',
+};
+
 export default class OSBar extends React.PureComponent<Props, {}> {
   constructor(props: Props) {
     super(props);
@@ -49,13 +39,13 @@ export default class OSBar extends React.PureComponent<Props, {}> {
   }
 
   render() {
-    const { title, onClose, onDoubleClick, classes, canGoBack, canGoForward } = this.props;
+    const { title, onClose, onDoubleClick, canGoBack, canGoForward } = this.props;
 
     return (
-      <div className={classNames('l-osbar', classes!.container)} onDoubleClick={onDoubleClick}>
+      <div className={classNames('l-osbar')} style={CONTAINER_STYLE} onDoubleClick={onDoubleClick}>
         <TrafficLightsContainer onClose={onClose} />
 
-        <div className={classes!.navigation}>
+        <div style={NAVIGATION_STYLE}>
           <DockNavigationButtons
             canGoBack={canGoBack}
             canGoForward={canGoForward}

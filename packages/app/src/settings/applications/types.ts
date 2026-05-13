@@ -23,4 +23,4 @@ export type Instance = {
   passwordManagerLink?: PasswordManagerLink,
 };
 
-export type Instances = Immutable.Iterable<number, Instance>;
+export type Instances = Immutable.Collection.Indexed<Instance>;
