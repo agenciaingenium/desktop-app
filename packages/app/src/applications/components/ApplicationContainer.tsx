@@ -1,7 +1,5 @@
-import { Icon, IconSymbol, ThemeTypes as Theme } from '@getstation/theme';
+import { Icon, IconSymbol, theme } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import * as log from 'electron-log';
 import { logger } from '../../api/logger';
 
@@ -10,14 +8,6 @@ import ApplicationError from './ApplicationError';
 import ApplicationLoading from './ApplicationLoading';
 import ApplicationAboutBlank from './ApplicationAboutBlank';
 import Maybe from 'graphql/tsutils/Maybe';
-
-export interface Classes {
-  container: string,
-  container2: string,
-  icon: string,
-  iconContainer: string,
-  unhappyIcon: string
-}
 
 export interface OwnProps {
   ready: boolean,
@@ -30,7 +20,6 @@ export interface OwnProps {
   errorCode: any,
   errorDescription: any,
 
-  classes?: Classes,
   themeGradient: string,
   tabUrl: string,
 
@@ -55,67 +44,6 @@ export interface StateProps {
 
 export type Props = OwnProps & StateProps;
 
-const styles = (theme: Theme) => {
-  const smallIcon = (props: Props) => props.promptBasicAuth;
-  const stopAnimation = (props: Props) => props.crashed || props.promptBasicAuth;
-
-  return ({
-    container: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'column',
-      position: 'fixed',
-      top: 0,
-      left: theme.dock.size,
-      right: 0,
-      backgroundImage: (props: Props) => props.themeGradient,
-      zIndex: 100,
-      padding: '10px',
-    },
-    container2: {
-      display: 'flex',
-      width: '100%',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(255,255,255, 0.1)',
-      borderRadius: '3px',
-      height: '100%',
-      color: 'white',
-      fontSize: '14px',
-    },
-    iconContainer: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: (props: Props) => smallIcon(props) ? 80 : 160,
-      height: (props: Props) => smallIcon(props) ? 80 : 160,
-      marginBottom: 30,
-      borderRadius: 100,
-      backgroundColor: 'rgba(255, 255, 255, .3)',
-      position: 'relative',
-    },
-    icon: {
-      width: (props: Props) => smallIcon(props) ? 60 : 120,
-      height: (props: Props) => smallIcon(props) ? 60 : 120,
-      animation: (props: Props) => stopAnimation(props) ? 'none' : '3s ease-in-out 0s infinite pulsation',
-    },
-    unhappyIcon: {
-      opacity: 0.8,
-      position: 'absolute',
-      bottom: '-16px',
-      right: '-16px',
-    },
-    '@keyframes pulsation': {
-      '0%': { transform: 'scale(1)' },
-      '50%': { transform: 'scale(1.2)' },
-      '100%': { transform: 'scale(1)' },
-    },
-  });
-};
-
-@injectSheet(styles)
 class ApplicationContainer extends React.PureComponent<Props, {}> {
 
   handleNavigateAboutBlank = () => {
@@ -130,10 +58,10 @@ class ApplicationContainer extends React.PureComponent<Props, {}> {
 
   render() {
     const {
-      classes, ready, crashed, errorCode, errorDescription, webView, promptBasicAuth,
+      ready, crashed, errorCode, errorDescription, webView, promptBasicAuth,
       applicationName, applicationIcon, email, performBasicAuth, authInfoHost, authInfoRealm,
       tabUrl, canGoBack, goBack,
-      askResetApplication, manifestURL,
+      askResetApplication, manifestURL, themeGradient,
     } = this.props;
 
     const hasError = crashed || typeof errorCode === 'number';
@@ -141,19 +69,63 @@ class ApplicationContainer extends React.PureComponent<Props, {}> {
 
     if (ready && !hasError && !promptBasicAuth && !isAboutBlank) return null;
 
+    const smallIcon = promptBasicAuth;
+    const stopAnimation = crashed || promptBasicAuth;
+
+    const containerStyle: React.CSSProperties = {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'column',
+      position: 'fixed',
+      top: 0,
+      left: theme.dock.size,
+      right: 0,
+      backgroundImage: themeGradient,
+      zIndex: 100,
+      padding: '10px',
+    };
+
+    const iconStyle: React.CSSProperties = {
+      width: smallIcon ? 60 : 120,
+      height: smallIcon ? 60 : 120,
+      animation: stopAnimation ? 'none' : '3s ease-in-out 0s infinite pulsation',
+    };
+
     return (
-      <div className={classes!.container}>
-        <div className={classes!.container2}>
-          <div className={classes!.iconContainer}>
+      <div style={containerStyle}>
+        <div style={{
+          display: 'flex',
+          width: '100%',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(255,255,255, 0.1)',
+          borderRadius: '3px',
+          height: '100%',
+          color: 'white',
+          fontSize: '14px',
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: smallIcon ? 80 : 160,
+            height: smallIcon ? 80 : 160,
+            marginBottom: 30,
+            borderRadius: 100,
+            backgroundColor: 'rgba(255, 255, 255, .3)',
+            position: 'relative',
+          }}>
             { this.props.applicationIcon &&
-            <img className={classes!.icon} src={this.props.applicationIcon} alt="Icon"/>
+            <img style={iconStyle} src={this.props.applicationIcon} alt="Icon"/>
             }
             {
               crashed &&
               <Icon
                 size={96}
                 symbolId={IconSymbol.UNHAPPY}
-                className={classes!.unhappyIcon}
+                style={{ opacity: 0.8, position: 'absolute', bottom: '-16px', right: '-16px' }}
               />
             }
           </div>

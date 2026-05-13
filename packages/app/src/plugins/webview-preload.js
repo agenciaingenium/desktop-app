@@ -139,5 +139,3 @@ const bxApi = {
 };
 
 contextBridge.exposeInMainWorld('bxApi', bxApi);
-
-console.log('>>>> contextBridge done')

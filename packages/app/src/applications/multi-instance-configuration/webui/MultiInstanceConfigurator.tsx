@@ -1,6 +1,4 @@
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { BxAppManifest } from '../../manifest-provider/bxAppManifest';
 import ChooseIdentityForm from './components/ChooseIdentityForm';
 import ChooseCommonForm from './components/ChooseCommonForm';
@@ -28,18 +26,7 @@ const getHostname = (url: string): string => {
   }
 };
 
-export interface Classes {
-  page: string,
-  shell: string,
-  iconContainer: string,
-  icon: string,
-  container: string,
-  remove: string,
-  removeCTA: string,
-}
-
 export interface Props {
-  classes?: Classes,
   manifestURL: string,
   applicationId: string,
 }
@@ -47,79 +34,14 @@ export interface Props {
 export interface State {
   manifest?: BxAppManifest,
   selectedPreset: Preset,
+  hoveredRemoveCTA: boolean,
 }
 
-const styles = {
-  page: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'linear-gradient(120deg, #2B91BA, #3794C2, #4B99CF, #629FDD)',
-    padding: 10,
-  },
-  shell: {
-    display: 'flex',
-    width: '100%',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 3,
-    height: '100%',
-    color: 'white',
-    fontSize: 14,
-    position: 'relative',
-  },
-  iconContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 80,
-    height: 80,
-    marginBottom: 30,
-    borderRadius: 100,
-    backgroundColor: 'rgba(255, 255, 255, .3)',
-    position: 'relative',
-  },
-  icon: {
-    width: 60,
-    height: 60,
-  },
-  container: {
-    width: 260,
-    textAlign: 'center',
-  },
-  title: {
-    marginBottom: 17,
-    fontSize: 13,
-    fontWeight: 600,
-  },
-  remove: {
-    marginLeft: 28,
-    bottom: 40,
-    position: 'absolute',
-  },
-  removeCTA: {
-    fontStyle: 'italic',
-    paddingLeft: 3,
-    cursor: 'pointer',
-    '&:hover': {
-      textDecoration: 'underline',
-    },
-  },
-};
-@injectSheet(styles)
 export default class MultiInstanceConfigurator extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { selectedPreset: UndefinedPreset };
+    this.state = { selectedPreset: UndefinedPreset, hoveredRemoveCTA: false };
   }
 
   submitSubdomainForm = (subdomain: string) => {
@@ -281,23 +203,67 @@ export default class MultiInstanceConfigurator extends React.Component<Props, St
   }
 
   render() {
-    const { classes } = this.props;
     const { manifest } = this.state;
+    const { hoveredRemoveCTA } = this.state;
 
     if (!manifest) return null;
 
     return (
-      <div className={classes.page}>
-        <div className={classes.shell}>
-          <div className={classes.iconContainer}>
-            <img className={classes.icon} src={interpretedIconUrl(manifest)} width={60} height={60} alt="Icon" />
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        position: 'absolute' as const,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'linear-gradient(120deg, #2B91BA, #3794C2, #4B99CF, #629FDD)',
+        padding: 10,
+      }}>
+        <div style={{
+          display: 'flex',
+          width: '100%',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(255,255,255,0.1)',
+          borderRadius: 3,
+          height: '100%',
+          color: 'white',
+          fontSize: 14,
+          position: 'relative' as const,
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: 80,
+            height: 80,
+            marginBottom: 30,
+            borderRadius: 100,
+            backgroundColor: 'rgba(255, 255, 255, .3)',
+            position: 'relative' as const,
+          }}>
+            <img style={{ width: 60, height: 60 }} src={interpretedIconUrl(manifest)} width={60} height={60} alt="Icon" />
           </div>
-          <div className={classes!.container}>
+          <div style={{ width: 260, textAlign: 'center' as const }}>
             {this.chooseForm()}
 
-            <p className={classes!.remove}>
+            <p style={{ marginLeft: 28, bottom: 40, position: 'absolute' as const }}>
               I don't need this app,
-              <a className={classes!.removeCTA} onClick={this.removeApplication}>
+              <a
+                style={{
+                  fontStyle: 'italic',
+                  paddingLeft: 3,
+                  cursor: 'pointer',
+                  textDecoration: hoveredRemoveCTA ? 'underline' : 'none',
+                }}
+                onClick={this.removeApplication}
+                onMouseEnter={() => this.setState({ hoveredRemoveCTA: true })}
+                onMouseLeave={() => this.setState({ hoveredRemoveCTA: false })}
+              >
                 remove it
               </a>.
             </p>

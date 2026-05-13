@@ -14,7 +14,7 @@ export enum OpenApplicationPreferencesVia {
 export type OpenApplicationPreferencesAction = {
   type: OPEN_APPLICATION_PREFERENCES,
   manifestURL: string,
-  via: OpenApplicationPreferencesVia,
+  via: OpenApplicationPreferencesViaType,
 };
 
 // Action creators

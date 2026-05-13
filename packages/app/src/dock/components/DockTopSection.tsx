@@ -1,6 +1,4 @@
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import TrafficLightsContainer from './TrafficLightsContainer';
 import DockNavigation from '../../dock-navigation/DockNavigationContainer';
 import SearchWrapper from '../../bang/BangContainer';
@@ -14,12 +12,7 @@ import {
 } from '../../bang/duck';
 import { ActivityEntry } from '../../activity/queries@local.gql.generated';
 
-interface Classes {
-  container: string,
-}
-
 interface Props {
-  classes?: Classes,
   isDarwin: boolean,
   onClose: () => any,
   handleBangWillUnmount: () => any,
@@ -39,25 +32,22 @@ interface Props {
   hideRecentSubdock: (via: SearchPaneClosedVia) => void,
 }
 
-const styles = () => ({
-  container: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingBottom: 2,
-  },
-});
-
-@injectSheet(styles)
 export default class DockTopSection extends React.PureComponent<Props, {}> {
   render() {
     const {
-      classes, isDarwin, onClose, cyclingStep,
+      isDarwin, onClose, cyclingStep,
       ctrlTabCycling, handlePaneEscape, stopCycling, recentApplications, selectItem,
       handleRecentDockDidMount, handleRecentDockWillUnmount, highlightedRecentSubdockItemId,
       setHighlightedRecentSubdockItemId, isRecentSubdockVisible, showRecentSubdock, hideRecentSubdock,
     } = this.props;
 
     return (
-      <div className={classes!.container}>
+      <div
+        style={{
+          backgroundColor: 'rgba(255,255,255,0.2)',
+          paddingBottom: 2,
+        }}
+      >
         {isDarwin &&
           <TrafficLightsContainer onClose={onClose} />
         }

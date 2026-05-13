@@ -36,7 +36,8 @@ async function safePromise<T>(p: Promise<T>): Promise<T | undefined> {
 
 // used to attempt to have the best quality favicon
 export const getFavicon = memoize(async (originUrl: string): Promise<string | undefined> => {
-  const favicon: string | undefined = await safePromise(fetchFavicon(originUrl));
+  // `fetch-favicon` can throw synchronously on redirect/header edge cases.
+  const favicon: string | undefined = await safePromise(Promise.resolve().then(() => fetchFavicon(originUrl)));
   if (!favicon) return undefined;
 
   if (!isValidAbsoluteUrl(favicon)) { // here the favicon url could be relative: e.g. `/favicon.ico`

@@ -2,7 +2,7 @@ import { SagaIterator } from 'redux-saga';
 import { all, call, fork, getContext, put, select } from 'redux-saga/effects';
 // @ts-ignore: no declaration file
 import { updateUI } from 'redux-ui/transpiled/action-reducer';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import { BrowserXAppWorker } from '../../app-worker';
 import { changeAppFocusState } from '../../app/duck';
 import { changeSelectedAppMain } from '../../nav/duck';
@@ -94,7 +94,7 @@ function* setHomeTabAsActiveForApplication({ applicationId }: SetHomeTabAsActive
 }
 
 function* sagaCreateNewTab({ applicationId, url, home, detach: shouldDetach, navigateToApplication }: CreateNewTabAction) {
-  const id = shortid.generate();
+  const id = nanoid();
   const tabId = `${applicationId}/${id}`;
   if (shouldDetach) {
     yield put(detach(tabId));

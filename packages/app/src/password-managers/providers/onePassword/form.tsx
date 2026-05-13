@@ -1,22 +1,12 @@
-import { Button, Input, InputType, Style, ThemeTypes as Theme } from '@getstation/theme';
+import { Button, Input, InputType, Style, theme } from '@getstation/theme';
 // @ts-ignore: no declaration file
 import * as isBlank from 'is-blank';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { AddPasswordManagerAction, ConfigurationStep } from '../../duck';
 import Providers from '../../providers';
 import { Provider } from '../../types';
 
-export interface Classes {
-  buttonsContainer: string,
-  marginBottom: string,
-  error: string,
-  onboard: string,
-}
-
 export interface Props {
-  classes?: Classes,
   configurationProcess: AddPasswordManagerAction,
   onConnect: (provider: Provider, payload: object) => any,
   onCancel: (provider: Provider) => any,
@@ -35,40 +25,31 @@ export interface State {
   errors: any,
 }
 
-const styles = (theme: Theme) => ({
-  onboard: {
-    marginBottom: 8,
-    fontSize: '12px',
-    color: 'rgba(255,255,255,1)',
-    textAlign: 'left',
-    fontStyle: 'italic',
-    fontWeight: 600,
-    '& a': {
-      color: 'rgba(255,255,255,0.6)',
-      '&:hover': {
-        textDecoration: 'underline',
-      },
-    },
-  },
-  buttonsContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: 30,
-    '& button': {
-      width: '48%',
-    },
-  },
-  marginBottom: {
-    marginBottom: 15,
-  },
-  error: {
-    marginBottom: 15,
-    ...theme.fontMixin(12, 'bold'),
-    color: theme.colors.error,
-  },
-});
+const onboardStyle: React.CSSProperties = {
+  marginBottom: 8,
+  fontSize: '12px',
+  color: 'rgba(255,255,255,1)',
+  textAlign: 'left',
+  fontStyle: 'italic',
+  fontWeight: 600,
+};
 
-@injectSheet(styles)
+const buttonsContainerStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  marginTop: 30,
+};
+
+const marginBottomStyle: React.CSSProperties = {
+  marginBottom: 15,
+};
+
+const errorStyle: React.CSSProperties = {
+  marginBottom: 15,
+  ...theme.fontMixin(12, 'bold'),
+  color: theme.colors.error,
+};
+
 export default class OnePasswordForm extends React.PureComponent<Props & OverridableProps, State> {
   static onePasswordDomains = ['.1password.com', '.1password.ca', '1password.eu'];
 
@@ -98,10 +79,10 @@ export default class OnePasswordForm extends React.PureComponent<Props & Overrid
       }, {});
   }
 
-  UNSAFE_componentWillUpdate(nextProps: Readonly<Props>) {
-    const { configurationProcess: { step } } = this.props;
+  componentDidUpdate(prevProps: Readonly<Props>) {
+    const { configurationProcess: { step } } = prevProps;
 
-    if (step === ConfigurationStep.Test && nextProps.configurationProcess.step === ConfigurationStep.Error) {
+    if (step === ConfigurationStep.Test && this.props.configurationProcess.step === ConfigurationStep.Error) {
       this.setState({ masterPassword: '' });
     }
   }
@@ -139,11 +120,11 @@ export default class OnePasswordForm extends React.PureComponent<Props & Overrid
   }
 
   render() {
-    const { classes, error, onCancel } = this.props;
+    const { error, onCancel } = this.props;
 
     return (
       <div>
-        <div className={classes!.onboard}>
+        <div className="onepassword-onboard" style={onboardStyle}>
           👉
           <a
             href="http://faq.getstation.com/login-and-passwords/how-to-use-1password-integration"
@@ -153,12 +134,12 @@ export default class OnePasswordForm extends React.PureComponent<Props & Overrid
           </a>
         </div>
         { error &&
-          <div className={classes!.error}>{error}</div>
+          <div style={errorStyle}>{error}</div>
         }
         <Input
           type={InputType.TEXT}
           label={'Domain'}
-          className={classes!.marginBottom}
+          style={marginBottomStyle}
           autoFocus={true}
           error={this.state.errors.domain}
           placeholder={'domain.1password.com'}
@@ -169,7 +150,7 @@ export default class OnePasswordForm extends React.PureComponent<Props & Overrid
         <Input
           type={InputType.TEXT}
           label={'Email'}
-          className={classes!.marginBottom}
+          style={marginBottomStyle}
           error={this.state.errors.email}
           placeholder={'your@email.com'}
           value={this.state.email}
@@ -179,7 +160,7 @@ export default class OnePasswordForm extends React.PureComponent<Props & Overrid
         <Input
           type={InputType.TEXT}
           label={'Secret Key'}
-          className={classes!.marginBottom}
+          style={marginBottomStyle}
           error={this.state.errors.secretKey}
           placeholder={'XX-XXXXXX-XXXXXX-XXXXXX'}
           value={this.state.secretKey}
@@ -189,14 +170,14 @@ export default class OnePasswordForm extends React.PureComponent<Props & Overrid
         <Input
           type={InputType.PASSWORD}
           label={'Master Password'}
-          className={classes!.marginBottom}
+          style={marginBottomStyle}
           error={this.state.errors.masterPassword}
           placeholder={'******'}
           value={this.state.masterPassword}
           onChange={(event: any) => this.setState({ masterPassword: event.target.value })}
         />
 
-        <div className={classes!.buttonsContainer}>
+        <div className="onepassword-buttons-container" style={buttonsContainerStyle}>
           <Button
             btnStyle={Style.SECONDARY}
             onClick={() => {

@@ -1,7 +1,6 @@
 import { updateUI } from 'redux-ui/transpiled/action-reducer';
 import classNames from 'classnames';
 import memoize from 'memoizee';
-import * as remote from '@electron/remote';
 import mod from 'mod-op';
 import PropTypes from 'prop-types';
 import { findIndex, prop, propEq, tail } from 'ramda';
@@ -9,7 +8,6 @@ import React from 'react';
 import { findDOMNode } from 'react-dom';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { compose } from 'react-apollo';
-import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed';
@@ -55,19 +53,15 @@ import { logger } from '../api/logger';
 import { changeSelectedApp } from '../applications/duck';
 import { OnApplicationInstalled } from './OnApplicationInstalled';
 
-const styles = () => ({
-  bottomSection: {
-    padding: '2px 0',
-    backgroundColor: 'rgba(255,255,255,0.2)'
-  }
-});
+const bottomSectionStyle = {
+  padding: '2px 0',
+  backgroundColor: 'rgba(255,255,255,0.2)',
+};
 
-const onTrafficLightClose = () => remote.getCurrentWindow().close();
+const onTrafficLightClose = () => window.station.window.close();
 
-@injectSheet(styles)
 class DockImpl extends React.PureComponent {
   static propTypes = {
-    classes: PropTypes.object.isRequired,
     applications: ImmutablePropTypes.list.isRequired,
     activeApplicationId: PropTypes.string,
     subdockApplicationId: PropTypes.string,
@@ -134,16 +128,14 @@ class DockImpl extends React.PureComponent {
     this.onSubdockOverStateChange = this.onSubdockOverStateChange.bind(this);
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { activeCyclingTabId } = this.state;
-    const highlightedItemIdChanged = this.props.highlightedItemId !== nextProps.highlightedItemId;
-    const activeCyclingTabIdNotChanged = activeCyclingTabId && activeCyclingTabId !== nextProps.highlightedItemId;
-    if (highlightedItemIdChanged && activeCyclingTabIdNotChanged) {
-      this.setState({ activeCyclingTabId: nextProps.highlightedItemId });
-    }
-  }
-
   componentDidUpdate(prevProps, prevState) {
+    const { activeCyclingTabId } = this.state;
+    const highlightedItemIdChanged = prevProps.highlightedItemId !== this.props.highlightedItemId;
+    const activeCyclingTabIdNotChanged = activeCyclingTabId && activeCyclingTabId !== this.props.highlightedItemId;
+    if (highlightedItemIdChanged && activeCyclingTabIdNotChanged) {
+      this.setState({ activeCyclingTabId: this.props.highlightedItemId });
+    }
+
     if (this.state.applicationId && (this.isSubdockOpen(this.state) !== this.isSubdockOpen(prevState)
       || prevState.applicationId !== this.state.applicationId)) {
       this.props.onOverStateChange(this.state.applicationId);
@@ -466,7 +458,7 @@ class DockImpl extends React.PureComponent {
 
   render() {
     const {
-      applications, classes, applicationsTabAdded, passwordManagerLinks,
+      applications, applicationsTabAdded, passwordManagerLinks,
       recentItems, highlightedItemId, setHighlightedRecentSubdockItemId,
       isRecentSubdockVisible, cyclingStep,
     } = this.props;
@@ -530,7 +522,7 @@ class DockImpl extends React.PureComponent {
           <DockIconDragLayer onDraggingStateChange={this.onDraggingStateChange} />
         </div>
 
-        <div className={classes.bottomSection}>
+        <div style={bottomSectionStyle}>
           <AutoUpdateDockNotification />
           <AppStore />
           <FocusModeDockContainer />

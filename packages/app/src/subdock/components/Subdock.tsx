@@ -1,18 +1,29 @@
 import * as React from 'react';
-// @ts-ignore no declaration file
-import injectSheet from 'react-jss';
 import { Application } from '../types';
 import { ITabSelectedInfo, ActiveTab } from '../Container';
 import SubdockHead from './SubdockHead';
 import SubdockPanel from './SubdockPanel';
 
-interface Classes {
-  container: string,
-  panels: string,
-}
+const containerStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  width: 280,
+  zIndex: 4,
+  borderRadius: 4,
+  maxHeight: '98vh',
+  backgroundColor: '#254969',
+  backgroundAttachment: 'fixed',
+};
+
+const panelsStyle: React.CSSProperties = {
+  flex: '1 1 auto',
+  position: 'relative',
+  overflowY: 'auto',
+  scrollbarWidth: 'none' as any,
+  msOverflowStyle: 'none',
+};
 
 interface Props {
-  classes?: Classes,
   application: Application,
   applicationId: string,
   onOverStateChange: (change: boolean) => any,
@@ -34,30 +45,11 @@ interface Props {
   handleHideSubdock: () => void,
 }
 
-@injectSheet(() => ({
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: 280,
-    zIndex: 4,
-    borderRadius: 4,
-    maxHeight: '98vh',
-    backgroundColor: '#254969',
-    backgroundAttachment: 'fixed',
-  },
-  panels: {
-    flex: '1 1 auto',
-    position: 'relative',
-    '&::-webkit-scrollbar': {
-      display: 'none',
-    },
-  },
-}))
 export default class Subdock extends React.PureComponent<Props, {}> {
 
   render() {
     const {
-      classes, application, onOverStateChange, notificationsEnabled,
+      application, onOverStateChange, notificationsEnabled,
       handleHideSubdock, activeTab, onSelectTab, onDetachTab, onAttachTab, onSelectFavorite, onAddTabAsFavorite,
       onRemoveFavorite, onDetachFavorite, onCloseTab, onClickAddNewInstance, onOpenNewTab, openApplicationPreferences,
       toggleNotifications,
@@ -67,7 +59,7 @@ export default class Subdock extends React.PureComponent<Props, {}> {
     const onMouseLeave = () => onOverStateChange(false);
 
     return (
-      <div className={classes!.container} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <div className="subdock-container" style={containerStyle} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
         <SubdockHead
           application={application}
           notificationsEnabled={notificationsEnabled}
@@ -75,7 +67,7 @@ export default class Subdock extends React.PureComponent<Props, {}> {
           toggleNotifications={toggleNotifications}
         />
 
-        <div className={classes!.panels}>
+        <div className="subdock-panels" style={panelsStyle}>
           {application &&
             <SubdockPanel
               application={application}

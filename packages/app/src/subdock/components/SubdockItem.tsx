@@ -1,11 +1,9 @@
 import * as React from 'react';
 import Maybe from 'graphql/tsutils/Maybe';
-import { getHighlightGradient, Icon, IconSymbol, roundedBackground, ThemeTypes as Theme } from '@getstation/theme';
+import { getHighlightGradient, Icon, IconSymbol, theme } from '@getstation/theme';
 import * as classNames from 'classnames';
 // @ts-ignore: no declaration file
 import * as isBlank from 'is-blank';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 
 import AppIcon from '../../dock/components/AppIcon';
 
@@ -13,114 +11,52 @@ import SubdockButton from './SubdockButton';
 
 // STYLE
 
-type OwnStyle = {
-  item: string,
-  iconWrapper: string,
-  iconWrapperActive: string,
-  txt: string,
-  favoriteIcon: string,
-  favoriteIconWrapper: string,
-  favoriteImg: string,
-  link: string,
-  buttons: string,
-  unPinned: string,
-};
-
 export const SUBDOCK_ITEM_HEIGHT = 40;
 
-const styles = (theme: Theme) => ({
-  item: {
-    padding: '0 20px 0 15px',
-    borderBottom: '2px solid rgba(255,255,255,0.1)',
-    listStyleType: 'none',
-    '&:hover': {
-      backgroundImage: getHighlightGradient(undefined, .30),
-    },
-    '&.isActive': {
-      backgroundImage: getHighlightGradient(undefined, .50),
-    },
-    '&:last-child': {
-      borderBottom: 'none',
-    },
-    '& $buttons': {
-      display: 'none',
-    },
-    '&:hover $buttons': {
-      display: 'flex',
-    },
-  },
-  link: {
-    display: 'flex',
-    alignItems: 'center',
-    cursor: 'default',
-    height: SUBDOCK_ITEM_HEIGHT,
-    position: 'relative',
-    borderBottom: '1px solid rgba(white, 0.15)',
-  },
-  favoriteIcon: {
-    opacity: 0.4,
-    '&:hover': {
-      opacity: 0.7,
-    },
-    '$item.isActive &, $item.favorite &': {
-      opacity: 1,
-    },
-  },
-  favoriteImg: {
-    flex: '0 0 auto',
-    marginRight: '9px',
-    opacity: 1,
-    borderRadius: '8px',
-    filter: 'grayscale(100%)',
-    '$link:hover &': {
-      filter: 'grayscale(30%)',
-    },
-    '$item.isActive &': {
-      filter: 'grayscale(0)',
-    },
-  },
-  txt: {
-    color: 'white',
-    flex: '1 1 auto',
-    marginRight: '5px',
-    position: 'relative',
-    opacity: 0.8,
-    ...theme.elipsisMixin(1),
-    ...theme.fontMixin(13),
-    '$item.isActive &': {
-      opacity: 1,
-      ...theme.fontMixin(13, 700),
-    },
-  },
-  iconWrapper: {
-    width: 24,
-    height: 24,
-    opacity: 0.8,
-    display: 'inline-flex',
-    marginLeft: '-8px',
-    '$item.isActive &': {
-      opacity: 1,
-    },
-  },
-  favoriteIconWrapper: {
-    width: 24,
-    height: 24,
-    marginLeft: '-3px',
-    marginRight: '5px',
-    display: 'inline-flex',
-    '&:hover': {
-      ...roundedBackground('rgba(255,255,255,0.2)'),
-    },
-    '$item.favorite &': {
-      ...roundedBackground('#EFC657'),
-    },
-  },
-  buttons: {
-  },
-  unPinned: {
-    transform: 'rotate(45deg)',
-  },
-});
+const itemBaseStyle: React.CSSProperties = {
+  padding: '0 20px 0 15px',
+  borderBottom: '2px solid rgba(255,255,255,0.1)',
+  listStyleType: 'none',
+};
+
+const linkStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  cursor: 'default',
+  height: SUBDOCK_ITEM_HEIGHT,
+  position: 'relative',
+  borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+};
+
+const favoriteImgStyle: React.CSSProperties = {
+  flex: '0 0 auto',
+  marginRight: '9px',
+  opacity: 1,
+  borderRadius: '8px',
+  filter: 'grayscale(100%)',
+};
+
+const txtStyle: React.CSSProperties = {
+  color: 'white',
+  flex: '1 1 auto',
+  marginRight: '5px',
+  position: 'relative',
+  opacity: 0.8,
+  ...theme.elipsisMixin(1),
+  ...theme.fontMixin(13),
+};
+
+const iconWrapperStyle: React.CSSProperties = {
+  width: 24,
+  height: 24,
+  opacity: 0.8,
+  display: 'inline-flex',
+  marginLeft: '-8px',
+};
+
+const unPinnedStyle: React.CSSProperties = {
+  transform: 'rotate(45deg)',
+};
 
 // PROPS
 
@@ -165,8 +101,8 @@ export const EmptySubdockItem = () => (
 
 // FULL SUBDOCK ELEMENT
 
-const SubdockItem = (props: OwnProps & { classes: OwnStyle }) => {
-  const { application, actions, item, classes } = props;
+const SubdockItem = (props: OwnProps) => {
+  const { application, actions, item } = props;
 
   const {
     title, icon,
@@ -181,11 +117,34 @@ const SubdockItem = (props: OwnProps & { classes: OwnStyle }) => {
 
   const { iconUrl, themeColor } = application;
 
+  const itemStyle: React.CSSProperties = {
+    ...itemBaseStyle,
+    ...(isActive ? { backgroundImage: getHighlightGradient(undefined, .50) } : {}),
+  };
+
+  const itemFavoriteImgStyle: React.CSSProperties = {
+    ...favoriteImgStyle,
+    ...(isActive ? { filter: 'grayscale(0)' } : {}),
+  };
+
+  const itemTxtStyle: React.CSSProperties = {
+    ...txtStyle,
+    ...(isActive ? { opacity: 1, ...theme.fontMixin(13, 700) } : {}),
+  };
+
+  const itemIconWrapperStyle: React.CSSProperties = {
+    ...iconWrapperStyle,
+    ...(isActive ? { opacity: 1 } : {}),
+  };
+
   return (
-    <li className={classNames(classes!.item, { isActive })}>
-      <a className={classes!.link} onClick={onSelect}>
+    <li
+      className={classNames('subdock-item', { isActive })}
+      style={itemStyle}
+    >
+      <a style={linkStyle} onClick={onSelect}>
         {isTabApplicationHome && iconUrl &&
-          <div className={classes!.favoriteImg}>
+          <div style={itemFavoriteImgStyle}>
             <AppIcon
               imgUrl={iconUrl}
               themeColor={themeColor || undefined}
@@ -195,19 +154,20 @@ const SubdockItem = (props: OwnProps & { classes: OwnStyle }) => {
         }
 
         {icon &&
-          <span className={classes!.iconWrapper}>
+          <span style={itemIconWrapperStyle}>
             <Icon size={24} color="white" symbolId={icon as IconSymbol} />
           </span>
         }
 
-        <span className={classes!.txt}>
+        <span style={itemTxtStyle}>
           {isBlank(title) ? <i>Untitled</i> : title}
         </span>
 
-        <span className={classes!.buttons}>
+        <span className="subdock-item-buttons">
           {canPin &&
             <SubdockButton
-              className={isPinned ? '' : classes!.unPinned}
+              className={isPinned ? '' : undefined}
+              style={isPinned ? undefined : unPinnedStyle}
               tooltip={isPinned ? 'Unpin this page' : 'Pin this page'}
               size={24}
               symbolId={IconSymbol.PIN}
@@ -281,4 +241,4 @@ const useEventWrapper = (actions: WrappedActions) => {
 
 // EXPORT
 
-export default injectSheet(styles)(SubdockItem) as React.ComponentType<OwnProps>;
+export default SubdockItem as React.ComponentType<OwnProps>;

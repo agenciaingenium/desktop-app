@@ -31,7 +31,7 @@ export default class ApplicationExtensions extends React.PureComponent<Props, {}
         onExtensionToggle(extension.manifestURL, !extension.added),
     });
 
-    const items: Immutable.Iterable<number, ListItemType> = Immutable.Iterable(extensions)
+    const items: Immutable.Collection.Indexed<ListItemType> = Immutable.Seq(extensions)
       .map((extension: Extension) => ({
         id: extension.id,
         name: extension.name,

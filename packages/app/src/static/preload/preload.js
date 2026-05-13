@@ -1,11 +1,39 @@
 /* eslint-disable global-require */
 
-// Exposed globals before preloads
-const preload = Object.keys(window);
-
+const { contextBridge } = require('electron');
 const { parse } = require('url');
-const ipc = require('electron').ipcRenderer;
 const equals = require('is-equal-shallow');
+const {
+  IPC,
+  registerApi,
+  exposeAll,
+  createSender,
+  createListener,
+  createSendToHost,
+  injectIntoPage,
+  ipcRenderer,
+} = require('./preload-api');
+
+// ====== Register sub-preload API sections ======
+
+// Dialogs (alert override)
+const dialogsApi = require('../../dialogs/webview-preload').api;
+registerApi('dialogs', dialogsApi);
+
+// UI (cursor icon)
+const uiApi = require('../../ui/webview-preload').api;
+registerApi('ui', uiApi);
+
+// Autologin
+const autologinApi = require('./autologin').api;
+registerApi('autologin', autologinApi);
+
+// BX API (notification center, applications, theme, identities, manifest)
+// The plugins/webview-preload uses contextBridge directly with 'bxApi' key.
+// We keep it as-is for backward compatibility since webview-inject.js uses window.bxApi.
+require('../../plugins/webview-preload');
+
+// ====== Page-level IPC handlers (run in preload context, DOM is shared) ======
 
 const BX_META_SELECTOR = 'meta[name^=browserx-]';
 
@@ -65,7 +93,7 @@ class BxMetasObserver {
     const v = this.getCurrentMetasValues();
     const changed = !equals(v, this.metasValuesCached);
     if (changed || forceEmit) {
-      ipc.sendToHost('page-bxmetas-updated', v);
+      ipcRenderer.sendToHost('page-bxmetas-updated', v);
     }
     this.metasValuesCached = v;
   }
@@ -93,7 +121,7 @@ document.addEventListener(
     document.body.addEventListener(
       'click',
       () => {
-        ipc.sendToHost('page-click');
+        ipcRenderer.sendToHost('page-click');
       },
       true
     );
@@ -101,35 +129,84 @@ document.addEventListener(
   false
 );
 
-// https://github.com/electron/electron/issues/3471
-ipc.on('redirect-url', (event, url) => {
+// Redirect handler
+ipcRenderer.on('redirect-url', (_event, url) => {
   window.location.assign(url);
 });
 
-// Fixes gdrive previews
-if (typeof chrome === 'undefined') {
-  window.chrome = undefined;
-}
+// ====== Register page-level APIs ======
 
-// Some apps like Qonto determine if browser is Chrome by checking if window.chrome.webstore exists
-window.chrome = Object.assign({ webstore: true }, window.chrome);
-if (!process.env.STATION_DISABLE_ECX) {
-  try {
-    // Ojo: el nombre del módulo va en una variable para que webpack
-    // no intente resolverlo estáticamente.
-    const ecxModuleName = 'electron-chrome-extension/preload';
-    // eslint-disable-next-line global-require
-    require(ecxModuleName);
-  } catch (e) {
-    console.warn('[preload] electron-chrome-extension/preload no disponible, se omite');
+registerApi('page', {
+  print: createSender(IPC.PRINT),
+  sendToHost: createSendToHost,
+});
+
+// ====== Inject page context overrides ======
+// With contextIsolation=true, window properties set in the preload context
+// are not visible to the page. We inject a script to set them in the page context.
+
+// Chrome runtime shim for GDrive and other apps
+injectIntoPage(`
+  // Some apps like Qonto determine if browser is Chrome by checking window.chrome.webstore
+  if (typeof window.chrome === 'undefined') {
+    window.chrome = {};
   }
-}
-require('./window-open');
+  window.chrome = Object.assign({ webstore: true }, window.chrome);
 
-// This piece of code is injected by `Google Drive Offline` extension
-// It prevents Google drive from displaying the popup when copy/pasting
-(function () {
-  window._docs_chrome_extension_exists = !0;
+  // GDrive expects window.chrome.runtime
+  if (!window.chrome.runtime) {
+    window.chrome = Object.assign(
+      {
+        runtime: {
+          connect: function() {
+            return {
+              onMessage: {
+                addListener: function() {},
+                removeListener: function() {}
+              },
+              postMessage: function() {},
+              disconnect: function() {}
+            };
+          },
+          sendMessage: function(extensionId, message, options, responseCallback) {
+            if (typeof options === 'function') {
+              responseCallback = options;
+            }
+            if (!responseCallback) return;
+            if (typeof responseCallback !== 'function')
+              throw new Error(
+                'Error in invocation of runtime.sendMessage(optional string extensionId, any message, optional object options, optional function responseCallback): No matching signature.'
+              );
+            callSendMessageCallbackWithError(
+              responseCallback,
+              'Could not establish connection. Receiving end does not exist.'
+            );
+          },
+          sendNativeMessage: function(application, message, responseCallback) {
+            if (!responseCallback) return;
+            if (typeof responseCallback !== 'function')
+              throw new Error(
+                'Error in invocation of runtime.sendNativeMessage(string application, object message, function responseCallback): No matching signature.'
+              );
+            callSendMessageCallbackWithError(
+              responseCallback,
+              'Could not establish connection. Receiving end does not exist.'
+            );
+          }
+        }
+      },
+      window.chrome
+    );
+  }
+
+  function callSendMessageCallbackWithError(responseCallback, errorMessage) {
+    window.chrome.runtime.lastError = { message: errorMessage };
+    responseCallback();
+    delete window.chrome.runtime.lastError;
+  }
+
+  // GDrive offline extension compat
+  window._docs_chrome_extension_exists = true;
   window._docs_chrome_extension_features_version = 1;
   window._docs_chrome_extension_permissions = [
     'alarms',
@@ -138,121 +215,48 @@ require('./window-open');
     'storage',
     'unlimitedStorage'
   ];
-})();
 
-require('../../plugins/webview-preload');
-//require('../../notification-center/webview-preload');
-require('../../dialogs/webview-preload');
-require('../../ui/webview-preload');
-require('./autologin');
+  // Forward print actions to main process
+  window.print = function() {
+    window.station.page.print();
+  };
 
-// autofill is a hack that did not work properly
-// so we decided to remove it for now
-// see APP-760 for more context
-// require('./autofill');
-
-// Forward print actions to handle them in sagas
-window.print = () => {
-  ipc.send('print');
-};
-
-// Fix for GDrive: when the user-agent is Chrome compatible
-// GDrive expect to have `window.chrome.rumtime` present
-// https://github.com/electron/electron/issues/16587
-if (!window.chrome.runtime) {
-  window.chrome = Object.assign(
-    {
-      runtime: {
-        connect: () => {
-          return {
-            onMessage: {
-              addListener: () => { },
-              removeListener: () => { }
-            },
-            postMessage: () => { },
-            disconnect: () => { }
-          };
-        },
-        sendMessage: (
-          extensionId,
-          message,
-          /*optional*/ options,
-          responseCallback
-        ) => {
-          if (typeof options === 'function') {
-            responseCallback = options;
-          }
-          if (!responseCallback) return;
-          if (typeof responseCallback !== 'function')
-            throw new Error(
-              'Error in invocation of runtime.sendMessage(optional string extensionId, any message, optional object options, optional function responseCallback): No matching signature.'
-            );
-
-          // Not implemented
-          callSendMessageCallbackWithError(
-            responseCallback,
-            'Could not establish connection. Receiving end does not exist.'
-          );
-        },
-        sendNativeMessage: (application, message, responseCallback) => {
-          if (!responseCallback) return;
-          if (typeof responseCallback !== 'function')
-            throw new Error(
-              'Error in invocation of runtime.sendNativeMessage(string application, object message, function responseCallback): No matching signature.'
-            );
-
-          // Not implemented
-          callSendMessageCallbackWithError(
-            responseCallback,
-            'Could not establish connection. Receiving end does not exist.'
-          );
-        }
-      }
-    },
-    window.chrome
-  );
-}
-
-/**
- * `sendMessage` methods and alike do not really have an error callback
- * According to documentation, when an error occurs, `responseCallback`
- * will be called with no arguments and `lastError` will be set during
- * the execution of `responseCallback`.
- */
-
-function callSendMessageCallbackWithError(responseCallback, errorMessage) {
-  // after checking in Chrome, `lastError` is not an Error but an object
-  window.chrome.runtime.lastError = { message: errorMessage };
-  responseCallback();
-  delete window.chrome.runtime.lastError;
-}
-
-require('../../webui/preload');
-
-// Prevents `Cmd+T` to be handled by any app (initialy made for slack app)
-// Chrome does not emit `KeyboardEvent` for `t` when
-// `Cmd+T` is pressed. We are trying to mimic a similar behavior.
-// related issue: https://github.com/electron/electron/issues/19279
-const isCmdT = e =>
-  e.key === 't' && e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
-
-window.addEventListener(
-  'keydown',
-  event => {
-    if (isCmdT(event)) {
+  // Prevents Cmd+T from being handled by any app
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 't' && event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
       event.stopPropagation();
     }
-  },
-  { capture: true }
-);
+  }, { capture: true });
+`);
 
-// POST PRELOAD CLEANING
+// ====== Electron chrome extension preload (currently disabled for Electron 31) ======
+if (!process.env.STATION_DISABLE_ECX) {
+  try {
+    /* webpackIgnore: true */
+    require('electron-chrome-extension/preload');
+  } catch (e) {
+    console.warn('[preload] electron-chrome-extension/preload not available, skipping');
+  }
+}
+
+// ====== Window open override ======
+require('./window-open');
+
+// ====== Expose all APIs to the page context via contextBridge ======
+exposeAll(contextBridge);
+
+// ====== Post-preload global cleanup ======
+// With contextIsolation=true, the preload context is isolated from the page,
+// so global cleanup is less critical, but we still do it for safety.
+const preload = Object.keys(window);
+const { removeDiff } = require('./clean-global');
 
 // Exposed globals after all executed preloads
 const postload = Object.keys(window);
 
 // List of allowed exposure on globals
-export const whitelist = new Set([
+const whitelist = new Set([
+  'station',
   'bxApi',
   'chrome',
   '_docs_chrome_extension_exists',
@@ -260,7 +264,8 @@ export const whitelist = new Set([
   '_docs_chrome_extension_permissions',
 ]);
 
-const { removeDiff } = require('./clean-global');
-
 // Remove diff in globals (IF NOT WHITELISTED) to avoid leaks
 removeDiff(preload, postload, whitelist, window);
+
+// ====== WebUI preload (station: protocol pages) ======
+require('../../webui/preload');

@@ -1,5 +1,5 @@
 import { all, call, put, select } from 'redux-saga/effects';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import { getTabApplicationId, getTabFavicons, getTabTitle, getTabURL } from '../tabs/get';
 import { getTabById } from '../tabs/selectors';
 import { NEW_TAB, NEW_WINDOW } from '../urlrouter/constants';
@@ -22,7 +22,7 @@ function* sagaAddTabAsFavorite(action: AddTabAsFavoriteAction) {
   const { tabId } = action;
   const tab = yield select(getTabById, tabId);
 
-  const favoriteId = `favorite-${shortid.generate()}`;
+  const favoriteId = `favorite-${nanoid()}`;
   const favicons = getTabFavicons(tab);
 
   yield put(addFavorite(

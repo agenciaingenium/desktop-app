@@ -2,20 +2,12 @@ import { Modal } from '@getstation/theme';
 import * as Immutable from 'immutable';
 import * as pluralize from 'pluralize';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import List from '../../../common/components/List';
 import { ListItemType } from '../../../common/components/ListItem';
 import { Instances, Instance } from '../types';
 import { withInstanceNumber } from '../utils';
 
-type Classes = {
-  modalBodyContent?: string,
-  hintText?: string,
-};
-
 type DefaultProps = {
-  classes: Classes,
   allInstancesRemoved: boolean,
   instancesToRemove: Instances,
   instanceTypeWording: string,
@@ -27,22 +19,15 @@ type Props = DefaultProps & {
   applicationName: string,
 };
 
-@injectSheet(() => ({
-  modalBodyContent: {
-    display: 'flex',
-    flexFlow: 'wrap',
-    textAlign: 'center',
-    justifyContent: 'center',
-  },
-  hintText: {
-    paddingTop: '20px',
-    width: '100%',
-    color: '#949494',
-  },
-}))
+const modalBodyContentStyle: React.CSSProperties = {
+  display: 'flex',
+  flexFlow: 'wrap',
+  textAlign: 'center',
+  justifyContent: 'center',
+};
+
 class RemoveModalConfirmation extends React.Component<Props> {
   static defaultProps: DefaultProps = {
-    classes: {},
     allInstancesRemoved: false,
     instancesToRemove: Immutable.List(),
     instanceTypeWording: 'instance',
@@ -54,7 +39,7 @@ class RemoveModalConfirmation extends React.Component<Props> {
 
   getPluralForm = () => this.props.instancesToRemove.size > 1;
 
-  getItems = (): Immutable.Iterable<number, ListItemType> =>
+  getItems = (): Immutable.Collection.Indexed<ListItemType> =>
     withInstanceNumber(this.props.instancesToRemove).map((instance: Instance) => ({
       id: instance.id,
       name: instance.needConfiguration ? `${this.props.applicationName} (Not connected)` : instance.name,
@@ -95,7 +80,7 @@ class RemoveModalConfirmation extends React.Component<Props> {
   }
 
   render() {
-    const { classes, onContinue, onCancel } = this.props;
+    const { onContinue, onCancel } = this.props;
 
     if (this.shouldRenderModal()) {
       return (
@@ -108,12 +93,12 @@ class RemoveModalConfirmation extends React.Component<Props> {
           continueContent={this.getContinueContent()}
           continueDanger={true}
         >
-          <div className={classes.modalBodyContent}>
+          <div style={modalBodyContentStyle}>
             <List
               iconSize={25}
               items={this.getItems()}
             />
-            <p className={classes.hintText}>
+            <p style={hintValueStyle}>
               {this.getHintText()}
             </p>
           </div>

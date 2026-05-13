@@ -8,7 +8,6 @@ import * as ReactDOM from 'react-dom';
 import { logger } from '../../api/logger';
 import { Omit } from '../../types';
 import { dissoc } from 'ramda';
-import * as remote from '@electron/remote';
 
 export interface ElectronWebviewProps extends Omit<Electron.WebviewTag, 'src'> {
   // webview `src` is updated by the webview itself, so we do not want to
@@ -198,12 +197,13 @@ const getRealPropName = (propName: string) => {
   }
 };
 
-const getPropString = (propName: string, value: unknown): string => {
+const setWebviewAttribute = (webview: Electron.WebviewTag, propName: string, value: unknown) => {
   const realPropName = getRealPropName(propName);
   if (typeof value === 'boolean') {
-    return `${realPropName}="${value ? 'on' : 'off'}" `;
+    webview.setAttribute(realPropName, value ? 'on' : 'off');
+    return;
   }
-  return `${realPropName}=${JSON.stringify(String(value))} `;
+  webview.setAttribute(realPropName, String(value));
 };
 
 const removeInitialSrcProp = dissoc('initialSrc');
@@ -235,19 +235,20 @@ class ElectronWebview extends React.Component<ElectronWebviewProps, {}> {
   componentDidMount() {
     const container = ReactDOM.findDOMNode(this.ref);
 
-    let propString = '';
+    const webview = document.createElement('webview') as Electron.WebviewTag;
+
     Object.keys(this.props).forEach((propName) => {
       // Waiting for a fix https://github.com/electron/electron/issues/9618
       if (this.props[propName] !== undefined && typeof this.props[propName] !== 'function') {
-        propString += getPropString(propName, this.props[propName]);
+        setWebviewAttribute(webview, propName, this.props[propName]);
       }
     });
     if (this.props.className) {
-      propString += `class="${this.props.className}" `;
+      webview.setAttribute('class', this.props.className);
     }
-    propString += 'tabindex="-1" ';
-    container.innerHTML = `<webview ${propString}/>`;
-    this.view = container.querySelector('webview') as Electron.WebviewTag;
+    webview.setAttribute('tabindex', '-1');
+    container.appendChild(webview);
+    this.view = webview;
 
     this.view.addEventListener('did-finish-load', () => {
       if (!this.loaded) {
@@ -300,39 +301,44 @@ class ElectronWebview extends React.Component<ElectronWebviewProps, {}> {
    */
   forwardKeyboardEvents() {
     // Inspired by https://github.com/electron/electron/issues/14258#issuecomment-416893856
-    remote.webContents
-      .fromId(this.view.getWebContentsId())
-      .on('before-input-event', (_event, input) => {
-        // Create a fake KeyboardEvent from the data provided
-        const emulatedKeyboardEvent = new KeyboardEvent(
-          input.type.toLowerCase(),
-          {
-            code: input.code,
-            key: input.key,
-            shiftKey: input.shift,
-            altKey: input.alt,
-            ctrlKey: input.control,
-            metaKey: input.meta,
-            repeat: input.isAutoRepeat,
-            bubbles: true,
-            composed: true,
-            cancelable: true
-          }
-        );
-        // Workaround for mousetrap
-        const keyCodeValue = getKeyboardKeyCode(
-          emulatedKeyboardEvent.key,
-          emulatedKeyboardEvent.code
-        );
-        Object.defineProperty(emulatedKeyboardEvent, 'which', {
-          value: keyCodeValue
-        });
-        Object.defineProperty(emulatedKeyboardEvent, 'keyCode', {
-          value: keyCodeValue
-        });
-
-        this.view.dispatchEvent(emulatedKeyboardEvent);
+    // Previously used remote.webContents.fromId().on('before-input-event', ...)
+    // Now uses window.station.ipc to communicate with the main process
+    const webContentsId = this.view.getWebContentsId();
+    window.station.ipc.send('station:webcontents:before-input-event:subscribe', webContentsId);
+    const unsubscribe = window.station.ipc.on('station:webcontents:before-input-event', (inputWebContentsId: number, input: any) => {
+      if (inputWebContentsId !== webContentsId) return;
+      // Create a fake KeyboardEvent from the data provided
+      const emulatedKeyboardEvent = new KeyboardEvent(
+        input.type.toLowerCase(),
+        {
+          code: input.code,
+          key: input.key,
+          shiftKey: input.shift,
+          altKey: input.alt,
+          ctrlKey: input.control,
+          metaKey: input.meta,
+          repeat: input.isAutoRepeat,
+          bubbles: true,
+          composed: true,
+          cancelable: true
+        }
+      );
+      // Workaround for mousetrap
+      const keyCodeValue = getKeyboardKeyCode(
+        emulatedKeyboardEvent.key,
+        emulatedKeyboardEvent.code
+      );
+      Object.defineProperty(emulatedKeyboardEvent, 'which', {
+        value: keyCodeValue
       });
+      Object.defineProperty(emulatedKeyboardEvent, 'keyCode', {
+        value: keyCodeValue
+      });
+
+      this.view.dispatchEvent(emulatedKeyboardEvent);
+    });
+    // Store unsubscribe for cleanup if needed
+    (this as any)._forwardKeyboardEventsUnsubscribe = unsubscribe;
   }
 
   shouldComponentUpdate(nextProps: ElectronWebviewProps) {
@@ -355,9 +361,9 @@ class ElectronWebview extends React.Component<ElectronWebviewProps, {}> {
     }
   };
 
-  UNSAFE_componentWillReceiveProps(nextProps: ElectronWebviewProps) {
-    if (this.props.hidden !== nextProps.hidden) {
-      this.updateClassName(nextProps);
+  componentDidUpdate(prevProps: ElectronWebviewProps) {
+    if (prevProps.hidden !== this.props.hidden) {
+      this.updateClassName(this.props);
     }
   }
 

@@ -1,97 +1,43 @@
-import { Button, ThemeTypes as Theme } from '@getstation/theme';
-import * as remote from '@electron/remote';
+import { Button, theme } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
+import DOMPurify from 'dompurify';
 
-const releaseNotesHTML = require('!!raw-loader!../../app/resources/release-notes.html').default;
-
-export interface Classes {
-  container: string,
-  header: string,
-  logo: string,
-  title: string,
-  description: string,
-  body: string,
-  content: string,
-  newVersion: string,
-}
+const releaseNotesRaw = require('!!raw-loader!../../app/resources/release-notes.html').default;
+const releaseNotesHTML = DOMPurify.sanitize(releaseNotesRaw);
 
 export interface Props {
-  classes?: Classes,
   updateAvailable: boolean,
   releaseName: string,
   onClickQuitAndInstall: () => any,
 }
 
-const styles = (theme: Theme) => ({
-  container: {
-    position: 'relative',
-  },
-  header: {
-    padding: 20,
-    borderBottom: '1px solid rgba(255, 255, 255, .1)',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  logo: {
-    width: 40,
-  },
-  title: {
-    marginTop: 30,
-    ...theme.fontMixin(23),
-  },
-  description: {
-    opacity: .4,
-  },
-  body: {
-    padding: 20,
-    '& button': {
-      width: '100%',
-      marginTop: 20,
-    },
-  },
-  content: {
-    '& h2': {
-      margin: [10, 0],
-      ...theme.fontMixin(13, 'bold'),
-      color: 'rgba(255, 255, 255, .4)',
-      textTransform: 'uppercase',
-    },
-    '& ul': {
-      marginBottom: 40,
-    },
-    '& li': {
-      listStyleType: 'disc',
-      marginLeft: 18,
-      ...theme.fontMixin(13),
-      marginBottom: 5,
-    },
-  },
-  newVersion: {
-    fontWeight: 600,
-    fontSize: 13,
-    textAlign: 'center',
-  },
-});
-
-@injectSheet(styles)
 export default class AutoUpdateSubdock extends React.PureComponent<Props, {}> {
   render() {
-    const { classes, updateAvailable, releaseName, onClickQuitAndInstall } = this.props;
+    const { updateAvailable, releaseName, onClickQuitAndInstall } = this.props;
 
     return (
-      <div className={classes!.container}>
-        <div className={classes!.header}>
-          <img className={classes!.logo} src="static/illustrations/illustration--updates.svg" alt="" />
-          <h1 className={classes!.title}>What's new on {remote.app.name}?</h1>
-          <p className={classes!.description}>
-            You're now on version {remote.app.getVersion()}
+      <div style={{ position: 'relative' as const }}>
+        <div style={{
+          padding: 20,
+          borderBottom: '1px solid rgba(255, 255, 255, .1)',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        }}>
+          <img style={{ width: 40 }} src="static/illustrations/illustration--updates.svg" alt="" />
+          <h1 style={{ marginTop: 30, ...theme.fontMixin(23) }}>What's new on {window.station.app.getName()}?</h1>
+          <p style={{ opacity: 0.4 }}>
+            You're now on version {window.station.app.getVersion()}
           </p>
         </div>
 
-        <div className={classes!.body}>
+        <div style={{
+          padding: 20,
+        }}>
           { updateAvailable ?
-            <div className={classes!.newVersion}>
+            <div style={{
+              fontWeight: 600,
+              fontSize: 13,
+              textAlign: 'center' as const,
+            }}>
               <p>A new version is available 🎉</p>
               <p>({releaseName})</p>
               <Button
@@ -101,7 +47,7 @@ export default class AutoUpdateSubdock extends React.PureComponent<Props, {}> {
               </Button>
             </div>
             :
-            <div className={classes!.content} dangerouslySetInnerHTML={{ __html: releaseNotesHTML }} />
+            <div className="auto-update-content" dangerouslySetInnerHTML={{ __html: releaseNotesHTML }} />
           }
         </div>
       </div>

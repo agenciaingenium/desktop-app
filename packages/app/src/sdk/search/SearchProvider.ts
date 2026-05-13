@@ -14,7 +14,7 @@ export function combineConsumersResultsWrappers(resultsWrappers: search.SearchRe
   // A Set of all categories that are in loading state
   const allLoadingCategories: Set<string> = resultsWrappers.reduce(
     (accumulator, currentValue) => currentValue.loading ? accumulator.add(currentValue.loading) : accumulator,
-    new Set()
+    new Set<string>()
   );
   // Leverage groupBy method of Immutable
   const mapByCategories = Immutable.List(allResults).groupBy<string>(results => results!.category);
@@ -31,7 +31,7 @@ export function combineConsumersResultsWrappers(resultsWrappers: search.SearchRe
  * @returns {SearchSection[]}
  */
 function getSearchResults(loadingCategories: Set<string>,
-                          resultsGroupedByCat: Immutable.Collection.Keyed<string, Immutable.Iterable<number, search.SearchResultItem>>)
+                          resultsGroupedByCat: Immutable.Collection.Keyed<string, Immutable.Collection.Indexed<search.SearchResultItem>>)
   : SearchSection[] {
   const allCategories = resultsGroupedByCat.keySeq().toSet().union(Immutable.Set(loadingCategories));
   const sectionsMap: Map<string, SearchSection> = new Map();

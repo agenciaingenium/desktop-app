@@ -25,12 +25,10 @@ import {
 
 const normalizeURL = (url:string): string => new NodeURL(url).toString();
 
-/* TODO Next Steps
-   - add `radix-router` typing
-   - Use `radix-router` even for `isInScope` and `findInInstalledScopes`
-     - For this, listen to `getApplications` updates and create a second `scopesRadix` for installed apps
-     - We should not need `manifestProvider` anymore (dataRouter + getApplications should be enough)
-   - `buildScopesRadix` should not create the full radix tree from scratch each time its updated
+/* Future improvements:
+   - Add `radix-router` typing
+   - Use `radix-router` for `isInScope` and `findInInstalledScopes`
+   - Incremental `buildScopesRadix` updates instead of full rebuild
  */
 export default class URLRouter {
   public dataRouter: BehaviorSubject<ApplicationItem[] | null>;
@@ -136,7 +134,7 @@ export default class URLRouter {
    * @param url URL to check against all the installed scopes
    */
   async findApplicationInInstalledScopes(url: string): Promise<ApplicationImmutable | null> {
-    const allApps: ApplicationImmutable[] = getApplications(this.state).toArray();
+    const allApps: ApplicationImmutable[] = getApplications(this.state).valueSeq().toArray() as ApplicationImmutable[];
     const appsWithCustomUrls: ApplicationImmutable[] = allApps.filter(app => !!getApplicationCustomURL(app));
     const appsWithoutCustomUrls: ApplicationImmutable[] = allApps.filter(app => !getApplicationCustomURL(app));
 

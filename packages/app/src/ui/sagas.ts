@@ -28,8 +28,6 @@ import {
   ToggleVisibility as UiToggleVisibility,
 } from './duck';
 
-// TODO search
-
 type VisibilityActions =
   | NotificationCenterSetVisibilityAction
   | BangSetVisibilityAction

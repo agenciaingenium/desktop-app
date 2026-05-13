@@ -1,9 +1,7 @@
 import { GradientType, withGradient } from '@getstation/theme';
 import classNames from 'classnames';
-import * as remote from '@electron/remote';
 import PropTypes from 'prop-types';
 import React from 'react';
-import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { toggleMaximize } from '../app/duck';
@@ -20,12 +18,6 @@ import { canTabGoBack, canTabGoForward, getTabApplicationId, getTabTitle } from 
 import { getTabById } from '../tabs/selectors';
 import { isDarwin } from '../utils/process';
 import ConfirmResetApplication from '../applications/components/ConfirmResetApplication';
-
-const styles = () => ({
-  container: {
-    backgroundImage: props => props.themeGradient,
-  }
-});
 
 @connect(
   (state, ownProps) => {
@@ -45,7 +37,6 @@ const styles = () => ({
     onGoForward: () => executeWebviewMethodForCurrentTab('go-forward'),
   }, dispatch)
 )
-@injectSheet(styles)
 class AppSub extends React.PureComponent {
   static propTypes = {
     subData: PropTypes.shape({
@@ -56,7 +47,6 @@ class AppSub extends React.PureComponent {
     tab: PropTypes.object,
     focus: PropTypes.number,
     onCloseSubwindow: PropTypes.func,
-    classes: PropTypes.object,
     themeGradient: PropTypes.string,
     canGoBack: PropTypes.bool,
     canGoForward: PropTypes.bool,
@@ -65,7 +55,7 @@ class AppSub extends React.PureComponent {
   };
 
   componentDidMount() {
-    this.currentWindowId = remote.getCurrentWindow().id;
+    this.currentWindowId = window.station.window.getId();
   }
 
   render() {
@@ -74,7 +64,7 @@ class AppSub extends React.PureComponent {
     // This means there is a `close` event in the pipe that will close this window.
     if (!this.props.application) return null;
     return (
-      <div className={classNames('l-container', 'l-nodock', this.props.classes.container)}>
+      <div className={classNames('l-container', 'l-nodock')} style={{ backgroundImage: this.props.themeGradient }}>
         {isDarwin &&
         <OSBar
           title={getTabTitle(this.props.tab)}

@@ -28,8 +28,10 @@ function* handleActivateServiceAction(bxApp: BrowserXAppWorker, action: Activate
       bxSDK
     );
 
-    // FIXME legacy
-    yield put(activateServiceRenderer(manifestURL, manifest.bx_legacy_service_id!));
+    // bx_legacy_service_id is set in all manifests that define a service renderer
+    if (manifest.bx_legacy_service_id) {
+      yield put(activateServiceRenderer(manifestURL, manifest.bx_legacy_service_id));
+    }
 
     const provider: DeprecatedSDKProvider = yield call(getProvider);
     const serviceErrors$: Observable<Error> = yield call(runtime.activate, sdk, provider.consumer);

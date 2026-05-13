@@ -1,7 +1,5 @@
-import { IconSymbol, Size, ThemeTypes as Theme, ButtonIcon, Style } from '@getstation/theme';
+import { IconSymbol, Size, theme, ButtonIcon, Style } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import {
   StatusState,
   checkForUpdate,
@@ -10,18 +8,7 @@ import {
   ExtensionState,
 } from '../../../chrome-extensions/types';
 
-type Classes = {
-  container: string,
-  description: string,
-  subtitle: string,
-  update: string,
-};
-
-type DefaultProps = {
-  classes: Partial<Classes>,
-};
-
-type Props = DefaultProps & {
+type Props = {
   extensionState: ExtensionState,
   onCheckForUpdate: typeof checkForUpdate,
 };
@@ -30,33 +17,7 @@ type State = {
   updateWording: string,
 };
 
-@injectSheet((theme: Theme) => ({
-  container: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    flexDirection: 'column',
-    paddingBottom: 10,
-  },
-  description: {
-    fontSize: 12,
-    marginLeft: 15,
-    maxWidth: '75%',
-  },
-  subtitle: {
-    ...theme.fontMixin(12, 600),
-    margin: [20, 0, 10],
-  },
-  update: {
-    display: 'flex',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-}))
 class ExtensionInfos extends React.PureComponent<Props, State> {
-  static defaultProps: DefaultProps = {
-    classes: {},
-  };
-
   constructor(props: Props) {
     super(props);
 
@@ -71,8 +32,10 @@ class ExtensionInfos extends React.PureComponent<Props, State> {
     this.updateWording(this.props);
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    this.updateWording(nextProps);
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps !== this.props) {
+      this.updateWording(this.props);
+    }
   }
 
   updateWording(props: Props) {
@@ -117,17 +80,21 @@ class ExtensionInfos extends React.PureComponent<Props, State> {
   render() {
     const {
       extensionState,
-      classes,
     } = this.props;
 
     const { updateWording } = this.state;
 
     return (
-      <div className={classes.container}>
-        <div className={classes!.subtitle}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        flexDirection: 'column',
+        paddingBottom: 10,
+      }}>
+        <div style={{ ...theme.fontMixin(12, 600), margin: '20px 0 10px' }}>
           EXTENSION {extensionState && extensionState.extension && `V${extensionState.extension!.version.number}`}
-        </div >
-        <div className={classes!.update}>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' as const }}>
           <ButtonIcon
             text={'Check for updates'}
             symbolId={IconSymbol.UPDATE}
@@ -135,8 +102,8 @@ class ExtensionInfos extends React.PureComponent<Props, State> {
             btnSize={Size.XSMALL}
             onClick={this.checkForUpdate}
           />
-          <i className={classes.description}>{updateWording}</i>
-        </div >
+          <i style={{ fontSize: 12, marginLeft: 15, maxWidth: '75%' }}>{updateWording}</i>
+        </div>
 
       </div>
     );

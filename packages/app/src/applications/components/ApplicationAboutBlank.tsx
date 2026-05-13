@@ -1,16 +1,8 @@
-import { Button, Style, ThemeTypes as Theme } from '@getstation/theme';
+import { Button, Style } from '@getstation/theme';
 import Maybe from 'graphql/tsutils/Maybe';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-
-export interface Classes {
-  container: string,
-  button: string,
-}
 
 export interface Props {
-  classes?: Classes,
   applicationName: Maybe<string>,
   canGoBack: boolean,
   onGoBack: () => void,
@@ -18,18 +10,6 @@ export interface Props {
   onDidMount: () => void,
 }
 
-const styles = (_theme: Theme) => ({
-  container: {
-    color: 'white',
-    textAlign: 'center',
-  },
-  button: {
-    width: '100%',
-    marginTop: 20,
-  },
-});
-
-@injectSheet(styles)
 export default class ApplicationAboutBlank extends React.PureComponent<Props, {}> {
   static defaultProps = {
     onDidMount: () => {},
@@ -48,15 +28,15 @@ export default class ApplicationAboutBlank extends React.PureComponent<Props, {}
   }
 
   render() {
-    const { classes, applicationName, canGoBack } = this.props;
+    const { applicationName, canGoBack } = this.props;
 
     return (
-      <div className={classes!.container}>
+      <div style={{ color: 'white', textAlign: 'center' }}>
         <div>
           <div>Something went wrong with {applicationName}, you navigated on a blank page</div>
           <Button
             btnStyle={Style.SECONDARY}
-            className={classes!.button}
+            className={{ width: '100%', marginTop: 20 }}
             onClick={canGoBack ? this.handleClickGoBack : this.handleClickResetApplication}
           >
             {canGoBack ? 'Go Back' : 'Reset application'}

@@ -1,27 +1,14 @@
 import { Icon, IconSymbol, Tooltip } from '@getstation/theme';
 import * as classNames from 'classnames';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 export import IconSymbol = IconSymbol;
 
 export enum Size {
   HALF, NORMAL, BIG,
 }
 
-interface Classes {
-  dockIcon: string,
-  sizeHalf: string,
-  sizeBig: string,
-  defaultInner: string,
-  defaultShape: string,
-  activeInner: string,
-  disabled: string,
-}
-
 interface Props {
-  classes?: Classes,
   className?: string,
   iconSymbolId: IconSymbol,
   imageURL?: string,
@@ -35,49 +22,14 @@ interface Props {
   disabled?: boolean,
   tooltip?: string,
   size?: Size,
+  style?: React.CSSProperties,
 }
 
 interface State {
   canRenderImage: boolean,
+  hovered: boolean,
 }
 
-@injectSheet({
-  dockIcon: {
-    display: 'block',
-    margin: [2, 0],
-    '&:not($disabled):hover': {
-      '& $defaultInner': { fillOpacity: 0.2 },
-      '& $defaultShape': { fillOpacity: 1 },
-      '& $activeInner': {
-        animationName: 'none',
-        fillOpacity: 0.9,
-      },
-    },
-  },
-  sizeHalf: {
-    margin: 0,
-  },
-  sizeBig: {
-    margin: [4, 0],
-  },
-  disabled: {
-    opacity: .2,
-  },
-  defaultInner: {
-    fill: '#fff',
-    fillOpacity: 0,
-    transition: 'all 250ms ease-out',
-  },
-  activeInner: {
-    fill: '#fff',
-    transition: 'all 250ms ease-out',
-  },
-  defaultShape: {
-    fill: '#fff',
-    fillOpacity: 0.6,
-    transition: 'all 250ms ease-out',
-  },
-})
 export default class NativeAppDockIcon extends React.PureComponent<Props, State> {
 
   static defaultProps = {
@@ -97,10 +49,11 @@ export default class NativeAppDockIcon extends React.PureComponent<Props, State>
     super(props);
     this.state = {
       canRenderImage: true,
+      hovered: false,
     };
 
-    this.maskId = `icon-mask-${shortid.generate()}`;
-    this.imageId = `icon-img-${shortid.generate()}`;
+    this.maskId = `icon-mask-${nanoid()}`;
+    this.imageId = `icon-img-${nanoid()}`;
   }
 
   componentDidMount() {
@@ -114,22 +67,28 @@ export default class NativeAppDockIcon extends React.PureComponent<Props, State>
   }
 
   renderImg() {
-    const { classes, active } = this.props;
+    const { active } = this.props;
+    const { hovered } = this.state;
+
     return (
       <g>
         { active &&
-          <rect width="42" height="24" x="4" y="0" rx="2" className={classes!.activeInner} />
+          <rect width="42" height="24" x="4" y="0" rx="2" fill="#fff" fillOpacity={hovered ? 0.9 : 1} />
         }
-        <circle cx="25" cy="12" r="9" fill="#fff" className={classes!.defaultShape} />
+        <circle cx="25" cy="12" r="9" fill="#fff" fillOpacity={hovered ? 1 : 0.6} />
         <circle cx="25" cy="12" r="8" fill={`url(#${this.imageId})`} />
       </g>
     );
   }
 
   renderIcon() {
-    const { classes, active, iconSymbolId, color, size } = this.props;
+    const { active, iconSymbolId, color, size } = this.props;
+    const { hovered } = this.state;
 
     const sizeProps = {
+      [Size.HALF]: {
+        width: 25, height: 24, x: 0, y: 0, rx: 2,
+      },
       [Size.NORMAL]: {
         width: 42, height: 24, x: 4, y: 0, rx: 2,
       },
@@ -138,17 +97,16 @@ export default class NativeAppDockIcon extends React.PureComponent<Props, State>
       },
     };
 
-    // if active we display a masked icon
     if (active) {
       return (
         <g fill="none" fillRule="evenodd" mask={`url(#${this.maskId})`}>
-          <rect {...sizeProps[size!]} className={classes!.activeInner} />
+          <rect {...sizeProps[size!]} fill="#fff" fillOpacity={hovered ? 0.9 : 1} />
         </g>
       );
     }
 
     return (
-      <g className={classes!.defaultShape}>
+      <g style={{ fill: '#fff', fillOpacity: hovered ? 1 : 0.6, transition: 'all 250ms ease-out' }}>
         <Icon symbolId={iconSymbolId} color={color} />
       </g>
     );
@@ -159,11 +117,8 @@ export default class NativeAppDockIcon extends React.PureComponent<Props, State>
 
     if (!badge) return null;
 
-    // coords of the badge
     let coords = { x: 34, y: 5 };
 
-    // for notificaton icon, for easthetism we'd like to place
-    // the badge exactly on the dot of the icon
     if (iconSymbolId === IconSymbol.NOTIFICATION) {
       coords = { ...coords, x: 28 };
     }
@@ -175,22 +130,10 @@ export default class NativeAppDockIcon extends React.PureComponent<Props, State>
 
   renderSvg() {
     const {
-      classes, onMouseEnter, onMouseLeave, iconSymbolId, active, disabled, onClick, imageURL,
+      onMouseEnter, onMouseLeave, iconSymbolId, active, disabled, onClick, imageURL,
       fallbackImageURL, size,
     } = this.props;
-    const { canRenderImage } = this.state;
-
-    const sizeClassNames = {
-      [Size.HALF]: classes!.sizeHalf,
-      [Size.NORMAL]: '',
-      [Size.BIG]: classes!.sizeBig,
-    };
-
-    const className = classNames(
-      classes!.dockIcon,
-      sizeClassNames[size!],
-      { [classes!.disabled]: disabled }
-    );
+    const { canRenderImage, hovered } = this.state;
 
     const SizesProps = {
       [Size.HALF]: {
@@ -211,10 +154,23 @@ export default class NativeAppDockIcon extends React.PureComponent<Props, State>
         width={props.width}
         height={props.height}
         viewBox={props.viewBox}
-        className={className}
+        className={classNames(this.props.className)}
         onClick={onClick}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
+        onMouseEnter={() => {
+          this.setState({ hovered: true });
+          onMouseEnter && onMouseEnter();
+        }}
+        onMouseLeave={() => {
+          this.setState({ hovered: false });
+          onMouseLeave && onMouseLeave();
+        }}
+        style={{
+          display: 'block',
+          margin: size === Size.HALF ? '0' : size === Size.BIG ? '4px 0' : '2px 0',
+          opacity: disabled ? 0.2 : 1,
+          cursor: disabled ? 'default' : 'pointer',
+          ...this.props.style,
+        }}
       >
         <defs>
           <mask id={this.maskId}>
@@ -233,7 +189,16 @@ export default class NativeAppDockIcon extends React.PureComponent<Props, State>
 
         <g>
           { !active &&
-            <rect className={classes!.defaultInner} width={props.rectWidth} height={props.height} x={props.x} y={props.y} rx={props.rx} />
+            <rect
+              width={props.rectWidth}
+              height={props.height}
+              x={props.x}
+              y={props.y}
+              rx={props.rx}
+              fill="#fff"
+              fillOpacity={!disabled && hovered ? 0.2 : 0}
+              style={{ transition: 'all 250ms ease-out' }}
+            />
           }
           {imageURL ? this.renderImg() : this.renderIcon()}
           {this.renderBadge()}

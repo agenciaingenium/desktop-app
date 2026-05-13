@@ -73,8 +73,8 @@ function BrowserWindowProxy(ipcRenderer, guestId) {
     ipcRenderer.send('ELECTRON_GUEST_WINDOW_MANAGER_WINDOW_POSTMESSAGE', guestId, message, toString(targetOrigin), window.location.origin);
   };
 
-  this.eval = (...args) => {
-    ipcRenderer.send('ELECTRON_GUEST_WINDOW_MANAGER_WEB_CONTENTS_METHOD', guestId, 'executeJavaScript', ...args);
+  this.eval = () => {
+    console.warn('[window-setup] eval is disabled for security reasons');
   };
 }
 

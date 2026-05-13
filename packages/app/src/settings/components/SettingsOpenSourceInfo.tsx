@@ -1,56 +1,38 @@
 import { Button, Size } from '@getstation/theme';
-import * as remote from '@electron/remote';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
+import { openExternal } from '../../utils/shellRenderer';
 
-export interface Classes {
-  container: string,
-  item: string,
-  title: string,
-  settingName: string,
-  button: string,
-}
-
-export interface Props {
-  classes?: Classes,
-}
-
-const styles = {
+const STYLE = {
   container: {
     maxWidth: '600px',
     paddingTop: '10px',
     paddingBottom: '10px',
-  },
-  item: {
-  },
+  } as React.CSSProperties,
+  item: {} as React.CSSProperties,
   settingName: {
     marginBottom: 8,
-    textTransform: 'uppercase',
+    textTransform: 'uppercase' as const,
     fontSize: 14,
     fontWeight: 'bold',
-  },
+  } as React.CSSProperties,
   button: {
     marginTop: 10,
-  },
+  } as React.CSSProperties,
 };
 
-@injectSheet(styles)
-export default class SettingsOpenSourceInfo extends React.PureComponent<Props, {}> {
+export default class SettingsOpenSourceInfo extends React.PureComponent<{}, {}> {
   render() {
-    const { classes } = this.props;
-
     return (
-      <div className={classes!.container}>
-        <div className={classes!.item}>
-          <p className={classes!.settingName}>open source info</p>
+      <div style={STYLE.container}>
+        <div style={STYLE.item}>
+          <p style={STYLE.settingName}>open source info</p>
           <label>
-            This software is maintained by the open source community. If you’re a developer and want to contribute, check our Github.
+            This software is maintained by the open source community. If you're a developer and want to contribute, check our Github.
           </label>
           <p>
             <Button
-              onClick={() => remote.shell.openExternal('https://github.com/getstation/desktop-app')}
-              className={classes!.button}
+              onClick={() => openExternal('https://github.com/getstation/desktop-app')}
+              className={STYLE.button}
               btnSize={Size.XXSMALL}
             >
               Open Github

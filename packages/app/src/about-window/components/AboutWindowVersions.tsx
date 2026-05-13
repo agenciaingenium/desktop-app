@@ -1,18 +1,7 @@
-import { ThemeTypes as Theme } from '@getstation/theme';
+import { theme } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-
-export interface Classes {
-  wrapper: string,
-  version: string,
-  title: string,
-  thin: string,
-  note: string,
-}
 
 export interface Props {
-  classes?: Classes,
   isDownloadingUpdate: boolean,
   appName: string,
   appVersion: string,
@@ -23,62 +12,46 @@ export interface Props {
   releaseName: string,
 }
 
-const styles = (theme: Theme) => ({
-  wrapper: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: 25,
-  },
-  title: { ...theme.titles.h2 },
-  thin: {
-    marginLeft: 3,
-    fontWeight: 400,
-    opacity: 0.5,
-  },
-  version: {
-    marginBottom: 6,
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  note: {
-    marginTop: 8,
-    marginBottom: 10,
-    fontSize: 11,
-    opacity: 0.7,
-  },
-});
+const thinStyle: React.CSSProperties = {
+  marginLeft: 3,
+  fontWeight: 400,
+  opacity: 0.5,
+};
 
-@injectSheet(styles)
+const versionStyle: React.CSSProperties = {
+  marginBottom: 6,
+  fontSize: 12,
+  fontWeight: 'bold',
+};
+
 export default class AboutWindowVersions extends React.PureComponent<Props, {}> {
   render() {
-    const { classes } = this.props;
-
     return (
-      <div className={classes!.wrapper}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 25 }}>
         <div>
-          <div className={classes!.title}>
+          <div style={theme.titles.h2}>
             {this.props.appName}
-            <span className={classes!.thin}>version {this.props.appVersion}</span>
+            <span style={thinStyle}>version {this.props.appVersion}</span>
           </div>
-          <p className={classes!.note}>
+          <p style={{ marginTop: 8, marginBottom: 10, fontSize: 11, opacity: 0.7 }}>
             Community-maintained fork
           </p>
 
-          <p className={classes!.version}>
+          <p style={versionStyle}>
             Electron
-            <span className={classes!.thin}>{process.versions.electron}</span>
+            <span style={thinStyle}>{process.versions.electron}</span>
           </p>
-          <p className={classes!.version}>
+          <p style={versionStyle}>
             Chrome
-            <span className={classes!.thin}>{process.versions.chrome}</span>
+            <span style={thinStyle}>{process.versions.chrome}</span>
           </p>
-          <p className={classes!.version}>
+          <p style={versionStyle}>
             Node
-            <span className={classes!.thin}>{process.versions.node}</span>
+            <span style={thinStyle}>{process.versions.node}</span>
           </p>
-          <p className={classes!.version}>
+          <p style={versionStyle}>
             v8
-            <span className={classes!.thin}>{process.versions.v8}</span>
+            <span style={thinStyle}>{process.versions.v8}</span>
           </p>
         </div>
       </div>

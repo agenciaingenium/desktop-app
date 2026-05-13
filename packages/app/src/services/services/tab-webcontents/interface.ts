@@ -20,7 +20,7 @@ export class TabWebContentsService extends ServiceBase implements RPC.Interface<
   print(webContentsId: number): Promise<void> { }
   // @ts-ignore
   loadURL(webContentsId: number, url: string): Promise<void> { }
-  // TODO: make this into a dedicated SpellcheckerService
+  // Note: spellchecking should eventually be extracted into a dedicated SpellcheckerService
   // @ts-ignore
   querySpellchecker(webContentsId: number, misspelledWord: string): Promise<string[]> { }
   // @ts-ignore

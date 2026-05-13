@@ -135,7 +135,7 @@ export class ContextMenuServiceImpl extends ContextMenuService implements RPC.No
     this.subscribeClickItem(autofill, this.contextMenuObservable);
 
     autofill.popup({
-      window: BrowserWindow.fromWebContents(wc.hostWebContents),
+      window: BrowserWindow.fromWebContents(wc.hostWebContents)!,
       // The rect we receive is given without our own UI elements
       // Hence the added offset value which correspond to dock (50) & top rack (38)
       x: Math.floor(rect.left + 50),

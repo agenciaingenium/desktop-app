@@ -3,7 +3,7 @@ import {
   Menu,
 } from 'electron';
 import { EventEmitter } from 'events';
-import * as uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { serializedKeyboardEvent } from '../services/services/menu/helpers';
 
 interface PopupOptions {
@@ -48,7 +48,7 @@ export default class AutofillContextMenu extends EventEmitter {
    * @param options Various options to forward to menu.popup()
    */
   popup(options: PopupOptions) {
-    const id = uuid.v4();
+    const id = uuidv4();
 
     const template = this.buildTemplate(this.emails);
     const menu = Menu.buildFromTemplate(template);

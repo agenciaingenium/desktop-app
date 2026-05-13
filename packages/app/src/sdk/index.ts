@@ -13,7 +13,7 @@ import ReactProvider from './react/ReactProvider';
 import SearchProvider from './search/SearchProvider';
 import SessionProvider from './session/SessionProvider';
 import StorageProvider from './storage/StorageProvider';
-import TabsProvider from './tabs/TabsProvider';
+import type TabsProvider from './tabs/TabsProvider';
 import ResourcesProvider from './resources/ResourcesProvider';
 
 export type Providers = SearchProvider |
@@ -42,19 +42,21 @@ export abstract class BxSDK implements Provider {
   protected _store: StationStore;
 
   register(consumer: Consumers) {
-    if (!(consumer.namespace in this)) {
+    const sub = this[consumer.namespace as keyof BxSDK] as BxSubSDK<any, any> | undefined;
+    if (!sub) {
       console.warn(`Namespace ${consumer.namespace} is not registered`);
       return;
     }
-    this[consumer.namespace].register(consumer as any); // TODO fix typing
+    sub.register(consumer);
   }
 
   unregister(consumer: Consumers) {
-    if (!(consumer.namespace in this)) {
+    const sub = this[consumer.namespace as keyof BxSDK] as BxSubSDK<any, any> | undefined;
+    if (!sub) {
       console.warn(`Namespace ${consumer.namespace} is not registered`);
       return;
     }
-    this[consumer.namespace].unregister(consumer as any); // TODO fix typing
+    sub.unregister(consumer);
   }
 
   init(..._args: any[]) { }

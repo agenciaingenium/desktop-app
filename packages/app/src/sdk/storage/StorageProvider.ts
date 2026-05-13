@@ -1,6 +1,6 @@
 import { storage } from '@getstation/sdk';
 import { Store } from 'redux';
-import { setServiceDataValue } from '../../plugins/duck';
+import { setServiceDataValue, removeServiceDataValue, clearServiceData } from '../../plugins/duck';
 import { StationState } from '../../types';
 import { AbstractProvider } from '../common';
 
@@ -28,7 +28,6 @@ export default class StorageProvider extends AbstractProvider<storage.StorageCon
 
   getItem(consumerKey: string, key: string) {
     const state = this.store.getState();
-    // TODO fix TS definition once servicesData is properly defined
     const item: any = state.getIn(['servicesData', consumerKey, key] as any);
     return Promise.resolve(item && item.toJS ? item.toJS() : item);
   }
@@ -46,11 +45,20 @@ export default class StorageProvider extends AbstractProvider<storage.StorageCon
       }));
   }
 
-  removeItem() {
-    // TODO
+  removeItem(consumerKey: string, key: string) {
+    this.store.dispatch(removeServiceDataValue(consumerKey, key));
+    this._consumers
+      .filter(c => c.id === consumerKey)
+      .forEach(c => c.onChanged.emit({
+        [key]: { oldValue: null, newValue: undefined },
+      }));
   }
 
-  clear() {
-    // TODO
+  clear(consumerKey: string) {
+    this.store.dispatch(clearServiceData(consumerKey));
+    const consumer = this._consumers.find(c => c.id === consumerKey);
+    if (consumer) {
+      consumer.onChanged.emit({});
+    }
   }
 }

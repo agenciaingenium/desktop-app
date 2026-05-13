@@ -31,7 +31,7 @@ export interface ServiceRuntime {
 
 const ensureActivator: Transformer<SDKActivator, Activator> = activate => async (sdk: SDK, bx?: SDKConsumer) => {
   const result = await activate(sdk, bx);
-  return result instanceof Observable ? result : Observable.empty();
+  return result instanceof Observable ? result : Observable.of();
 };
 
 const ensureRuntime: Transformer<SDKServiceRuntime, ServiceRuntime> = evolve({
@@ -45,7 +45,9 @@ const ensureRuntime: Transformer<SDKServiceRuntime, ServiceRuntime> = evolve({
  */
 export const getServiceRuntime = async (manifest: BxAppManifest): Promise<ServiceRuntime | void> => {
   if (!manifest || !manifest.main) return;
+  if (!/^[a-z0-9_-]+\/[a-z0-9_-]+$/i.test(manifest.main)) return;
 
+  // eslint-disable-next-line no-unsanitized/method
   const sdkRuntime: ServiceRuntime = await import(
     `../../manifests/runtime/${manifest.main}`)
     .then(({ default: main }) => main);
@@ -55,17 +57,8 @@ export const getServiceRuntime = async (manifest: BxAppManifest): Promise<Servic
 
 /**
  * Load the `ServiceRuntimeRenderer` of a given service.
- * If there is no runtime defined (no `renderer` key in service definition), load
- * a dummy runtime that does nothing.
- * FIXME migrate this to use manifest
+ * @deprecated Renderer runtimes are no longer supported. This function always returns undefined.
  */
-export const getServiceRuntimeRenderer = async (_serviceId?: string): Promise<ServiceRuntime | void> => {
+export const getServiceRuntimeRenderer = async (): Promise<void> => {
   return;
-  /*if (!manifest || !manifest.main) return;
-
-  const sdkRuntime: ServiceRuntime = await import(
-    `../../manifests/runtime/${manifest.renderer}`)
-    .then(({ default: main }) => main);
-
-  return ensureRuntime(sdkRuntime);*/
 };

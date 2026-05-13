@@ -1,8 +1,5 @@
 import { Modal } from '@getstation/theme';
-import * as remote from '@electron/remote';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 // @ts-ignore: no declaration file
@@ -13,18 +10,13 @@ import { resetApplication, ResetApplicationAction } from '../duck';
 import { withGetApplication } from '../queries@local.gql.generated';
 import { getUIConfirmResetApplicationModalIsVisible } from '../selectors';
 
-const currentWindowId = remote.getCurrentWindow().id;
-
-interface Classes {
-  description: string,
-}
+const currentWindowId = window.station.window.getId();
 
 interface InputProps {
   applicationId: string,
 
 }
 interface StateProps {
-  classes?: Classes,
   isVisible: boolean,
 }
 
@@ -43,20 +35,13 @@ type Props = InputProps & StateProps & DispatchProps & GqlProps;
 interface State {
 }
 
-@injectSheet(() => ({
-  description: {
-    textAlign: 'center',
-    width: '80%',
-    margin: 'auto',
-  },
-}))
 class ConfirmResetApplicationImpl extends React.Component<Props, State> {
   constructor(args: Props) {
     super(args);
   }
 
   render() {
-    const { classes, applicationName, applicationId, onReset, onCancel, isVisible, loading } = this.props;
+    const { applicationName, applicationId, onReset, onCancel, isVisible, loading } = this.props;
 
     if (!loading && isVisible) {
       return (
@@ -67,7 +52,7 @@ class ConfirmResetApplicationImpl extends React.Component<Props, State> {
           cancelContent={'Cancel'}
           continueContent={'Continue'}
         >
-          <p className={classes!.description}>
+          <p style={{ textAlign: 'center', width: '80%', margin: 'auto' }}>
             This will clear all of {applicationName} pages and send you back home.
           </p>
         </Modal>

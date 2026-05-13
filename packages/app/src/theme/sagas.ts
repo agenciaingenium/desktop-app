@@ -3,7 +3,7 @@ import * as log from 'electron-log';
 // @ts-ignore no declaration file
 import ms = require('ms');
 import { SagaIterator } from 'redux-saga';
-import { all, call, delay, put } from 'redux-saga/effects';
+import { all, call, delay, put, select } from 'redux-saga/effects';
 import { READY } from '../app/duck';
 
 import { periodicTick, takeEveryWitness, takeLatestWitness } from '../utils/sagas';
@@ -89,7 +89,6 @@ function* triggerTransition({ from, to }: { from: number, to: number }): SagaIte
  * @returns {SagaIterator}
  */
 function* checkNewThemeColors(): SagaIterator {
-  // FIXME? Didn't find a more handy way
   if (jumpInProgress) return;
   let [momentOfTheDay, ratio] = [currentMomentOfTheDay, 0];
   const suncalc = yield call(sagaGetSunCalc);
@@ -199,7 +198,10 @@ function* doUpdateCurrentLocation(): SagaIterator {
   log.debug('[theme] Update current location');
   try {
     const coords = yield call(getMyCoordinates);
-    // TODO: check if coords have changed before changing them
+    const currentCoords = yield select((state: any) => state.getIn(['theme', 'coords']));
+    if (currentCoords && currentCoords.get('latitude') === coords.latitude && currentCoords.get('longitude') === coords.longitude) {
+      return;
+    }
     yield put(setCurrentLocation(coords));
   } catch (e) {
     log.error(e);

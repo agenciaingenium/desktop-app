@@ -80,7 +80,6 @@ function* hideDiscoverabilityInsert({ searchValue }: SetSearchValueAction): Saga
 
 function* produceResults(providerResults: Timestamp<SearchSection[]>, query: Timestamp<search.SearchQuery>):
   SagaIterator {
-  // TODO find a way to pipe this instead of putting it there
   const serializedResults: SearchSectionSerialized[] = yield call(serializeResults, providerResults.value, callbacksSearch);
   const flattenedResults = flattenResults(serializedResults);
   const resultsSyncedWithQuery = (providerResults.timestamp - query.timestamp) > -1;

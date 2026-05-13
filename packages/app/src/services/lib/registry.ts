@@ -33,5 +33,4 @@ export class ServicesRegistry {
   }
 }
 
-// TODO find a better way
 export const allServicesRegistry = new ServicesRegistry();

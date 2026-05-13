@@ -1,4 +1,3 @@
-import * as remote from '@electron/remote';
 import { compact } from 'ramda-adjunct';
 import * as Immutable from 'immutable';
 // @ts-ignore: no declaration file
@@ -17,8 +16,66 @@ import { isPackaged } from '../utils/env';
 import { namespace } from './const';
 import { createActionsBusMiddleware, ActionsEmitter } from './actionsBus';
 
+declare global {
+  interface Window {
+    station: {
+      getGlobal: (name: string) => any;
+      ipc: {
+        send: (channel: string, ...args: any[]) => void;
+        sendSync: (channel: string, ...args: any[]) => any;
+        invoke: (channel: string, ...args: any[]) => Promise<any>;
+        on: (channel: string, callback: (...args: any[]) => void) => () => void;
+        removeListener: (channel: string, callback: (...args: any[]) => void) => void;
+      };
+      app: {
+        getName: () => string;
+        getVersion: () => string;
+        getPath: (name: string) => string;
+        exit: (code?: number) => void;
+        quit: () => void;
+      };
+      shell: {
+        openExternal: (url: string) => Promise<void>;
+        openPath: (path: string) => Promise<string>;
+      };
+      window: {
+        close: () => void;
+        minimize: () => void;
+        focus: () => void;
+        isFocused: () => Promise<boolean>;
+        isFullScreen: () => Promise<boolean>;
+        setFullScreen: (flag: boolean) => void;
+        toggleFullScreen: () => void;
+        getId: () => number;
+        getSubData: () => any;
+        onFocus: (callback: () => void) => () => void;
+        onBlur: (callback: () => void) => () => void;
+        onClose: (callback: () => void) => () => void;
+      };
+      webContents: {
+        getCurrentId: () => number;
+        openDevTools: () => void;
+        fromId: (id: number) => Promise<any>;
+      };
+      dialog: {
+        showMessageBox: (options: any) => Promise<any>;
+      };
+      browserWindow: {
+        getFocusedWindow: () => Promise<any>;
+      };
+      clipboard: {
+        writeText: (text: string) => void;
+        readText: () => string;
+      };
+      webFrame: {
+        setVisualZoomLevelLimits: (min: number, max: number) => void;
+      };
+    };
+  }
+}
+
 export default async function configureStore(actionsEmitter?: ActionsEmitter): Promise<Store> {
-  const workerWebContentsId = remote.getGlobal('worker').webContentsId;
+  const workerWebContentsId = window.station.getGlobal('worker').webContentsId;
   console.log(`[DEBUG] configureStore.client: Creating duplex to worker wcId=${workerWebContentsId}, namespace=${namespace}`);
   const duplex = new ElectronIpcRendererDuplex(workerWebContentsId, namespace);
 
@@ -68,7 +125,7 @@ export default async function configureStore(actionsEmitter?: ActionsEmitter): P
       level: 'info',
       collapsed: true,
       stateTransformer: (state: StationState) => {
-        if (Immutable.Iterable.isIterable(state)) return state.toJS();
+        if (Immutable.isCollection(state)) return state.toJS();
         return state;
       },
     });

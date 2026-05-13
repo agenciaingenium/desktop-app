@@ -1,14 +1,7 @@
 import { IconSymbol, Size, ButtonIcon, Style } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-
-type Classes = {
-  container: string,
-};
 
 type DefaultProps = {
-  classes: Partial<Classes>,
   instanceTypeWording: string,
   onClick: () => void,
 };
@@ -17,16 +10,9 @@ type Props = DefaultProps & {
   name: string,
 };
 
-@injectSheet(() => ({
-  container: {
-    maxWidth: 300,
-    margin: [20, 0],
-  },
-}))
 class AddNewInstance extends React.PureComponent<Props> {
 
   static defaultProps: DefaultProps = {
-    classes: {},
     instanceTypeWording: 'instance',
     onClick: () => { },
   };
@@ -41,10 +27,10 @@ class AddNewInstance extends React.PureComponent<Props> {
   }
 
   render() {
-    const { classes, onClick } = this.props;
+    const { onClick } = this.props;
 
     return (
-      <div className={classes.container}>
+      <div style={{ maxWidth: 300, margin: '20px 0' }}>
         <ButtonIcon
           text={this.getWording()}
           symbolId={IconSymbol.PLUS}

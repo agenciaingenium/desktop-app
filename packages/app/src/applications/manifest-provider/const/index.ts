@@ -34,7 +34,7 @@ export const JAVASCRIPT_INJECTIONS = {
   'station-support': ['slackInjectedScript'],
   'gdrive-mu':    ['removeGoogleAccountInjectedScript'],
   'gcalendar-mu': ['removeGoogleAccountInjectedScript'],
-  'google-cloud': ['removeGoogleAccountInjectedScript'],  // vk: FIXME: doesn't work
+  'google-cloud': ['removeGoogleAccountInjectedScript'], // Note: removeGoogleAccountInjectedScript may not work for google-cloud
   'google-keep':  ['removeGoogleAccountInjectedScript'],
   meet:         ['removeGoogleAccountInjectedScript'],
   outlook: ['office365InjectedScript'],

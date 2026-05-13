@@ -1,23 +1,9 @@
-import { Icon, IconSymbol, ThemeTypes as Theme } from '@getstation/theme';
+import { Icon, IconSymbol, theme } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { compose } from 'redux';
 import { oc } from 'ts-optchain';
 import { withGetApplication } from '../queries@local.gql.generated';
 import AppIcon from '../../dock/components/AppIcon';
-
-export interface Classes {
-  container: string,
-  progress: string,
-  wrapper: string,
-  appIcon: string,
-  content: string,
-  filename: string,
-  successWrapper: string,
-  filenameSuccess: string,
-  close: string,
-}
 
 export interface InjectedProps {
   loading: boolean,
@@ -31,11 +17,8 @@ interface OnFinished {
 }
 
 export interface Props {
-  classes?: Classes,
   applicationId: string,
   filename: string,
-  // waiting for https://github.com/electron/electron/pull/7851
-  // fileIconURL:  str,
   completionPercent: number,
   onClickOpen: () => any,
   onClickHide: () => any,
@@ -48,72 +31,33 @@ export type FullProps = Props & InjectedProps;
 
 const noop = () => {};
 
-const styles = (theme: Theme) => ({
-  container: {
-    position: 'relative',
-    width: 265,
-    height: 65,
-    backgroundColor: (props: Props) => {
-      if (props.failed) {
-        return 'darkred';
-      }
-      return theme.mixinDarkenColor(props.themeColor, 0.3);
-    },
-    borderRadius: 4,
-    marginTop: 5,
-  },
-  progress: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    width: (props: Props) => `${props.completionPercent}%`,
-    backgroundColor: 'rgba(0, 0, 0, .3)',
-    borderRadius: 4,
-    transition: '200ms',
-  },
-  wrapper: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 15,
-    color: 'white',
-    fontSize: 12,
-    zIndex: 1,
-  },
-  content: {
-    ...theme.mixins.ellipsis(2),
-    flexGrow: 1,
-    padding: '0 10px',
-  },
-  filename: {
-    width: 160,
-    fontWeight: 600,
-  },
-  successWrapper: {
-    ...theme.mixins.ellipsis(2),
-    cursor: 'pointer',
-  },
-  filenameSuccess: {
-    width: 160,
-    color: 'rgba(255, 255, 255, .5)',
-  },
-  close: {
-    ...theme.mixins.flexbox.containerCenter,
-    flexShrink: 0,
-    ...theme.mixins.size(25),
-    backgroundColor: 'rgba(255, 255, 255, .5)',
-    border: 0,
-    borderRadius: 100,
-    cursor: 'pointer',
-    outline: 'none',
-  },
-});
+const contentStyle = {
+  ...theme.mixins.ellipsis(2),
+  flexGrow: 1,
+  padding: '0 10px',
+} as React.CSSProperties;
 
-@injectSheet(styles)
+const filenameStyle: React.CSSProperties = {
+  width: 160,
+  fontWeight: 600,
+};
+
+const filenameSuccessStyle: React.CSSProperties = {
+  width: 160,
+  color: 'rgba(255, 255, 255, .5)',
+};
+
+const closeStyle: React.CSSProperties = {
+  ...theme.mixins.flexbox.containerCenter,
+  flexShrink: 0,
+  ...theme.mixins.size(25),
+  backgroundColor: 'rgba(255, 255, 255, .5)',
+  border: 0,
+  borderRadius: 100,
+  cursor: 'pointer',
+  outline: 'none',
+};
+
 class DownloadToast extends React.PureComponent<FullProps> {
 
   handleClickOpen() {
@@ -123,7 +67,7 @@ class DownloadToast extends React.PureComponent<FullProps> {
   }
 
   render() {
-    const { classes, completionPercent, filename, onClickHide, interpretedIconUrl, failed, loading, themeColor, onFinished } = this.props;
+    const { completionPercent, filename, onClickHide, interpretedIconUrl, failed, loading, themeColor, onFinished } = this.props;
     const completed = completionPercent === 100;
     const finished = completed || failed;
 
@@ -132,37 +76,75 @@ class DownloadToast extends React.PureComponent<FullProps> {
       setTimeout(onFinished.doTheJob, onFinished.delay);
     }
 
+    const containerStyle: React.CSSProperties = {
+      position: 'relative',
+      width: 265,
+      height: 65,
+      backgroundColor: failed ? 'darkred' : theme.mixinDarkenColor(themeColor, 0.3),
+      borderRadius: 4,
+      marginTop: 5,
+    };
+
+    const progressStyle: React.CSSProperties = {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      width: `${completionPercent}%`,
+      backgroundColor: 'rgba(0, 0, 0, .3)',
+      borderRadius: 4,
+      transition: '200ms',
+    };
+
+    const wrapperStyle: React.CSSProperties = {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: 15,
+      color: 'white',
+      fontSize: 12,
+      zIndex: 1,
+    };
+
+    const successWrapperStyle = {
+      ...theme.mixins.ellipsis(2),
+      cursor: 'pointer',
+    } as React.CSSProperties;
+
     return (
-      <div className={classes!.container}>
-        <div className={classes!.wrapper}>
+      <div style={containerStyle}>
+        <div style={wrapperStyle}>
           { interpretedIconUrl &&
             <AppIcon
               imgUrl={interpretedIconUrl}
               themeColor={themeColor}
             />
           }
-          <div className={classes!.content} onClick={finished ? this.handleClickOpen.bind(this) : noop}>
+          <div style={contentStyle} onClick={finished ? this.handleClickOpen.bind(this) : noop}>
             {
               !finished ? (
                 <div>
                   <div>Downloading</div>
-                  <div className={classes!.filename}>{filename}</div>
+                  <div style={filenameStyle}>{filename}</div>
                 </div>
               ) : (
-                <div className={classes!.successWrapper}>
+                <div style={successWrapperStyle}>
                   <div>{failed ? 'Failed download' : 'Successful download'}!</div>
-                  <div className={classes!.filenameSuccess}>{filename}</div>
+                  <div style={filenameSuccessStyle}>{filename}</div>
                 </div>
               )
             }
           </div>
 
-          <button className={classes!.close} onClick={onClickHide}>
+          <button style={closeStyle} onClick={onClickHide}>
             <Icon symbolId={IconSymbol.CROSS} size={25} />
           </button>
         </div>
 
-        <div className={classes!.progress} />
+        <div style={progressStyle} />
       </div>
     );
   }

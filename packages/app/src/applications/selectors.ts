@@ -188,29 +188,32 @@ export const getNotificationsEnabled = (state: StationState, applicationId: stri
 export const getUIConfirmResetApplicationModalIsVisible = (state: StationState, windowId: number) =>
   state.getIn(['ui', 'confirmResetApplicationModal', 'isVisible'], false) === windowId;
 
-// TODO memoize
-export const getApplicationDescription = (state: StationState, application) => {
-  if (!application) return null;
-  const identityId = getApplicationIdentityId(application);
-  const subdomain = getApplicationSubdomain(application);
+export const getApplicationDescription = createSelector(
+  (_state: StationState, application: any) => application,
+  (state: StationState) => state,
+  (application, state) => {
+    if (!application) return null;
+    const identityId = getApplicationIdentityId(application);
+    const subdomain = getApplicationSubdomain(application);
 
-  if (!identityId && !subdomain) return null;
+    if (!identityId && !subdomain) return null;
 
-  if (subdomain) {
-    return subdomain;
+    if (subdomain) {
+      return subdomain;
+    }
+
+    const identity = getIdentityById(state, identityId);
+    if (!identity) return null;
+
+    let description = identity.getIn(['profileData', 'email'], null);
+
+    if (!description) {
+      description = identity.get('email', null);
+    }
+
+    return `Connected as ${description}`;
   }
-
-  const identity = getIdentityById(state, identityId);
-  if (!identity) return null;
-
-  let description = identity.getIn(['profileData', 'email'], null);
-
-  if (!description) {
-    description = identity.get('email', null);
-  }
-
-  return `Connected as ${description}`;
-};
+);
 
 /**
  * Used by template strings of manifests
@@ -227,7 +230,7 @@ export const getApplicationFullConfigData =
       // it might happen that 2 identities have the same `userId`
       // lets deduplicate them before
       .groupBy((ident: StationUserIdentityImmutable) => ident.get('userId'))
-      .map((group: Immutable.Iterable<any, any>) => group.first());
+      .map((group: Immutable.Collection<any, any>) => group.first());
 
     return {
       ...minimalConfigData,

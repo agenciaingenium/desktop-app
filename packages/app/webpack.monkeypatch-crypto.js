@@ -1,6 +1,12 @@
 const crypto = require('crypto');
 
 /**
+ * Webpack 4 defaults to MD4 for content hashing, but MD4 was removed in
+ * Node.js 17+ (OpenSSL 3.0 legacy provider is disabled by default).
+ *
+ * Instead of falling back to MD5 (also broken), we use SHA-256 which is
+ * cryptographically sound and available in all Node.js versions.
+ *
  * @see {@link https://stackoverflow.com/a/72219174}
  */
 let cryptoPatched = false;
@@ -8,17 +14,12 @@ const monkeyPathCrypto = () => {
   if (cryptoPatched) return;
   cryptoPatched = true;
 
-  /**
-   * The MD4 algorithm is not available anymore in Node.js 17+ (because of library SSL 3).
-   * In that case, silently replace MD4 by the MD5 algorithm.
-   */
   try {
     crypto.createHash('md4');
   } catch (e) {
-    console.warn('Crypto "MD4" is not supported anymore by this Node.js version');
     const origCreateHash = crypto.createHash;
     crypto.createHash = (alg, opts) => {
-      return origCreateHash(alg === 'md4' ? 'md5' : alg, opts);
+      return origCreateHash(alg === 'md4' ? 'sha256' : alg, opts);
     };
   }
 };

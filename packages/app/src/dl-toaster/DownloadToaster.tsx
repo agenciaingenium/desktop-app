@@ -1,7 +1,5 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import * as Immutable from 'immutable';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { compose, bindActionCreators } from 'redux';
@@ -21,34 +19,22 @@ type DownloadItem = ObjectToImmutable<{
 }>;
 
 export type Props = {
-  classes?: Classes,
   downloads: ImmutableList<DownloadItem[]>,
   onOpenDownloadedFile: (downloadId: string) => void,
   onHideToasterClick: (downloadId: string) => void,
   themeColor: string,
 };
 
-interface Classes {
-  container: string,
-  clearAllButton: string,
-}
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    position: 'fixed',
-    bottom: '10px',
-    right: '10px',
-    zIndex: 9,
-  },
-  clearAllButton:{
-    cursor: 'pointer',
-  },
+const CONTAINER_STYLE: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  position: 'fixed',
+  bottom: '10px',
+  right: '10px',
+  zIndex: 9,
 };
 
-@injectSheet(styles)
 class DownloadToasterImpl extends React.PureComponent<Props, {}> {
 
   /**
@@ -77,9 +63,9 @@ class DownloadToasterImpl extends React.PureComponent<Props, {}> {
   }
 
   render() {
-    const { downloads, themeColor, classes } = this.props;
+    const { downloads, themeColor } = this.props;
     return (
-      <div className={classes!.container}>
+      <div style={CONTAINER_STYLE}>
         {this.clearAllButton(downloads)}
         <TransitionGroup>
           { downloads.map((dl: DownloadItem) => (

@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { ThemeTypes as Theme } from '@getstation/theme';
+import { theme } from '@getstation/theme';
 import * as memoize from 'memoizee';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { delay } from 'redux-saga/effects';
@@ -14,13 +12,12 @@ import { getUISettingsManifestURL } from '../../ui/selectors';
 import { StationState } from '../../types';
 import App from './App';
 
-interface Classes {
-  container: string,
-  title: string,
-}
+const titleStyle: React.CSSProperties = {
+  ...theme.titles.h1,
+  marginBottom: 30,
+};
 
 type OwnProps = {
-  classes?: Classes,
   onModalStateChanged: (isOpened: boolean) => void,
 };
 
@@ -41,7 +38,6 @@ interface State {
 }
 
 const isModalOpened = (_state: State) => false;
-// state.toRemove.instances.size > 0;
 
 const getManifestsOrder = (manifestsUrls: string[]) =>
   manifestsUrls.reduce(
@@ -50,14 +46,6 @@ const getManifestsOrder = (manifestsUrls: string[]) =>
     ''
   );
 
-@injectSheet((theme: Theme) => ({
-  container: {
-  },
-  title: {
-    ...theme.titles.h1,
-    marginBottom: 30,
-  },
-}))
 class SettingsMyAppsImpl extends React.PureComponent<Props, State> {
   public state: State = {
     selectedManifestURL: undefined,
@@ -72,10 +60,6 @@ class SettingsMyAppsImpl extends React.PureComponent<Props, State> {
     this.manifestURLsRef = {};
   }
 
-  /**
-   * Attach the the nodeRef in a memoize way for performance reason
-   * in render.
-   */
   refAttacher = memoize((manifestURL: string) => (node: HTMLDivElement) => {
     this.manifestURLsRef[manifestURL] = node;
   });
@@ -124,21 +108,21 @@ class SettingsMyAppsImpl extends React.PureComponent<Props, State> {
     this.props.setSelectedManifestURL(undefined);
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    const selectedManifestURL = nextProps.selectedManifestURL;
+  componentDidUpdate(prevProps: Props) {
+    const selectedManifestURL = this.props.selectedManifestURL;
 
     if (selectedManifestURL) {
+      const prevAppOrder = getManifestsOrder(prevProps.manifestsUrls);
       const currentAppOrder = getManifestsOrder(this.props.manifestsUrls);
-      const nextAppOrder = getManifestsOrder(this.props.manifestsUrls);
 
-      if (currentAppOrder !== nextAppOrder) {
+      if (prevAppOrder !== currentAppOrder) {
         setImmediate(() => this.scrollToSelectedManifestURL());
       }
     }
   }
 
   render() {
-    const { classes, manifestsUrls } = this.props;
+    const { manifestsUrls } = this.props;
 
     const items = manifestsUrls.map(manifestURL => (
       <App
@@ -150,8 +134,8 @@ class SettingsMyAppsImpl extends React.PureComponent<Props, State> {
     ));
 
     return (
-      <div className={classes!.container}>
-        <div className={classes!.title}>My Apps</div>
+      <div>
+        <div style={titleStyle}>My Apps</div>
 
         <div>
           {items}

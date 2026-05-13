@@ -1,8 +1,5 @@
-import { ThemeTypes as Theme } from '@getstation/theme';
-import * as remote from '@electron/remote';
+import { theme } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
@@ -20,15 +17,7 @@ import SettingsHideMainMenu from './SettingsHideMainMenu/SettingsHideMainMenu';
 import SettingsMinimizeToTray from './SettingsMinimizeToTray/SettingsMinimizeToTray';
 import { isDarwin, isWindows } from '../../utils/process';
 
-export interface Classes {
-  container: string,
-  header: string,
-  thin: string,
-  separator: string,
-}
-
 export interface StateProps {
-  classes?: Classes,
   downloadFolder?: string,
 }
 
@@ -46,34 +35,15 @@ type OwnProps = {};
 
 type Props = OwnProps & StateProps & DispatchProps & MergeProps;
 
-const styles = (theme: Theme) => ({
-  container: {
-  },
-  header: {
-    ...theme.titles.h2,
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  thin: {
-    marginLeft: 3,
-    fontWeight: 400,
-    opacity: 0.5,
-  },
-});
-
-@injectSheet(styles)
 class SettingsPanelGeneralImpl extends React.PureComponent<Props, {}> {
 
   render() {
-    const { classes } = this.props;
-
     return (
-      <div className={classes!.container}>
-        <div className={classes!.header}>
+      <div>
+        <div style={{ ...theme.titles.h2, display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
           <div>
-            {remote.app.name}
-            <span className={classes!.thin}>version {remote.app.getVersion()}</span>
+            {window.station.app.getName()}
+            <span style={{ marginLeft: 3, fontWeight: 400, opacity: 0.5 }}>version {window.station.app.getVersion()}</span>
           </div>
 
           <SettingsUpdatesButton />
@@ -122,6 +92,6 @@ const SettingsPanelGeneral = connect<StateProps, DispatchProps, MergeProps>(
     onDownloadLocationClick: () =>
       dispatchProps.revealPathInFinder(stateProps.downloadFolder),
   })
-)(SettingsPanelGeneralImpl);
+)(SettingsPanelGeneralImpl) as any;
 
 export default SettingsPanelGeneral as React.ComponentType<OwnProps>;

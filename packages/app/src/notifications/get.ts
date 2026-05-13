@@ -12,11 +12,11 @@ export const getNotificationWebContentsId = (notif: ImmutableNotification): numb
 
 export const getNotificationTitle = (notif: ImmutableNotification): string => notif.get('title');
 
-export const getNotificationBody = (notif: ImmutableNotification): string => notif.get('body');
+export const getNotificationBody = (notif: ImmutableNotification): string => notif.get('body') || '';
 
-export const getNotificationIcon = (notif: ImmutableNotification): string => notif.get('icon');
+export const getNotificationIcon = (notif: ImmutableNotification): string => notif.get('icon') || '';
 
-export const getNotificationTimestamp = (notif: ImmutableNotification): string => notif.get('timestamp');
+export const getNotificationTimestamp = (notif: ImmutableNotification): string => String(notif.get('timestamp') || '');
 
 export const isNotificationFull = (notif: ImmutableNotification): boolean => notif.get('full', false);
 

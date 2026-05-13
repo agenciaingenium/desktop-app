@@ -1,18 +1,5 @@
-import { Button, IconSymbol, Style, Switcher, ThemeTypes, Tooltip, ButtonIcon, Size } from '@getstation/theme';
+import { Button, IconSymbol, Style, Switcher, theme, Tooltip, ButtonIcon, Size } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-
-interface Classes {
-  actions: string,
-  item: string,
-  itemContent: string,
-  itemImg: string,
-  itemBody: string,
-  itemActionsLeft: string,
-  itemActionsRight: string,
-  itemAction: string,
-}
 
 export enum ListActionType {
   BUTTON, BUTTON_ICON, SWITCHER,
@@ -59,69 +46,65 @@ type DefaultProps = {
 };
 
 type Props = DefaultProps & {
-  classes?: Classes,
   item: ListItemType,
 };
 
-@injectSheet((theme: ThemeTypes) => ({
-  item: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  actions: {
-    width: '100%',
-  },
-  itemContent: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-    minWidth: (props: Props) => {
-      const leftActions = props.item.leftActions || [];
-      const rightActions = props.item.rightActions || [];
-      const hasActions = Boolean(leftActions.length || rightActions.length);
-      return hasActions ? '300px' : '0px';
-    },
-    maxWidth: '300px',
-    width: '80%',
-  },
-  itemImg: (props: Props) => ({
-    flexShrink: 0,
-    ...theme.mixins.size(props.iconSize),
-    marginRight: 5,
-    display: 'inline-block',
-    verticalAlign: 'middle',
-    borderRadius: 100,
-    border: '2px solid white',
-  }),
-  itemBody: ({ item }: Props) => ({
-    textDecoration: item.onClick ? 'underline' : 'inherit',
-    cursor: item.onClick ? 'pointer' : 'inherit',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  }),
-  itemActionsLeft: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-  },
-  itemActionsRight: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  itemAction: {
-    display: 'inline-block',
-    marginLeft: 5,
-  },
-}))
+const itemStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  marginBottom: 10,
+};
+
+const actionsStyle: React.CSSProperties = {
+  width: '100%',
+};
+
 export default class ListItem extends React.PureComponent<Props, {}> {
   static defaultProps: DefaultProps = {
     iconSize: 20,
   };
 
+  getItemContentStyle(): React.CSSProperties {
+    const { item } = this.props;
+    const leftActions = item.leftActions || [];
+    const rightActions = item.rightActions || [];
+    const hasActions = Boolean(leftActions.length || rightActions.length);
+    return {
+      display: 'flex',
+      flex: 1,
+      alignItems: 'center',
+      minWidth: hasActions ? '300px' : '0px',
+      maxWidth: '300px',
+      width: '80%',
+    };
+  }
+
+  getItemImgStyle(): React.CSSProperties {
+    const { iconSize } = this.props;
+    return {
+      flexShrink: 0,
+      ...theme.mixins.size(iconSize),
+      marginRight: 5,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: 100,
+      border: '2px solid white',
+    };
+  }
+
+  getItemBodyStyle(): React.CSSProperties {
+    const { item } = this.props;
+    return {
+      textDecoration: item.onClick ? 'underline' : 'inherit',
+      cursor: item.onClick ? 'pointer' : 'inherit',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    };
+  }
+
   renderButtonIcon(action: ListItemActionButtonIcon) {
-    const { classes } = this.props;
     const buttonIcon = (
       <ButtonIcon
         key={action.id}
@@ -134,7 +117,7 @@ export default class ListItem extends React.PureComponent<Props, {}> {
     );
     if (action.tooltip) {
       return (
-        <Tooltip className={classes!.itemAction} key={action.id} tooltip={action.tooltip} offset="-2, 12" placement="right">
+        <Tooltip key={action.id} tooltip={action.tooltip} offset="-2, 12" placement="right">
           {buttonIcon}
         </Tooltip>
       );
@@ -143,7 +126,6 @@ export default class ListItem extends React.PureComponent<Props, {}> {
   }
 
   renderButton(action: ListItemActionButton) {
-    const { classes } = this.props;
     const btnStyle = action.btnStyle || Style.SECONDARY;
     const buttonIcon = (
       <Button btnStyle={btnStyle} key={action.id} btnSize={Size.XXSMALL} onClick={action.handleAction}>
@@ -152,7 +134,7 @@ export default class ListItem extends React.PureComponent<Props, {}> {
     );
     if (action.tooltip) {
       return (
-        <Tooltip className={classes!.itemAction} key={action.id} tooltip={action.tooltip} placement={'top'} offset="0, 4">
+        <Tooltip key={action.id} tooltip={action.tooltip} placement={'top'} offset="0, 4">
           {buttonIcon}
         </Tooltip>
       );
@@ -166,12 +148,11 @@ export default class ListItem extends React.PureComponent<Props, {}> {
     );
   }
 
-  renderActions(actions: undefined | ListItemAction[], className: string) {
-    const { classes } = this.props;
+  renderActions(actions: undefined | ListItemAction[], justifyContent: 'flex-start' | 'flex-end') {
     if (actions) {
       return (
-        <div className={classes!.actions}>
-          <div className={className}>
+        <div style={actionsStyle}>
+          <div style={{ display: 'flex', justifyContent }}>
             {
               actions.map((action: ListItemAction) => {
                 switch (action.type) {
@@ -194,17 +175,17 @@ export default class ListItem extends React.PureComponent<Props, {}> {
   }
 
   render() {
-    const { classes, item } = this.props;
+    const { item } = this.props;
 
     return (
-      <li className={classes!.item}>
-        <div className={classes!.itemContent}>
-          {item.imageURL && <img className={classes!.itemImg} src={item.imageURL} alt={item.name} />}
-          <span onClick={item.onClick} className={classes!.itemBody}>{item.name}</span>
+      <li style={itemStyle}>
+        <div style={this.getItemContentStyle()}>
+          {item.imageURL && <img style={this.getItemImgStyle()} src={item.imageURL} alt={item.name} />}
+          <span onClick={item.onClick} style={this.getItemBodyStyle()}>{item.name}</span>
         </div>
 
-        {this.renderActions(item.leftActions, classes!.itemActionsLeft!)}
-        {this.renderActions(item.rightActions, classes!.itemActionsRight!)}
+        {this.renderActions(item.leftActions, 'flex-start')}
+        {this.renderActions(item.rightActions, 'flex-end')}
       </li>
     );
   }

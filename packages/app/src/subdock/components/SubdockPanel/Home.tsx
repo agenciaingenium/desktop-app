@@ -1,14 +1,19 @@
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 
 import SubdockItem, { MinimalSubdockApplication } from '../SubdockItem';
 import { ActiveTab } from '../../Container';
 
 import { HomeTab, SubdockActionsProps } from './types';
-import { SubdockListStyle, subdockListStyle } from './styles';
 import { extractTabActions } from './Tabs';
 import { useActionsWrapper } from './TabItem';
+
+const containerStyle: React.CSSProperties = {
+  position: 'relative',
+  flex: '1 1 auto',
+  padding: '0 0 0 20px',
+  width: '100%',
+  marginBottom: 10,
+};
 
 export type OwnProps = SubdockActionsProps & {
   className?: string,
@@ -22,14 +27,14 @@ const Home = ({
   item,
   activeTab,
   ...props
-}: OwnProps & { classes: SubdockListStyle }) => {
+}: OwnProps) => {
   const tabActions = extractTabActions(props);
 
   const surchargedItem = useSanitization(item, activeTab);
   const wrappedActions = useActionsWrapper(tabActions, item);
 
   return (
-    <div>
+    <div style={containerStyle}>
       <ul>
         <SubdockItem
           application={application}
@@ -61,4 +66,4 @@ const useSanitization = (item: HomeTab, activeTab: ActiveTab) => {
   );
 };
 
-export default injectSheet(subdockListStyle)(Home) as React.ComponentType<OwnProps>;
+export default Home as React.ComponentType<OwnProps>;

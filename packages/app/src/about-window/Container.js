@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { BrowserXThemeProvider, GradientType, withGradient } from '@getstation/theme';
+import { GradientType, withGradient } from '@getstation/theme';
 import { checkForUpdates, quitAndInstall } from '../auto-update/duck';
 import { getReleaseName, isCheckingUpdate, isDownloadingUpdate, isUpdateAvailable } from '../auto-update/selectors';
 import { areBetaIncludedInUpdates, getAppAutoLaunchEnabledStatus, getAppName, getAppVersion } from '../app/selectors';
@@ -41,9 +41,7 @@ class AboutWindowContainer extends React.PureComponent {
 
   render() {
     return (
-      <BrowserXThemeProvider>
-        <AboutWindowPresenter {...this.props} />
-      </BrowserXThemeProvider>
+      <AboutWindowPresenter {...this.props} />
     );
   }
 }

@@ -1,20 +1,6 @@
-import { ThemeTypes as Theme } from '@getstation/theme';
-import * as classNames from 'classnames';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
-
-interface Classes {
-  label: string,
-  container: string,
-  input: string,
-  searchIcon: string,
-  navigation: string,
-  navigationIcon: string,
-}
 
 export interface Props {
-  classes?: Classes,
   value: string,
   onValueChange: (value: string) => void,
   onArrowDown: () => void,
@@ -29,60 +15,6 @@ export interface Props {
   shortcut?: string,
 }
 
-@injectSheet((theme: Theme) => ({
-  container: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    minHeight: '52px',
-    cursor: 'text',
-    padding: 20,
-    borderBottom: '2px solid rgba(255,255,255,0.1)',
-  },
-  label: {
-    cursor: 'inherit',
-    flex: 1,
-  },
-  input: {
-    width: '100%',
-    cursor: 'inherit',
-    appearance: 'none',
-    border: 'none',
-    backgroundColor: 'transparent',
-    color: 'rgba(255, 255, 255, 0.8)',
-    ...theme.fontMixin(16, 600),
-    caretColor: 'rgba(255, 255, 255, 0.8)',
-    '&::placeholder': {
-      ...theme.fontMixin(14),
-      color: 'rgba(255, 255, 255, 0.6)',
-      fontStyle: 'italic',
-      paddingLeft: 10,
-    },
-    '&:hover': {
-      '&::placeholder': {
-        textDecoration: 'inherit',
-      },
-    },
-  },
-  searchIcon: {
-    cursor: 'inherit',
-    flexGrow: 0,
-    ...theme.avatarMixin('24px'),
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
-  navigation: {
-    marginLeft: 5,
-    fontSize: 10,
-    color: 'rgba(255, 255, 255, .6)',
-  },
-  navigationIcon: {
-    marginRight: 4,
-    padding: [2, 4],
-    background: 'rgba(255, 255, 255, .2)',
-    borderRadius: 2,
-    fontSize: 10,
-  },
-}))
 export default class BangInput extends React.PureComponent<Props> {
 
   static defaultProps = {
@@ -148,8 +80,6 @@ export default class BangInput extends React.PureComponent<Props> {
       }
       case 'Enter': {
         e.preventDefault();
-        // handling will happen on KeyUp
-        // otherwile it might interfer with the app we'll focus on next
         break;
       }
       case 'Escape': {
@@ -185,17 +115,33 @@ export default class BangInput extends React.PureComponent<Props> {
   }
 
   render() {
-    const { classes, value, onClick, onContextMenu, shortcut } = this.props;
+    const { value, onClick, onContextMenu, shortcut } = this.props;
+
+    const navigationIconStyle: React.CSSProperties = {
+      marginRight: 4,
+      padding: '2px 4px',
+      background: 'rgba(255, 255, 255, .2)',
+      borderRadius: 2,
+      fontSize: 10,
+    };
 
     return (
       <div
-        className={classes!.container}
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          minHeight: 52,
+          cursor: 'text',
+          padding: 20,
+          borderBottom: '2px solid rgba(255,255,255,0.1)',
+        }}
         onClick={onClick}
         onContextMenu={onContextMenu}
       >
-        <label className={classes!.label}>
+        <label style={{ cursor: 'inherit', flex: 1 }}>
           <input
-            className={classNames(classes!.input, 'mousetrap')}
+            className="bang-input mousetrap"
             placeholder="Jump to..."
             ref={this.setRef}
             type="text"
@@ -207,8 +153,8 @@ export default class BangInput extends React.PureComponent<Props> {
         </label>
 
         { shortcut &&
-          <div className={classes!.navigation}>
-            <span className={classes!.navigationIcon}>{shortcut}</span>
+          <div style={{ marginLeft: 5, fontSize: 10, color: 'rgba(255, 255, 255, .6)' }}>
+            <span style={navigationIconStyle}>{shortcut}</span>
             Open
           </div>
         }

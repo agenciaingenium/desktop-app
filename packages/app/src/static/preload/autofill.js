@@ -1,4 +1,4 @@
-const ipc = require('electron').ipcRenderer;
+const { IPC, createSender, createListener, injectIntoPage } = require('./preload-api');
 const memoize = require('memoizee/weak');
 const { fillInput } = require('./utils');
 
@@ -29,17 +29,25 @@ const isAutocompleteEmailAuthorized = memoize((target) => {
   return Boolean(password);
 });
 
-ipc.on('autofill-value-chosen', (e, value) => {
+const sendAskAutofillPopup = createSender('ask-autofill-popup');
+const onAutofillValueChosen = createListener('autofill-value-chosen');
+
+// Register API for contextBridge
+const api = {
+  sendAskAutofillPopup: (rect) => sendAskAutofillPopup(rect),
+};
+
+onAutofillValueChosen((value) => {
   if (currentAutocompletedInput) {
     fillInput(currentAutocompletedInput, value);
   }
 });
 
-document.addEventListener('focusin', e => {
+document.addEventListener('focusin', (e) => {
   if (e.target && isAutocompleteEmailAuthorized(e.target)) {
     currentAutocompletedInput = e.target;
     const rect = e.target.getBoundingClientRect();
-    ipc.send('ask-autofill-popup', {
+    sendAskAutofillPopup({
       bottom: rect.bottom,
       height: rect.height,
       left: rect.left,
@@ -49,3 +57,5 @@ document.addEventListener('focusin', e => {
     });
   }
 }, false);
+
+module.exports = { api };

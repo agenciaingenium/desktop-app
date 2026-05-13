@@ -2,8 +2,6 @@ import * as React from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import mergeRefs from 'react-merge-refs';
 import classNames from 'classnames';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { IconSymbol } from '@getstation/theme';
 
 import { MinimalSubdockApplication } from '../SubdockItem';
@@ -16,20 +14,42 @@ import {
   useScrollData,
   IdentifierType,
 } from './customHooks';
-import { SubdockListStyle, subdockListStyle } from './styles';
 import TabItem from './TabItem';
 
-// CUSTOM STYLE
+// STYLE
 
-interface OwnStyle {
-  newPageButton: string,
-}
+const containerStyle: React.CSSProperties = {
+  position: 'relative',
+  flex: '1 1 auto',
+  padding: '0 0 0 20px',
+  width: '100%',
+  marginBottom: 10,
+};
 
-const ownStyle = {
-  newPageButton: {
-    marginRight: '20px',
-    opacity: .4,
-  },
+const sectionHeaderStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+};
+
+const titleStyle: React.CSSProperties = {
+  textTransform: 'uppercase',
+  padding: 10,
+  fontSize: 10,
+  opacity: 0.3,
+  fontStyle: 'bold',
+  color: 'white',
+};
+
+const contentStyle: React.CSSProperties = {
+  maxHeight: 200,
+  overflowY: 'scroll',
+};
+
+const newPageButtonStyle: React.CSSProperties = {
+  marginRight: 20,
+  opacity: 0.4,
 };
 
 // PROPS
@@ -55,14 +75,13 @@ export type OwnProps = SubdockActionsProps & {
 
 const Tabs = React.forwardRef((
   {
-    classes,
     className,
     application,
     tabs,
     activeTab,
     handleOpenNewTab,
     ...props
-  }: OwnProps & { classes: SubdockListStyle & OwnStyle },
+  }: OwnProps,
   ref: React.Ref<HTMLDivElement>
 ) => {
   // Scroll Stuff
@@ -76,15 +95,15 @@ const Tabs = React.forwardRef((
   if (nbTabs === 0) return null;
 
   return (
-    <div className={classes!.container}>
-      <div className={classes!.sectionHeader}>
-        <p className={classes!.title}>
+    <div style={containerStyle}>
+      <div style={sectionHeaderStyle}>
+        <p style={titleStyle}>
           Opened pages
           {nbTabs > 5 && <span> : {nbTabs}</span>}
         </p>
         <SubdockButton
           tooltip={'Open a new page'}
-          className={classes!.newPageButton}
+          style={newPageButtonStyle}
           size={24}
           symbolId={IconSymbol.PLUS}
           onClick={handleOpenNewTab}
@@ -93,12 +112,13 @@ const Tabs = React.forwardRef((
       <div
         ref={mergeRefs([ref, internalRef])}
         onScroll={onScroll}
+        style={contentStyle}
         className={classNames(
           className,
-          classes.content,
+          'subdock-scroll-content',
           {
-            [classes.scrollOverlayTop]: !scrolled.top && nbTabs > 5,
-            [classes.scrollOverlayBottom]: !scrolled.bottom && nbTabs > 5,
+            'subdock-scroll-overlay-top': !scrolled.top && nbTabs > 5,
+            'subdock-scroll-overlay-bottom': !scrolled.bottom && nbTabs > 5,
           }
         )}
       >
@@ -144,4 +164,4 @@ export const extractTabActions = (props: SubdockActionsProps): RawTabActions => 
 
 // EXPORT
 
-export default injectSheet({ ...subdockListStyle, ...ownStyle })(Tabs) as React.ComponentType<OwnProps>;
+export default Tabs as React.ComponentType<OwnProps>;

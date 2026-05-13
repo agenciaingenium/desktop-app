@@ -38,7 +38,7 @@ export class OSNotificationServiceImpl extends OSNotificationService implements 
       if (!myWebcontent) return;
       // Send signal back to the webview to trigger click callbacks if any
       myWebcontent.send('trigger-notification-click', notificationId);
-    } catch (e) {}
+    } catch (e) { console.warn('[os-notification] Error sending notification click:', e); }
   }
 
   async isDoNotDisturbEnabled() {

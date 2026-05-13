@@ -79,6 +79,8 @@ export default class GenericWindowManager extends EventEmitter {
       ...options,
       preventNavigation: true,
       webPreferences: {
+        // nodeIntegration is overridden to false by BrowserWindowServiceImpl
+        // when contextIsolation is true (the preload bridge replaces Node access).
         nodeIntegration: true,
         webviewTag: true,
         // The following 2 parameters combined will disable the `same-origin` policy.
@@ -95,7 +97,8 @@ export default class GenericWindowManager extends EventEmitter {
         // (i.e. make slack calls inside the slack webview context).
         webSecurity: false,
         allowRunningInsecureContent: false,
-        contextIsolation: false,
+        contextIsolation: true,
+        sandbox: false,
       },
     });
 

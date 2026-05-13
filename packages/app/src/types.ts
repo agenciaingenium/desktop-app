@@ -14,7 +14,6 @@ export type StationStoreWorker = StationStore & {
   ready: () => Promise<void>;
 };
 
-export type JSSClasses<T> = Record<keyof T, string>;
 
 export type WithDefault<X, Y> = X extends undefined ? (Y extends undefined ? X : NonNullable<X>) : X;
 
@@ -30,7 +29,7 @@ export interface FnSet<TProps, Context> {
   ): Context;
 }
 
-// FIXME: - If one the item is nullable, result could be undefined
+// Note: If an intermediate item in the path is nullable, the result could be undefined
 export interface FnGetIn<TProps> {
   <
     K1 extends keyof TProps,
@@ -73,7 +72,7 @@ export interface FnGetIn<TProps> {
   (a: [K1, K2, K3, K4], notSetValue?: V): WithDefault<O5, V>;
 
   // copied from ImmutableJS definition file
-  (searchKeyPath: Immutable.Iterable<any, any>, notSetValue?: any): any;
+  (searchKeyPath: Immutable.Collection<any, any>, notSetValue?: any): any;
 }
 
 export interface FnSetIn<TProps, Context> {
@@ -114,7 +113,7 @@ export interface FnSetIn<TProps, Context> {
   (a: [K1, K2, K3, K4], value: O5): Context;
 
   // inspired from ImmutableJS definition file
-  (searchKeyPath: Immutable.Iterable<any, any>, value: any): Context;
+  (searchKeyPath: Immutable.Collection<any, any>, value: any): Context;
 }
 
 // There is no distinction between 'missing' and 'undefined' values for now

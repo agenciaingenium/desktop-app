@@ -4,7 +4,7 @@ if (!['storybook', 'test'].includes(process.env.NODE_ENV!)) {
 
   _isPackaged = Boolean(
       process.type === 'renderer'
-          ? require('electron').ipcRenderer.sendSync('get-is-packaged')
+          ? (window as any).station.ipc.sendSync('get-is-packaged')
           : require('electron').app.isPackaged
   );
 }

@@ -212,17 +212,12 @@ function* interceptNotificationEventsFromWebContents({ webcontentsId, tabId }: {
 
   const notificationCloseChannel = createWebContentsServiceObserverChannel(
     webcontentsId, 'addNotificationsObserver', 'onNotificationClose', 'intercept-notif-close');
-  yield takeEveryWitness(notificationCloseChannel, function* handle(/*notificationId: string*/) {
-    // AL: From my understanding of the [specs](https://notifications.spec.whatwg.org/#dom-notification-close)
-    // calling Notification#close should remove the notification from the notification center
-    // however, most apps (like Slack) misinterpreted the `#close` and use it to make sure a
-    // Notification doe not stay on screen.
-    // Therefore, when `#close` is called, by default, we do not remove the notification
-    // — unless `removeNotificationOnClose` is set in service data
-
-    // TODO fetch flag from manifest?
-    // yield put(removeNotificationFromNotificationCenter(notificationId));
-    // yield put(removeNotification(notificationId));
+  yield takeEveryWitness(notificationCloseChannel, function* handle(notificationId: string) {
+    // From the Notification API specs, calling Notification#close should remove the notification
+    // from the notification center. However, most apps (like Slack) misinterpreted #close
+    // and use it to dismiss the notification from screen rather than remove it from history.
+    // Therefore, when #close is called, by default, we do not remove the notification.
+    yield put(removeNotificationFromNotificationCenter(notificationId));
   });
 }
 

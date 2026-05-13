@@ -66,11 +66,11 @@ const observeBackAndForwardState = observer(
     services.menu.setEnabled({
       menuItemId: 'page-go-back',
       value: backForwardState.canGoBack,
-    }).catch(console.error); // FIXME
+    }).catch(console.error);
     services.menu.setEnabled({
       menuItemId: 'page-go-forward',
-      value: backForwardState.canGoBack
-    }).catch(console.error); // FIXME
+      value: backForwardState.canGoForward,
+    }).catch(console.error);
   },
 );
 

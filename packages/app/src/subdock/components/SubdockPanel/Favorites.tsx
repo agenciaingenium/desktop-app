@@ -1,8 +1,6 @@
 import * as React from 'react';
 import * as ReactApolloHooks from 'react-apollo-hooks';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import * as classNames from 'classnames';
 
 import { MinimalSubdockApplication } from '../SubdockItem';
@@ -22,8 +20,38 @@ import {
   useScrollData,
   IdentifierType,
 } from './customHooks';
-import { SubdockListStyle, subdockListStyle } from './styles';
 import FavoriteItem from './FavoriteItem';
+
+// STYLE
+
+const containerStyle: React.CSSProperties = {
+  position: 'relative',
+  flex: '1 1 auto',
+  padding: '0 0 0 20px',
+  width: '100%',
+  marginBottom: 10,
+};
+
+const sectionHeaderStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+};
+
+const titleStyle: React.CSSProperties = {
+  textTransform: 'uppercase',
+  padding: 10,
+  fontSize: 10,
+  opacity: 0.3,
+  fontStyle: 'bold',
+  color: 'white',
+};
+
+const contentStyle: React.CSSProperties = {
+  maxHeight: 200,
+  overflowY: 'scroll',
+};
 
 // PROPS
 
@@ -45,13 +73,12 @@ export type OwnProps = SubdockActionsProps & {
 // COMPONENT
 
 const Favorites = ({
-  classes,
   className,
   application,
   items,
   activeTab,
   ...props
-}: OwnProps & { classes: SubdockListStyle }) => {
+}: OwnProps) => {
   // Stuff for scrolling
   const internalRef = useScrollToActiveTabOnMount(items, activeTab.url, IdentifierType.Favorite);
   const { onScroll, scrolled } = useScrollData();
@@ -63,9 +90,9 @@ const Favorites = ({
   if (nbTabs === 0) return null;
 
   return (
-    <div className={classes!.container}>
-      <div className={classes!.sectionHeader}>
-        <p className={classes!.title}>
+    <div style={containerStyle}>
+      <div style={sectionHeaderStyle}>
+        <p style={titleStyle}>
           Pinned pages
           {nbTabs > 5 && <span> : {nbTabs}</span>}
         </p>
@@ -73,12 +100,13 @@ const Favorites = ({
       <div
         ref={internalRef}
         onScroll={onScroll}
+        style={contentStyle}
         className={classNames(
           className,
-          classes.content,
+          'subdock-scroll-content',
           {
-            [classes.scrollOverlayTop]: !scrolled.top && nbTabs > 5,
-            [classes.scrollOverlayBottom]: !scrolled.bottom && nbTabs > 5,
+            'subdock-scroll-overlay-top': !scrolled.top && nbTabs > 5,
+            'subdock-scroll-overlay-bottom': !scrolled.bottom && nbTabs > 5,
           }
         )}
       >
@@ -123,4 +151,4 @@ export const useFavoritesMutators = (props: SubdockActionsProps) => {
 
 // EXPORT
 
-export default injectSheet(subdockListStyle)(Favorites) as React.ComponentType<OwnProps>;
+export default Favorites as React.ComponentType<OwnProps>;

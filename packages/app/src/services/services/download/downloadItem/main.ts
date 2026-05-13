@@ -3,7 +3,7 @@ import * as path from 'path';
 import { anyPass, equals } from 'ramda';
 import { Observer, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 // @ts-ignore no definition types
 import * as unusedFilename from 'unused-filename';
 import { isDarwin } from '../../../../utils/process';
@@ -34,7 +34,7 @@ const observeDownloadItemStateChanged = (item: Electron.DownloadItem): Observabl
           item.cancel();
         }
         item.removeListener('updated', listener);
-      } catch (e) {}
+      } catch (e) { console.warn('[downloadItem] Error cancelling download:', e); }
     };
   });
 
@@ -72,7 +72,7 @@ export class DownloadItemServiceImpl extends DownloadItemService implements RPC.
   private downloadItem$: Observable<Electron.DownloadItem>;
 
   constructor({ downloadItem, webContentsId, promptDownloadEnabled }: ConstructorParams) {
-    const downloadId = `download-${shortid.generate()}`;
+    const downloadId = `download-${nanoid()}`;
     super(downloadId); // see `getDownloadId`
     this.downloadItem = downloadItem;
     this.webContentsId = webContentsId;

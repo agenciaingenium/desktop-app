@@ -1,17 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as electron from 'electron';
+import { app } from 'electron';
 import * as log from 'electron-log';
-import * as remote from '@electron/remote';
-
-const app = (process.type === 'renderer') ? remote.app : electron.app;
 
 export enum FILE {
   SHOW_RELEASE_NOTES = 'show_release_notes',
 }
 
 export const createLockFile = (file: FILE) => {
-  // TODO : Change app.getPath() with ElectronAppService (or else) on migration
   const filepath = path.resolve(app.getPath('userData'), file);
 
   fs.writeFile(filepath, null, (err: any) => {
@@ -26,7 +22,6 @@ export const createLockFile = (file: FILE) => {
 };
 
 export const consumeLockFileIfExists = (file: FILE) => {
-  // TODO : Change app.getPath() with ElectronAppService (or else) on migration
   const filepath = path.resolve(app.getPath('userData'), file);
 
   return new Promise((resolve) => {

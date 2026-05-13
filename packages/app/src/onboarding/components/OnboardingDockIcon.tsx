@@ -1,21 +1,9 @@
-import { Icon, IconSymbol, ThemeTypes } from '@getstation/theme';
-import * as classNames from 'classnames';
+import { Icon, IconSymbol, theme } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { MinimalApplication } from '../../applications/graphql/withApplications';
 import AppIcon from '../../dock/components/AppIcon';
 
-export interface IClasses {
-  container: string,
-  translated: string,
-  removeAnimation: string,
-  icon: string,
-  closeOverlay: string,
-}
-
 export interface IProps {
-  classes?: IClasses,
   application: MinimalApplication & { position?: DOMRect },
   indexPosition: number,
   onRemove?: (
@@ -27,46 +15,32 @@ export interface IProps {
 export interface IState {
   translated: boolean,
   removeAnimation: boolean,
+  hovered: boolean,
 }
 
-@injectSheet((theme: ThemeTypes) => ({
-  container: {
-    position: 'relative',
-    marginBottom: 10,
-    ...theme.mixins.size(30),
-    borderRadius: 100,
-    transition: 'all 400ms, transform 800ms cubic-bezier(0.4, 0.09, 0.3, 1.14)',
-    cursor: (props: IProps) => props.onRemove ? 'pointer' : 'inherit',
-    opacity: 1,
-    '&:hover $closeOverlay': {
-      opacity: 1,
-    },
-  },
-  translated: {
-    visibility: 'hidden',
-    transform: ({ application: { position }, indexPosition }: IProps) =>
-      position ? `translate(-${500 - position.x}px, ${position.y - (40 * indexPosition) - 60}px)` : 'initial',
-  },
-  removeAnimation: {
-    opacity: 0,
-    transform: 'scale(0)',
-    height: 0,
-    margin: 0,
-  },
-  icon: {
-    ...theme.mixins.size(30),
-    borderRadius: 100,
-  },
-  closeOverlay: {
-    position: 'absolute',
-    top: 0,
-    ...theme.mixins.size(30),
-    borderRadius: 100,
-    backgroundColor: 'rgba(0, 0, 0, .5)',
-    opacity: 0,
-    transition: '300ms',
-  },
-}))
+const containerBaseStyle: React.CSSProperties = {
+  position: 'relative',
+  marginBottom: 10,
+  ...theme.mixins.size(30),
+  borderRadius: 100,
+  transition: 'all 400ms, transform 800ms cubic-bezier(0.4, 0.09, 0.3, 1.14)',
+  opacity: 1,
+};
+
+const iconStyle: React.CSSProperties = {
+  ...theme.mixins.size(30),
+  borderRadius: 100,
+};
+
+const closeOverlayBaseStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  ...theme.mixins.size(30),
+  borderRadius: 100,
+  backgroundColor: 'rgba(0, 0, 0, .5)',
+  transition: '300ms',
+};
+
 export class OnboardingDockIcon extends React.PureComponent<IProps, IState> {
   iconRef: React.RefObject<HTMLDivElement>;
 
@@ -76,6 +50,7 @@ export class OnboardingDockIcon extends React.PureComponent<IProps, IState> {
     this.state = {
       translated: true,
       removeAnimation: false,
+      hovered: false,
     };
 
     this.iconRef = React.createRef();
@@ -102,21 +77,36 @@ export class OnboardingDockIcon extends React.PureComponent<IProps, IState> {
   }
 
   render() {
-    const { classes, application, onRemove } = this.props;
+    const { application, onRemove, indexPosition } = this.props;
+    const { translated, removeAnimation, hovered } = this.state;
 
-    const containerClasses = classNames(
-      classes!.container,
-      { [classes!.translated]: this.state.translated },
-      { [classes!.removeAnimation]: this.state.removeAnimation },
-    );
+    const containerStyle: React.CSSProperties = {
+      ...containerBaseStyle,
+      cursor: onRemove ? 'pointer' : 'inherit',
+      ...(translated && application.position
+        ? { visibility: 'hidden', transform: `translate(-${500 - application.position.x}px, ${application.position.y - (40 * indexPosition) - 60}px)` }
+        : {}),
+      ...(removeAnimation ? { opacity: 0, transform: 'scale(0)', height: 0, margin: 0 } : {}),
+    };
+
+    const closeOverlayStyle: React.CSSProperties = {
+      ...closeOverlayBaseStyle,
+      opacity: hovered ? 1 : 0,
+    };
 
     return (
-      <div ref={this.iconRef} className={containerClasses} onClick={onRemove ? this.handleClick : undefined}>
-        <div className={classes!.icon}>
+      <div
+        ref={this.iconRef}
+        style={containerStyle}
+        onClick={onRemove ? this.handleClick : undefined}
+        onMouseEnter={() => this.setState({ hovered: true })}
+        onMouseLeave={() => this.setState({ hovered: false })}
+      >
+        <div style={iconStyle}>
           <AppIcon imgUrl={application.iconURL} themeColor={application.themeColor} />
         </div>
 
-        {onRemove && <div className={classes!.closeOverlay}>
+        {onRemove && <div style={closeOverlayStyle}>
           <Icon symbolId={IconSymbol.CROSS} size={30} />
         </div>}
       </div>

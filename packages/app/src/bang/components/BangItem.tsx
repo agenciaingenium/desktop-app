@@ -2,31 +2,14 @@ import {
   getHighlightGradient,
   Icon,
   IconSymbol,
-  ThemeTypes as Theme,
+  theme,
 } from '@getstation/theme';
-import * as classNames from 'classnames';
 import * as React from 'react';
-// @ts-ignore no ts definitions
-import injectSheet from 'react-jss';
 
 import AppIcon from '../../dock/components/AppIcon';
 import { SearchPaneItemSelectedItem } from '../duck';
 import KeyHold from './KeyHold';
 
-interface Classes {
-  item: string,
-  content: string,
-  labelWrapper: string,
-  label: string,
-  context: string,
-  image: string,
-  caretIcon: string,
-  current: string,
-}
-
-interface InjectSheetProps {
-  classes: Classes,
-}
 export interface OwnProps {
   label: string,
   imgUrl: string,
@@ -34,10 +17,6 @@ export interface OwnProps {
   type: SearchPaneItemSelectedItem,
   current?: boolean,
   context?: string,
-  /**
-   * Indicates that this item is currently selected,
-   * for instance via keyboard navigation.
-   */
   selected: boolean,
   onClick: () => void,
   ctrlTabCycling?: boolean,
@@ -48,64 +27,7 @@ interface State {
   isHover: boolean
 }
 
-@injectSheet((theme: Theme) => {
-  const labelSize = ({ smallSize }: OwnProps) => smallSize ? 13 : 16;
-  const contextSize = ({ smallSize }: OwnProps) => smallSize ? 10 : 12;
-  const imageSize = ({ smallSize }: OwnProps) => smallSize ? '24px' : '30px';
-
-  return ({
-    item: {
-      display: 'flex',
-      height: ({ smallSize }: OwnProps) => smallSize ? 50 : 60,
-      alignItems: 'center',
-      padding: 20,
-      '&.highlighted': {
-        backgroundImage: getHighlightGradient(undefined, .50),
-      },
-      '&.mediumlighted': {
-        backgroundImage: getHighlightGradient(undefined, .30),
-      },
-      '& $shortcutsButton': {
-        display: 'none',
-      },
-      '&:hover $shortcutsButton': {
-        display: 'initial',
-      },
-    },
-    content: {
-      display: 'flex',
-      alignItems: 'center',
-      width: '92%',
-      marginLeft: 10,
-      color: 'white',
-    },
-    labelWrapper: {
-      width: '91%',
-    },
-    label: {
-      ...theme.fontMixin(labelSize, 600),
-      ...theme.mixins.ellipsis(1),
-    },
-    context: {
-      ...theme.fontMixin(contextSize),
-      marginLeft: 2,
-      opacity: .5,
-      ...theme.mixins.ellipsis(1),
-    },
-    image: {
-      ...theme.avatarMixin(imageSize),
-      flexShrink: 0,
-      '&.placeholder': {
-        content: '""',
-      },
-    },
-    caretIcon: {
-      flexGrow: 0,
-    },
-  });
-})
-
-class BangItem extends React.PureComponent<OwnProps & InjectSheetProps, State> {
+class BangItem extends React.PureComponent<OwnProps, State> {
   static defaultProps = {
     onHover: () => { },
     current: false,
@@ -124,25 +46,29 @@ class BangItem extends React.PureComponent<OwnProps & InjectSheetProps, State> {
   }
 
   renderImage() {
-    const { imgUrl, label, type, themeColor, smallSize, classes } = this.props;
+    const { imgUrl, label, type, themeColor, smallSize } = this.props;
+
+    const imageStyle: React.CSSProperties = {
+      ...theme.avatarMixin(smallSize ? '24px' : '30px'),
+      flexShrink: 0,
+    };
 
     if (!imgUrl) {
-      // if no image put a placeholder
-      return <span className={classNames(classes!.image, 'placeholder')} />;
+      return <span style={imageStyle} className="placeholder" />;
     }
 
     if (type === 'station-app') {
       const iconSize = smallSize ? 24 : 30;
 
       return (
-        <div className={classes!.image}>
+        <div style={imageStyle}>
           <AppIcon size={iconSize} imgUrl={imgUrl} themeColor={themeColor} />
         </div>
       );
     }
 
     return (
-      <img className={classes!.image} src={imgUrl} alt={label} />
+      <img style={imageStyle} src={imgUrl} alt={label} />
     );
   }
 
@@ -150,7 +76,7 @@ class BangItem extends React.PureComponent<OwnProps & InjectSheetProps, State> {
   unsetIsHover = () => this.setState({ isHover: false });
 
   renderButton() {
-    const { classes, selected } = this.props;
+    const { selected } = this.props;
 
     if (!selected) return;
 
@@ -158,7 +84,6 @@ class BangItem extends React.PureComponent<OwnProps & InjectSheetProps, State> {
       <KeyHold keyValue={'Alt'} >
         {() => (
           <Icon
-            className={classes!.caretIcon}
             symbolId={IconSymbol.RETURN}
             size={35}
             color="rgba(255, 255, 255, .6)"
@@ -169,7 +94,39 @@ class BangItem extends React.PureComponent<OwnProps & InjectSheetProps, State> {
   }
 
   render() {
-    const { classes, selected, onClick, label, context } = this.props;
+    const { selected, onClick, label, context, smallSize } = this.props;
+
+    const labelSize = smallSize ? 13 : 16;
+    const contextSize = smallSize ? 10 : 12;
+
+    const itemStyle: React.CSSProperties = {
+      display: 'flex',
+      height: smallSize ? 50 : 60,
+      alignItems: 'center',
+      padding: 20,
+      ...(selected ? { backgroundImage: getHighlightGradient(undefined, .50) } : {}),
+      ...(!selected && this.state.isHover ? { backgroundImage: getHighlightGradient(undefined, .30) } : {}),
+    };
+
+    const contentStyle: React.CSSProperties = {
+      display: 'flex',
+      alignItems: 'center',
+      width: '92%',
+      marginLeft: 10,
+      color: 'white',
+    };
+
+    const labelStyle = {
+      ...theme.fontMixin(labelSize, 600),
+      ...theme.mixins.ellipsis(1),
+    } as React.CSSProperties;
+
+    const contextStyle = {
+      ...theme.fontMixin(contextSize),
+      marginLeft: 2,
+      opacity: 0.5,
+      ...theme.mixins.ellipsis(1),
+    } as React.CSSProperties;
 
     return (
       <li
@@ -177,16 +134,13 @@ class BangItem extends React.PureComponent<OwnProps & InjectSheetProps, State> {
         onMouseLeave={this.unsetIsHover}
         onClick={onClick}
         onContextMenu={this.handleCtrlClick}
-        className={classNames(classes!.item, {
-          highlighted: selected,
-          mediumlighted: !selected && this.state.isHover,
-        })}
+        style={itemStyle}
       >
         {this.renderImage()}
-        <div className={classes!.content}>
-          <div className={classes!.labelWrapper}>
-            <p className={classes!.label}>{label || ''}</p>
-            <p className={classes!.context}>{context}</p>
+        <div style={contentStyle}>
+          <div style={{ width: '91%' }}>
+            <p style={labelStyle}>{label || ''}</p>
+            <p style={contextStyle}>{context}</p>
           </div>
           {this.renderButton()}
         </div>

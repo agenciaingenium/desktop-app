@@ -147,14 +147,15 @@ export class TabWebContentsServiceImpl extends TabWebContentsService implements 
     const shared = this.onNewWebviews().pipe(share());
     return new ServiceSubscription([
       this.askAutoLogin.subscribe(async (webContentsId: number) => {
-        await getWebContentsFromIdOrThrow(webContentsId);
+        const wc = await getWebContentsFromIdOrThrow(webContentsId);
 
-        // vk: 18.01.2024 FIXME: TypeError: Cannot destructure property 'account' of '(intermediate value)' as it is null.
-        // const { account, canAutoSubmit } = await provider.getCredentials(wc.id);
-        // if (account) {
-        //   wc.focus();
-        //   wc.send('autologin-value-retrieved', account, canAutoSubmit);
-        // }
+        const credentials = await provider.getCredentials(wc.id);
+        if (!credentials) return;
+        const { account, canAutoSubmit } = credentials;
+        if (account) {
+          wc.focus();
+          wc.send('autologin-value-retrieved', account, canAutoSubmit);
+        }
       }),
       shared.subscribe(wc => {
         return fromEvent(wc, 'ipc-message', (_e, channel) => channel)

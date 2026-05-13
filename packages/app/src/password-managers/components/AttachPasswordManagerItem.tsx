@@ -1,24 +1,13 @@
-import { Chooser, Input, Modal, ThemeTypes } from '@getstation/theme';
+import { Chooser, Input, Modal, theme } from '@getstation/theme';
 import * as Fuse from 'fuse.js';
 // @ts-ignore: no declaration file
 import * as isBlank from 'is-blank';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { AccountsAction, AccountsStep } from '../duck';
 import { Account, PasswordManager } from '../types';
 
-export interface Classes {
-  input: string,
-  modalBody: string,
-  body: string,
-  noResults: string,
-  chooser: string,
-}
-
 export interface Props {
   themeColor: string,
-  classes?: Classes,
   applicationName: string,
   applicationManifestURL: string,
   applicationIcon: string,
@@ -34,45 +23,45 @@ export interface State {
   accounts: Account[],
 }
 
-@injectSheet((theme: ThemeTypes) => ({
-  input: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    boxSizing: 'border-box',
-    marginTop: -10,
-    padding: [0, 20, 10],
-    backgroundColor: theme.colors.gray.light,
-    zIndex: 1,
-  },
-  modalBody: {
-    padding: '5px 0 !important',
-  },
-  body: {
-    marginTop: 50,
-    height: 180,
-    '& input, input:hover:enabled, input:active:enabled': {
-      backgroundColor: 'white',
-    },
-  },
-  noResults: {
-    ...theme.mixins.flexbox.containerCenter,
-    height: '100%',
-    boxSizing: 'border-box',
-    padding: 60,
-    ...theme.fontMixin(14, 500),
-    lineHeight: '20px',
-    color: theme.colors.gray.middle,
-    textAlign: 'center',
-  },
-  chooser: {
-    height: '100%',
-    padding: [10, 20, 0],
-    overflow: 'auto',
-    boxSizing: 'border-box',
-  },
-}))
+const inputStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  boxSizing: 'border-box',
+  marginTop: -10,
+  padding: '0 20px 10px',
+  backgroundColor: theme.colors.gray.light,
+  zIndex: 1,
+};
+
+const modalBodyStyle: React.CSSProperties = {
+  padding: '5px 0 !important',
+};
+
+const bodyStyle: React.CSSProperties = {
+  marginTop: 50,
+  height: 180,
+};
+
+const noResultsStyle: React.CSSProperties = {
+  ...theme.mixins.flexbox.containerCenter,
+  height: '100%',
+  boxSizing: 'border-box',
+  padding: 60,
+  ...theme.fontMixin(14, 500),
+  lineHeight: '20px',
+  color: theme.colors.gray.middle,
+  textAlign: 'center',
+};
+
+const chooserStyle: React.CSSProperties = {
+  height: '100%',
+  padding: '10px 20px 0',
+  overflow: 'auto',
+  boxSizing: 'border-box',
+};
+
 export default class AttachPasswordManagerItem extends React.PureComponent<Props, State> {
 
   constructor(props: Props) {
@@ -133,7 +122,7 @@ export default class AttachPasswordManagerItem extends React.PureComponent<Props
   }
 
   render() {
-    const { themeColor, classes, process, applicationName, applicationIcon, passwordManager: { providerName } } = this.props;
+    const { themeColor, process, applicationName, applicationIcon, passwordManager: { providerName } } = this.props;
     const { query, accounts } = this.state;
 
     return (
@@ -143,11 +132,11 @@ export default class AttachPasswordManagerItem extends React.PureComponent<Props
         onCancel={this.onCancel}
         applicationIcon={applicationIcon}
         themeColor={themeColor}
-        classNameModalBody={classes!.modalBody}
+        classNameModalBody={modalBodyStyle as any}
         isLoading={process.step === AccountsStep.Load}
       >
-        <div className={classes!.body}>
-          <div className={classes!.input}>
+        <div className="attach-pm-body" style={bodyStyle}>
+          <div style={inputStyle}>
             <Input
               autoFocus={true}
               type="search"
@@ -158,13 +147,13 @@ export default class AttachPasswordManagerItem extends React.PureComponent<Props
           </div>
 
           {accounts.length === 0 ?
-            <div className={classes!.noResults}>
+            <div style={noResultsStyle}>
               😢 <br />
               Sorry, we couldn't find any accounts for "{query}"
             </div>
             :
             <Chooser
-              className={classes!.chooser}
+              style={chooserStyle}
               items={accounts.map((account: Account) => ({ title: account.title, description: account.username, value: account }))}
               onSelect={this.onSelect}
             />

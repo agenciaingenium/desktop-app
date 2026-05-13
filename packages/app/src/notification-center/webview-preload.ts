@@ -1,5 +1,5 @@
 //import { ipcRenderer } from 'electron';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import { EventTarget } from 'event-target-shim';
 
 const RecursiveOverride = require('../utils/webview-override-helper');
@@ -53,7 +53,7 @@ export class BxNotification extends EventTarget('click', 'error', 'close', 'show
 
     // Chrome, Safari, etc. does not throw when title is empty string
     if (!title && title !== '') throw new Error('Title is required');
-    this.id = `notif/${shortid.generate()}`;
+    this.id = `notif/${nanoid()}`;
 
     // default properties
     const properties = Object.assign({ }, getDefaultProperties(title), options || {});

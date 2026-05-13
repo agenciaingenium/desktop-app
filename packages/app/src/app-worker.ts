@@ -1,8 +1,7 @@
 // It is used as a global to know that we are in the worker process
 process.worker = true;
 import './dotenv';
-import { ipcRenderer } from 'electron';
-import * as remote from '@electron/remote';
+import { app, ipcRenderer } from 'electron';
 import { InMemoryCache, NormalizedCacheObject } from 'apollo-cache-inmemory';
 import ApolloClient from 'apollo-client';
 import { PubSub } from 'graphql-subscriptions';
@@ -92,7 +91,7 @@ export class BrowserXAppWorker {
       this.initAutoLaunch().catch(handleError());
     } catch (e) {
       handleError()(e);
-      remote.app.exit(1);
+      app.exit(1);
     }
   }
 
@@ -100,7 +99,7 @@ export class BrowserXAppWorker {
     this.manifestProvider = new ManifestProvider({
       // Use native fetch for manifests fetching
       distantFetcher: new DistantFetcher(),
-//      cachePath: join(remote.app.getPath('userData'), 'ApplicationManifestsCache'),
+//      cachePath: join(app.getPath('userData'), 'ApplicationManifestsCache'),
     });
 
     (services.manifest as ManifestServiceImpl).init(this.manifestProvider);

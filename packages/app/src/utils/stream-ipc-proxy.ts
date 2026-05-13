@@ -5,6 +5,17 @@ const GET_CURRENT_WEB_CONTENTS_ID = 'stream-electron-ipc.get-current-web-content
 
 const isRenderer = process.type === 'renderer';
 
+// When contextIsolation is enabled, ipcRenderer is not available in the page context.
+// Use the station bridge instead.
+const stationIpc = isRenderer && typeof window !== 'undefined' && (window as any).station
+  ? (window as any).station.ipc
+  : null;
+
+function getIpcRenderer() {
+  if (stationIpc) return stationIpc;
+  return ipcRenderer;
+}
+
 const getSenderId = (e: any) => typeof e.senderId === 'number' ? e.senderId :
     typeof e.sender.id === 'number' ? e.sender.id : 0;
 
@@ -12,7 +23,6 @@ const getFullChannel = (channel: string, webContentsId: number) => `sei-${channe
 
 if (!isRenderer) {
   ipcMain.on(GET_CURRENT_WEB_CONTENTS_ID, (event: Electron.IpcMainEvent) => {
-      console.log(`[DEBUG] IPC: GET_CURRENT_WEB_CONTENTS_ID from sender: ${event.sender.id}`);
       event.returnValue = event.sender.id;
     });
 }
@@ -48,14 +58,13 @@ export class ElectronIpcMainDuplex extends Duplex {
           webContents.once('destroyed', () => {
               const remaining = ElectronIpcMainDuplex.activeMainInstances.get(this.wcId);
               if (remaining) {
-                  console.log(`[DEBUG] WebContents ${this.wcId} destroyed, cleaning up ${remaining.size} IPC duplexes`);
                   for (const instance of remaining) {
                       try {
                           instance.destroy();
-                        } catch (e) { }
+                        } catch (e) { console.warn('[stream-ipc-proxy] Error destroying IPC duplex:', e); }
                     }
                   ElectronIpcMainDuplex.activeMainInstances.delete(this.wcId);
-                }
+            }
             });
         }
       instances.add(this);
@@ -141,31 +150,29 @@ export class ElectronIpcRendererDuplex extends Duplex {
 
   constructor(webContentsId?: number, channel: string = 'data') {
       super();
-      console.log(`[DEBUG] ElectronIpcRendererDuplex created for channel: ${channel}, targetId: ${webContentsId}`);
-      console.trace('[DEBUG] Trace for ElectronIpcRendererDuplex creation');
       this.wcId = typeof webContentsId === 'number' ? webContentsId : 0;
+
+      const ipc = getIpcRenderer();
 
         // Try to get current ID from main, or fallback
       let currentWebContentsId = 0;
       try {
-          if (ipcRenderer) {
-              currentWebContentsId = ipcRenderer.sendSync(GET_CURRENT_WEB_CONTENTS_ID);
+          if (ipc) {
+              currentWebContentsId = ipc.sendSync(GET_CURRENT_WEB_CONTENTS_ID);
             }
         } catch (e) {
           console.warn('ElectronIpcRendererDuplex: Failed to get current WC ID via sendSync', e);
-            // Ideally we should handle this, but for now let's hope it works or we don't need it if logic differs
         }
 
       this.channel = getFullChannel(channel, currentWebContentsId);
 
       if (this.wcId === 0) {
             // renderer to main - Use standard send
-          this.sendTo = ipcRenderer.send.bind(ipcRenderer);
+          this.sendTo = (ch: string, ...args: any[]) => ipc.send(ch, ...args);
         } else {
             // renderer to renderer - PROXY FIX
-            // Instead of sendTo, we use our proxy 'bx-api-response' which forwards to 'channel' on 'targetId'
-          this.sendTo = (channel: string, ...args: any[]) => {
-              ipcRenderer.send('bx-api-response', this.wcId, channel, ...args);
+          this.sendTo = (ch: string, ...args: any[]) => {
+              ipc.send('bx-api-response', this.wcId, ch, ...args);
             };
         }
 
@@ -175,7 +182,7 @@ export class ElectronIpcRendererDuplex extends Duplex {
       if (activeListeners.has(this._listenChannel)) {
           const oldListener = activeListeners.get(this._listenChannel);
           if (oldListener) {
-              ipcRenderer.removeListener(this._listenChannel, oldListener);
+              ipc.removeListener(this._listenChannel, oldListener);
             }
           activeListeners.delete(this._listenChannel);
         }
@@ -196,7 +203,7 @@ export class ElectronIpcRendererDuplex extends Duplex {
         };
 
       activeListeners.set(this._listenChannel, this._msgListener);
-      ipcRenderer.on(this._listenChannel, this._msgListener);
+      ipc.on(this._listenChannel, this._msgListener);
 
         // init connection
       this.sendTo(channel);
@@ -211,7 +218,8 @@ export class ElectronIpcRendererDuplex extends Duplex {
 
   _destroy(err: Error | null, callback: (error: Error | null) => void) {
       if (this._msgListener && this._listenChannel) {
-          ipcRenderer.removeListener(this._listenChannel, this._msgListener);
+          const ipc = getIpcRenderer();
+          ipc.removeListener(this._listenChannel, this._msgListener);
           activeListeners.delete(this._listenChannel);
         }
       callback(err);
@@ -220,9 +228,9 @@ export class ElectronIpcRendererDuplex extends Duplex {
 
 export const firstConnectionHandler = (callback: (socket: Duplex) => void, channel?: string) => {
   const seensIds = new Set<number>();
-  console.log(`[DEBUG] firstConnectionHandler initialized for channel: ${channel || 'data'}`);
 
-  (isRenderer ? ipcRenderer : ipcMain).on(channel || 'data', (e: any, data: any, ..._rest: any[]) => {
+  const ipc: any = isRenderer ? getIpcRenderer() : ipcMain;
+  ipc.on(channel || 'data', (e: any, data: any, ..._rest: any[]) => {
         // When messages come through the Main process proxy, the first arg may contain __senderId
         // This tells us the original sender's webContentsId for proper reply routing
       let senderId = getSenderId(e);
@@ -230,22 +238,12 @@ export const firstConnectionHandler = (callback: (socket: Duplex) => void, chann
         // Check if data contains __senderId (proxied message from Main)
       if (data && typeof data === 'object' && typeof data.__senderId === 'number') {
           senderId = data.__senderId;
-          console.log(`[DEBUG] Extracted __senderId from proxied message: ${senderId}`);
         }
 
-      const pid = process.pid;
-      const type = process.type;
-      console.log(`[DEBUG] [${type}:${pid}] firstConnectionHandler: Received msg on ${channel || 'data'} from senderId: ${senderId}`);
-
-        // FIXED: Always check seensIds to prevent infinite connection loops.
-        // Previously, this check was only done when channel was undefined (default 'data').
-        // This caused infinite loops when a channel was specified because the init
-        // response from ElectronIpcMainDuplex would trigger a new connection in the Worker.
+        // Always check seensIds to prevent infinite connection loops.
       if (seensIds.has(senderId)) {
-          console.log(`[DEBUG] [${type}:${pid}] Skipping senderId ${senderId} (already seen)`);
           return;
         }
-      console.log(`[DEBUG] [${type}:${pid}] New connection from senderId ${senderId}`);
       seensIds.add(senderId);
 
       let duplex: Duplex;

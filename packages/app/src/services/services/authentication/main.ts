@@ -1,7 +1,8 @@
-import { BrowserWindow, shell } from 'electron';
+import { BrowserWindow } from 'electron';
 import * as http from 'http';
 import * as url from 'url';
 import { RPC } from '../../lib/types';
+import { openExternal } from '../../../utils/shell';
 import { AuthenticationService } from './interface';
 import OAuthPKCE from './oauthPKCE';
 import { OAuthPKCEConfig, OAuthResponseBody } from './types';
@@ -19,8 +20,8 @@ import { OAuthPKCEConfig, OAuthResponseBody } from './types';
  */
 const LOOPBACK_INTERFACE_REDIRECTION_PORT = 42813;
 
-const AUTH_CLIENT_ID = process.env.AUTH_CLIENT_ID;
-const AUTH_AUDIENCE = process.env.AUTH_AUDIENCE;
+const AUTH_CLIENT_ID = process.env.AUTH_CLIENT_ID || '';
+const AUTH_AUDIENCE = process.env.AUTH_AUDIENCE || '';
 const STATION_API_AUTHPROXY_ENDPOINT = process.env.STATION_API_AUTHPROXY_ENDPOINT!;
 
 export class AuthenticationServiceImpl extends AuthenticationService implements RPC.Interface<AuthenticationService> {
@@ -82,7 +83,7 @@ export class AuthenticationServiceImpl extends AuthenticationService implements 
       successRedirectURL: 'https://getstation.com/',
     });
 
-    shell.openExternal(urlToLoad);
+    openExternal(urlToLoad);
 
     const reachedCallbackURL = await this.server.waitForRedirection();
 

@@ -1,52 +1,12 @@
-import { createStyles, ThemeTypes as Theme } from '@getstation/theme';
+import { theme } from '@getstation/theme';
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { SHORTCUTS } from '../../../keyboard-shortcuts';
 import SDKPortal from '../../../sdk/react/components/SDKPortal';
 import FindBoostedAppsButton, { OwnProps as FindBoostedAppsButtonOwnProps } from './FindBoostedAppsButton';
 
 const kbShortcut = SHORTCUTS.bang.kbd.replace(' ', '+');
 
-type InjectSheetProps = {
-  classes: {
-    title: string,
-    description: string,
-    boostedAppsButton: string,
-    navigation: string,
-    navigationIcon: string,
-  },
-};
-
 type OwnProps = Pick<FindBoostedAppsButtonOwnProps, 'closeSettings'>;
-
-const styles = (theme: Theme) => createStyles({
-  title: {
-    ...theme.titles.h1,
-    marginBottom: 10,
-    display: 'inline-block',
-  },
-  description: {
-    marginBottom: 30,
-  },
-  boostedAppsButton: {
-    marginTop: 20,
-  },
-  navigation: {
-    display: 'inline-block',
-    paddingLeft: 10,
-    transform: 'translateY(-3px)',
-    fontSize: 10,
-    color: 'rgba(255, 255, 255, .6)',
-  },
-  navigationIcon: {
-    marginRight: 4,
-    padding: [2, 4],
-    background: 'rgba(255, 255, 255, .2)',
-    borderRadius: 2,
-    fontSize: 10,
-  },
-});
 
 const getDescription = (nbComponents: number): string => {
   if (nbComponents === 0) {
@@ -57,24 +17,32 @@ const getDescription = (nbComponents: number): string => {
   return '';
 };
 
-type Props = OwnProps & InjectSheetProps;
+const navigationIconStyle: React.CSSProperties = {
+  marginRight: 4,
+  padding: '2px 4px',
+  background: 'rgba(255, 255, 255, .2)',
+  borderRadius: 2,
+  fontSize: 10,
+};
+
+type Props = OwnProps;
 
 const SettingsQuickSwitch = (props: Props) => {
-  const { classes, ...restProps } = props;
+  const { closeSettings, ...restProps } = props;
 
   const [nbComponents, setNbComponents] = React.useState(-1);
 
   return (
     <>
-      <div className={classes.title}>Quick-Switch</div>
-      <div className={classes!.navigation}>
-        <span className={classes!.navigationIcon}>{kbShortcut}</span>
+      <div style={{ ...theme.titles.h1, marginBottom: 10, display: 'inline-block' }}>Quick-Switch</div>
+      <div style={{ display: 'inline-block', paddingLeft: 10, transform: 'translateY(-3px)', fontSize: 10, color: 'rgba(255, 255, 255, .6)' }}>
+        <span style={navigationIconStyle}>{kbShortcut}</span>
       </div>
-      <div className={classes.description}>
+      <div style={{ marginBottom: 30 }}>
         <p>{getDescription(nbComponents)}</p>
         {nbComponents === 0 &&
-          <div className={classes.boostedAppsButton}>
-            <FindBoostedAppsButton {...restProps} />
+          <div style={{ marginTop: 20 }}>
+            <FindBoostedAppsButton closeSettings={closeSettings} {...restProps} />
           </div>
         }
       </div>
@@ -83,4 +51,4 @@ const SettingsQuickSwitch = (props: Props) => {
   );
 };
 
-export default injectSheet(styles)(SettingsQuickSwitch) as React.ComponentType<OwnProps>;
+export default SettingsQuickSwitch as React.ComponentType<OwnProps>;

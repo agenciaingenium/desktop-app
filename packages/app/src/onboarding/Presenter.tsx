@@ -1,9 +1,6 @@
-import { GradientType, SlideX, ThemeTypes, withGradient } from '@getstation/theme';
-import * as classNames from 'classnames';
+import { GradientType, SlideX, theme, withGradient } from '@getstation/theme';
 // @ts-ignore: no declaration file
 import * as React from 'react';
-// @ts-ignore: no declaration file
-import injectSheet from 'react-jss';
 import { MinimalApplication } from '../applications/graphql/withApplications';
 import TrafficLights from '../dock/components/TrafficLights';
 import { OnboardingDockIcon } from './components/OnboardingDockIcon';
@@ -14,21 +11,9 @@ import {
   Platform,
 } from './queries@local.gql.generated';
 
-export interface Classes {
-  container: string,
-  section: string,
-  sectionHeader: string,
-  trafficLights: string,
-  illustration: string,
-  onboardingDock: string,
-  hideOnboardingDock: string,
-  onboardingDockAppIcon: string,
-}
-
 type InstallApplicationInput = InstallApplicationMutationVariables['input'];
 
 export interface Props {
-  classes?: Classes,
   applications: MinimalApplication[],
   themeGradient: string,
   error?: string,
@@ -60,54 +45,49 @@ interface State {
   isLoading: boolean,
 }
 
-const styles = (theme: ThemeTypes) => ({
-  container: {
-    display: 'flex',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    ...theme.mixins.size('100%'),
-    zIndex: 101,
-  },
-  section: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    flexDirection: 'column',
-    width: 490,
-    height: '100%',
-    backgroundColor: 'white',
-  },
-  sectionHeader: {
-    padding: [60, 60, 0, 60],
-    width: '100%',
-  },
-  trafficLights: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-  },
-  illustration: {
-    flex: 1,
-    backgroundImage: (props: Props) =>
-      `url("static/illustrations/illustration--onboarding@2x.png"), ${props.themeGradient}`,
-    backgroundSize: 'contain',
-    backgroundRepeat: 'no-repeat',
-  },
-  onboardingDock: {
-    width: 60,
-    height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, .8)',
-    padding: [60, 15, 20],
-    transition: '300ms ease-in-out',
-  },
-  hideOnboardingDock: {
-    width: 0,
-    padding: 0,
-  },
-});
+const containerStyle: React.CSSProperties = {
+  display: 'flex',
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  ...theme.mixins.size('100%'),
+  zIndex: 101,
+};
 
-@injectSheet(styles)
+const sectionStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
+  flexDirection: 'column',
+  width: 490,
+  height: '100%',
+  backgroundColor: 'white',
+};
+
+const sectionHeaderStyle: React.CSSProperties = {
+  padding: '60px 60px 0 60px',
+  width: '100%',
+};
+
+const trafficLightsStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+};
+
+const onboardingDockStyle: React.CSSProperties = {
+  width: 60,
+  height: '100%',
+  backgroundColor: 'rgba(255, 255, 255, .8)',
+  padding: '60px 15px 20px',
+  transition: '300ms ease-in-out',
+};
+
+const hideOnboardingDockStyle: React.CSSProperties = {
+  width: 0,
+  padding: 0,
+};
+
 class Presenter extends React.PureComponent<Props, State> {
 
   static defaultProps = {
@@ -159,7 +139,7 @@ class Presenter extends React.PureComponent<Props, State> {
     const selectedApps = this.state.selectedApplications.map(app => ({
       id: undefined,
       application: app,
-      configuration: {},
+      configuration: {},
     }));
 
     const apps = selectedApps;
@@ -180,11 +160,14 @@ class Presenter extends React.PureComponent<Props, State> {
   }
 
   renderDockIcons = () => {
-    const { classes } = this.props;
     const { selectedApplications } = this.state;
 
+    const dockStyle = selectedApplications.length === 0
+      ? { ...onboardingDockStyle, ...hideOnboardingDockStyle }
+      : onboardingDockStyle;
+
     return (
-      <div className={classNames(classes!.onboardingDock, { [classes!.hideOnboardingDock]: selectedApplications.length === 0 })}>
+      <div style={dockStyle}>
         {selectedApplications.map((app, index: number) =>
           <OnboardingDockIcon
             key={app.id}
@@ -199,18 +182,26 @@ class Presenter extends React.PureComponent<Props, State> {
 
   render() {
     const {
-      classes, applications, step,
+      applications, step,
       isWindowFocused, onCloseWindow, onMinimizeWindow,
       onExpandWindow, isDarwin, searchInputValue, handleSearchInputValue,
+      themeGradient,
     } = this.props;
 
     const { selectedApplications, isLoading } = this.state;
 
+    const illustrationStyle: React.CSSProperties = {
+      flex: 1,
+      backgroundImage: `url("static/illustrations/illustration--onboarding@2x.png"), ${themeGradient}`,
+      backgroundSize: 'contain',
+      backgroundRepeat: 'no-repeat',
+    };
+
     return (
-      <div className={classes!.container}>
+      <div style={containerStyle}>
         <div id="portal-powered-by-station" />
         {isDarwin &&
-          <div className={classes!.trafficLights}>
+          <div style={trafficLightsStyle}>
             <TrafficLights
               focused={isWindowFocused}
               handleClose={onCloseWindow}
@@ -221,8 +212,8 @@ class Presenter extends React.PureComponent<Props, State> {
           </div>
         }
 
-        <div className={classes!.section}>
-          <div className={classes!.sectionHeader}>
+        <div style={sectionStyle}>
+          <div style={sectionHeaderStyle}>
             <img src="static/logos/station-logo-full-black.svg" alt="" />
           </div>
 
@@ -239,7 +230,7 @@ class Presenter extends React.PureComponent<Props, State> {
           </SlideX>
         </div>
 
-        <div className={classes!.illustration}>
+        <div style={illustrationStyle}>
           {this.renderDockIcons()}
         </div>
       </div>
