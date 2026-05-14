@@ -64,7 +64,7 @@ export const getApplicationsWithoutInternals = createSelector(
 );
 
 export const getInstalledManifestURLs = createSelector(getApplications, applications => {
-  const manifests = applications.toArray()
+  const manifests = applications.valueSeq().toArray()
     .map(getApplicationManifestURL)
     .filter((manifestURL?: string) => !isBlank(manifestURL));
   return uniq(manifests);

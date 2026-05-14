@@ -1,6 +1,6 @@
 import { GradientType, withGradient } from '@getstation/theme';
 import * as React from 'react';
-import DOMPurify from 'dompurify';
+import DOMPurify = require('dompurify');
 import { compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import { CSSTransition } from 'react-transition-group';

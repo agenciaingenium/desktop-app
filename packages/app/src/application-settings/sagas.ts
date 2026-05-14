@@ -61,7 +61,7 @@ function* onInstallableApplication({ manifestURL, doNotInstall }: MarkApplicatio
       const tab = yield select(getTabById, tabId);
       urlsToReopenInTheDefaultBrowser.push(getTabURL(tab));
       yield put(uninstallApplication(app.get('applicationId')));
-    })).toArray());
+    })).valueSeq().toArray());
 
     for (const url of urlsToReopenInTheDefaultBrowser) {
       if (url) {

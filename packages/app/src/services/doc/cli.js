@@ -5,7 +5,7 @@ global.sharedObject = {
   mmds: process.argv.filter(x => x.endsWith('.mmd'))
 };
 
-const cliPreloadPath = path.join(__dirname, 'static/preload/cli-preload.js');
+const cliPreloadPath = path.join(__dirname, 'cli-preload.js');
 
 app.whenReady().then(() => {
   const bw = new BrowserWindow({

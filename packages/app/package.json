@@ -350,6 +350,15 @@
   },
   "electronWebpack": {
     "title": false,
+    "whiteListedModules": [
+      "stream-json-rpc",
+      "electron-better-web-request",
+      "shared-redux",
+      "uuid",
+      "is-equal-shallow",
+      "rxjs",
+      "tslib"
+    ],
     "renderer": {
       "sourceDirectory": "src",
       "webpackConfig": "webpack.config.renderer.js"
@@ -358,7 +367,8 @@
       "extraEntries": [
         "@/static/preload/preload.js",
         "@/static/preload/main-preload.js",
-        "@/static/preload/cli-preload.js"
+        "@/static/preload/cli-preload.js",
+        "@/static/preload/worker-preload.js"
       ],
       "sourceDirectory": "src",
       "webpackConfig": "webpack.config.main.js"

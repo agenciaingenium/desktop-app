@@ -30,6 +30,10 @@ export function registerStationIpcHandlers() {
     event.returnValue = app.getPath(name as any);
   });
 
+  ipcMain.on('station:app-isPackaged', (event) => {
+    event.returnValue = app.isPackaged;
+  });
+
   ipcMain.on('station:app-exit', (_event, code?: number) => {
     app.exit(code);
   });

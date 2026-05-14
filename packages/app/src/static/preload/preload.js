@@ -240,7 +240,11 @@ if (!process.env.STATION_DISABLE_ECX) {
 }
 
 // ====== Window open override ======
-require('./window-open');
+if (process && typeof process._linkedBinding === 'function') {
+  require('./window-open');
+} else {
+  console.warn('[preload] window-open override unavailable in sandboxed preload, skipping');
+}
 
 // ====== Expose all APIs to the page context via contextBridge ======
 exposeAll(contextBridge);

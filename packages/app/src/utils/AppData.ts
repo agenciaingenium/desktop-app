@@ -1,14 +1,20 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { app } from 'electron';
 import * as log from 'electron-log';
+
+function getUserDataPath(): string {
+  if (process.type === 'renderer' && typeof window !== 'undefined' && (window as any).station) {
+    return (window as any).station.app.getPath('userData');
+  }
+  return require('electron').app.getPath('userData');
+}
 
 export enum FILE {
   SHOW_RELEASE_NOTES = 'show_release_notes',
 }
 
 export const createLockFile = (file: FILE) => {
-  const filepath = path.resolve(app.getPath('userData'), file);
+  const filepath = path.resolve(getUserDataPath(), file);
 
   fs.writeFile(filepath, null, (err: any) => {
     if (err) {
@@ -22,7 +28,7 @@ export const createLockFile = (file: FILE) => {
 };
 
 export const consumeLockFileIfExists = (file: FILE) => {
-  const filepath = path.resolve(app.getPath('userData'), file);
+  const filepath = path.resolve(getUserDataPath(), file);
 
   return new Promise((resolve) => {
     fs.stat(filepath, (statErr) => {

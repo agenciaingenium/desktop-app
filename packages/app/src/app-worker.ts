@@ -1,7 +1,7 @@
 // It is used as a global to know that we are in the worker process
 process.worker = true;
 import './dotenv';
-import { app, ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 import { InMemoryCache, NormalizedCacheObject } from 'apollo-cache-inmemory';
 import ApolloClient from 'apollo-client';
 import { PubSub } from 'graphql-subscriptions';
@@ -91,7 +91,7 @@ export class BrowserXAppWorker {
       this.initAutoLaunch().catch(handleError());
     } catch (e) {
       handleError()(e);
-      app.exit(1);
+      ipcRenderer.send('station:app-exit', 1);
     }
   }
 

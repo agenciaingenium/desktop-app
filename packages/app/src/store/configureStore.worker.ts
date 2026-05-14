@@ -1,4 +1,4 @@
-import { dialog } from 'electron';
+import { ipcRenderer } from 'electron';
 import log from 'electron-log';
 import * as EventEmitter from 'events';
 import { applyMiddleware, compose, createStore } from 'redux';
@@ -67,13 +67,13 @@ function asyncInit(store: StationStoreWorker, sagaMiddleware: SagaMiddleware<any
       .catch(err => {
         logger.notify(err);
         log.error(err);
-        dialog.showMessageBox({
+        ipcRenderer.invoke('station:dialog-showMessageBox', {
           type: 'error',
           buttons: ['OK'],
           title: 'Station Fatal Error',
           message: 'Station Fatal Error',
           detail: err.message,
-        }, () => {
+        }).then(() => {
           services.electronApp.quit();
         });
       });

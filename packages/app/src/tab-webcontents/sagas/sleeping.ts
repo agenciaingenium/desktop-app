@@ -31,7 +31,7 @@ function* checkSleepyTabs(): SagaIterator {
   const appSettings = yield select(getApplicationsSettings);
   const tabs = yield select(getTabs);
   const windows = yield select(getWindows);
-  const currentlyVisibleTabIds = windows.map(getWindowCurrentTabId).toArray();
+  const currentlyVisibleTabIds = windows.map(getWindowCurrentTabId).valueSeq().toArray();
   const applications = yield select((state: StationState) => state.get('applications'));
 
   const manifestURLs = yield select(getInstalledManifestURLs);

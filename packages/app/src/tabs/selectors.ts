@@ -111,7 +111,7 @@ export const getTabIdsByApplicationId = (state: StationState, applicationId: str
   return getTabs(state)
     .filter(tab => getTabApplicationId(tab) === applicationId)
     .map(tab => getTabId(tab))
-    .toArray();
+    .valueSeq().toArray();
 };
 
 export const getDuplicateTabsByURL = createSelector(

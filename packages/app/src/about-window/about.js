@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import { BrowserXThemeProvider } from '@getstation/theme';
 
 import '../utils/stat-cache';
 import '../dotenv';
@@ -34,9 +35,11 @@ const render = (store) => {
   ReactDOM.render(
     <Provider store={store}>
       <ConsoleErrorBoundary>
-        <ReduxBasedGradientProvider>
-          <AboutWindowContainer />
-        </ReduxBasedGradientProvider>
+        <BrowserXThemeProvider>
+          <ReduxBasedGradientProvider>
+            <AboutWindowContainer />
+          </ReduxBasedGradientProvider>
+        </BrowserXThemeProvider>
       </ConsoleErrorBoundary>
     </Provider>
     , document.getElementById('root')

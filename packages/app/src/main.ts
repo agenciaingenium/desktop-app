@@ -31,6 +31,7 @@ const loadWorker = () => {
       // Migrating worker to contextIsolation requires refactoring shared-redux duplex.
       contextIsolation: false,
       sandbox: false,
+      preload: path.join(__dirname, 'worker-preload.js'),
     },
     width: 0,
     height: 0,
@@ -86,7 +87,7 @@ const loadWorker = () => {
   return worker;
 };
 
-const cliPreloadPath = path.join(__dirname, 'static/preload/cli-preload.js');
+const cliPreloadPath = path.join(__dirname, 'cli-preload.js');
 
 const loadCliWindow = async (command: string) => {
   await app.whenReady();
@@ -220,7 +221,7 @@ const init = () => {
 
   if (!isPackaged && !process.env.STATION_DISABLE_ECX) {
     app.on('session-created', s => {
-      s.setPreloads([path.resolve(__dirname, 'static/preload/dev-preload.js')]);
+      s.setPreloads([path.resolve(__dirname, 'dev-preload.js')]);
     });
     bxAppMain.onOpen = installDevToolsExtensions;
   }

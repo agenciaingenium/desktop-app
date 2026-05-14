@@ -14,7 +14,7 @@ import { observe } from '../../utils/sagas/observe';
 
 export function* getTabsAvailableForBackNavigation(): SagaIterator {
   const applicationsIdsWithoutInternals = (yield select(getApplicationsWithoutInternals))
-    .toArray()
+    .valueSeq().toArray()
     .map(getApplicationId);
 
   return (yield select(getTabsSortedByLastActivityAt))

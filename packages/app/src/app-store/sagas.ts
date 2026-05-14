@@ -1,4 +1,3 @@
-import { app } from 'electron';
 import * as isBlank from 'is-blank';
 import * as _ from 'lodash';
 import { SagaIterator } from 'redux-saga';
@@ -108,7 +107,7 @@ function* installAppStoreApplicationIfNotPresent(): SagaIterator {
  * Will be called once Station launches.
  */
 function* installSlackStationNextIfNextAndNotPresent(): SagaIterator {
-  const appName = app.name;
+  const appName = window.station.app.getName();
   if (appName !== 'Station Next') return;
 
   const nextSlackAlreadyInstalled: boolean = yield select(hasAlreadyApplicationsForManifest, SLACK_STATION_NEXT_MANIFEST_URL);
