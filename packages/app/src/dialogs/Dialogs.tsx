@@ -40,7 +40,7 @@ class DialogImpl extends React.PureComponent<Props, {}> {
                   themeColor={themeColor}
                 />
               </CSSTransition>
-            ).toArray()
+            ).valueSeq().toArray()
           }
         </TransitionGroup>
       </div>

@@ -39,7 +39,7 @@ export default class ConfigProvider extends AbstractProvider<config.ConfigConsum
       map(applications => applications.map((application: ApplicationImmutable) => ({
         applicationId: application.get('applicationId'),
         subdomain: application.get('subdomain'),
-      })).toArray()),
+      })).valueSeq().toArray()),
     );
   }
 

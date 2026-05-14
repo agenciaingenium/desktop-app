@@ -60,6 +60,7 @@ interface StationApp {
   getName: () => string;
   getVersion: () => string;
   getPath: (name: string) => string;
+  isPackaged: () => boolean;
   exit: (code?: number) => void;
   quit: () => void;
 }

@@ -10,6 +10,13 @@
  */
 
 const { contextBridge, ipcRenderer, webFrame } = require('electron');
+const nodeRequire = typeof __non_webpack_require__ === 'function'
+  ? __non_webpack_require__
+  : require;
+const path = nodeRequire('path');
+const rendererDirname = process.resourcesPath
+  ? path.join(process.resourcesPath, 'app.asar')
+  : __dirname;
 
 // ====== IPC Channel Constants ======
 const IPC = {
@@ -17,6 +24,7 @@ const IPC = {
   APP_GET_NAME: 'station:app-getName',
   APP_GET_VERSION: 'station:app-getVersion',
   APP_GET_PATH: 'station:app-getPath',
+  APP_IS_PACKAGED: 'station:app-isPackaged',
   APP_EXIT: 'station:app-exit',
   APP_QUIT: 'station:app-quit',
 
@@ -176,6 +184,7 @@ const station = {
     getName: () => sendSync(IPC.APP_GET_NAME),
     getVersion: () => sendSync(IPC.APP_GET_VERSION),
     getPath: (name) => sendSync(IPC.APP_GET_PATH, name),
+    isPackaged: () => sendSync(IPC.APP_IS_PACKAGED),
     exit: (code) => send(IPC.APP_EXIT, code),
     quit: () => send(IPC.APP_QUIT),
   },
@@ -247,4 +256,30 @@ const station = {
 };
 
 // ====== Expose API to renderer ======
-contextBridge.exposeInMainWorld('station', station);
+if (process.contextIsolated) {
+  contextBridge.exposeInMainWorld('require', (moduleName) => nodeRequire(moduleName));
+  contextBridge.exposeInMainWorld('__dirname', rendererDirname);
+  contextBridge.exposeInMainWorld('__filename', path.join(rendererDirname, 'mainRenderer.js'));
+  contextBridge.exposeInMainWorld('process', {
+    env: process.env,
+    type: process.type,
+    platform: process.platform,
+    arch: process.arch,
+    versions: process.versions,
+    cwd: () => process.cwd(),
+    nextTick: (callback, ...args) => process.nextTick(callback, ...args),
+    on: (eventName, listener) => {
+      process.on(eventName, listener);
+      return () => process.removeListener(eventName, listener);
+    },
+    once: (eventName, listener) => process.once(eventName, listener),
+    removeListener: (eventName, listener) => process.removeListener(eventName, listener),
+  });
+  contextBridge.exposeInMainWorld('station', station);
+} else {
+  window.require = nodeRequire;
+  window.__dirname = rendererDirname;
+  window.__filename = path.join(rendererDirname, 'mainRenderer.js');
+  window.process = process;
+  window.station = station;
+}

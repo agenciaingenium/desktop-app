@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ApolloProvider } from 'react-apollo';
 import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
+import { BrowserXThemeProvider } from '@getstation/theme';
 import './theme/css/app.global.css';
 import '../../../node_modules/font-awesome/css/font-awesome.min.css';
 import { handleError } from './services/api/helpers';
@@ -59,7 +60,9 @@ const render = (store) => {
         <ActionsBusReactContext.Provider value={{ actionsBus }}>
           <ApolloProvider client={client}>
             <ApolloHooksProvider client={client}>
-              <AppSub subData={currentWindow.subData} />
+              <BrowserXThemeProvider>
+                <AppSub subData={currentWindow.subData} />
+              </BrowserXThemeProvider>
             </ApolloHooksProvider>
           </ApolloProvider>
         </ActionsBusReactContext.Provider>

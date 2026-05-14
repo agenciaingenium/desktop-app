@@ -3,7 +3,32 @@
  */
 const { resolve } = require('path');
 const webpack = require('webpack');
+const { RawSource } = require('webpack-sources');
 const { mutateWebpackConfig } = require('./webpack.config.common');
+
+const preloadEntrypoints = new Set([
+  'preload.js',
+  'main-preload.js',
+  'cli-preload.js',
+  'worker-preload.js',
+]);
+const sourceMapSupportBannerPattern = /require\("source-map-support\/source-map-support\.js"\)\.install\(\)[;,]/;
+
+class StripSourceMapSupportFromPreloadsPlugin {
+  apply(compiler) {
+    compiler.hooks.emit.tap('StripSourceMapSupportFromPreloadsPlugin', (compilation) => {
+      for (const filename of preloadEntrypoints) {
+        const asset = compilation.assets[filename];
+        if (!asset) continue;
+
+        const source = asset.source().toString();
+        if (!sourceMapSupportBannerPattern.test(source)) continue;
+
+        compilation.assets[filename] = new RawSource(source.replace(sourceMapSupportBannerPattern, ''));
+      }
+    });
+  }
+}
 
 /**
  * @param config {webpack.Configuration}
@@ -23,6 +48,7 @@ module.exports = (config) => {
   }
 
   config.target = 'electron-main';
+  config.plugins.push(new StripSourceMapSupportFromPreloadsPlugin());
 
   return config;
 };

@@ -1,6 +1,6 @@
 import { Button, theme } from '@getstation/theme';
 import * as React from 'react';
-import DOMPurify from 'dompurify';
+import DOMPurify = require('dompurify');
 
 const releaseNotesRaw = require('!!raw-loader!../../app/resources/release-notes.html').default;
 const releaseNotesHTML = DOMPurify.sanitize(releaseNotesRaw);

@@ -85,6 +85,10 @@ const mutateAlias = config => {
   config.resolve.alias[
     '@electron/internal/renderer/ipc-renderer-internal'
   ] = path.resolve(__dirname, 'app/lib/ipc-renderer-internal.ts');
+
+  // uuid/v4 subpath is not defined in uuid 9.x exports. Resolve at build time
+  // so runtime require('uuid/v4') never hits Node's exports validation.
+  config.resolve.alias['uuid/v4$'] = path.resolve(__dirname, 'src/lib/uuid-v4.js');
 };
 
 /**

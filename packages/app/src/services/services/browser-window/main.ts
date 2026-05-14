@@ -10,7 +10,7 @@ import { BrowserWindowService, BrowserWindowServiceConstructorOptions, BrowserWi
 const noop = () => {};
 
 // Preload script path for the main renderer (enables contextBridge)
-const mainPreloadPath = path.join(__dirname, 'static/preload/main-preload.js');
+const mainPreloadPath = path.join(__dirname, 'main-preload.js');
 
 export class BrowserWindowServiceImpl extends BrowserWindowService implements RPC.Interface<BrowserWindowService> {
 
@@ -21,8 +21,10 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
     super();
     const positionOptions = this.startInitPositionManager(options.savePosition);
 
-    // If the caller explicitly requests contextIsolation, inject the preload script
-    // and enforce nodeIntegration: false. Otherwise, preserve legacy behavior.
+    // If the caller explicitly requests contextIsolation, inject the preload script.
+    // Keep this renderer in the legacy Node context for now: the renderer bundle
+    // still externalizes many CommonJS dependencies and expects native require(),
+    // process, __dirname, and class prototypes at runtime.
     const callerWebPrefs = options.webPreferences || {};
     const usePreload = callerWebPrefs.contextIsolation === true;
 
@@ -30,8 +32,7 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
       ? {
           ...callerWebPrefs,
           preload: mainPreloadPath,
-          contextIsolation: true,
-          nodeIntegration: false,
+          contextIsolation: false,
         }
       : callerWebPrefs;
 

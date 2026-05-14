@@ -134,10 +134,20 @@ function createSendToHost(channel) {
  * @param {string} code - JavaScript code to execute in the page context
  */
 function injectIntoPage(code) {
-  const script = document.createElement('script');
-  script.textContent = code;
-  (document.head || document.documentElement).appendChild(script);
-  script.remove();
+  const inject = () => {
+    const target = document.head || document.documentElement;
+    if (!target) return false;
+
+    const script = document.createElement('script');
+    script.textContent = code;
+    target.appendChild(script);
+    script.remove();
+    return true;
+  };
+
+  if (!inject()) {
+    document.addEventListener('DOMContentLoaded', inject, { once: true });
+  }
 }
 
 module.exports = {

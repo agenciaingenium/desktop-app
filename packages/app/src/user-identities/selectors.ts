@@ -58,4 +58,4 @@ export const getIdentityById = (state: StationState, identityId: string): Statio
   state.getIn(['userIdentities', identityId]);
 
 export const getAllEmails = (state: StationState): string[] =>
-  arrayUniq(state.get('userIdentities').toArray().filter(getEmail).map(getEmail));
+  arrayUniq(state.get('userIdentities').valueSeq().toArray().filter(getEmail).map(getEmail));
