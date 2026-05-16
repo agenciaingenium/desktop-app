@@ -1,3 +1,10 @@
+## [1.1.9](https://github.com/agenciaingenium/desktop-app/compare/1.1.8...1.1.9) (2026-05-16)
+
+
+### Bug Fixes
+
+* restore packaged renderer startup ([bdff55e](https://github.com/agenciaingenium/desktop-app/commit/bdff55e47119a45f8d23895e016795f7e24d98f7))
+
 ## [1.1.8](https://github.com/agenciaingenium/desktop-app/compare/1.1.7...1.1.8) (2026-03-30)
 
 
