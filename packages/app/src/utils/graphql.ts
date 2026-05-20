@@ -1,7 +1,5 @@
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloClient } from 'apollo-client';
-import { ApolloLink, Observable, Operation } from 'apollo-link';
-import { onError } from 'apollo-link-error';
+import { InMemoryCache, ApolloClient, ApolloLink, Observable, Operation } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
 import { ExecutionResult, print } from 'graphql';
 import { pick } from 'ramda';
 import { observer } from '../services/lib/helpers';

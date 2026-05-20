@@ -2,8 +2,7 @@
 process.worker = true;
 import './dotenv';
 import { ipcRenderer } from 'electron';
-import { InMemoryCache, NormalizedCacheObject } from 'apollo-cache-inmemory';
-import ApolloClient from 'apollo-client';
+import { InMemoryCache, NormalizedCacheObject, ApolloClient } from '@apollo/client';
 import { PubSub } from 'graphql-subscriptions';
 // @ts-ignore no declaration file
 import { updateUI } from 'redux-ui/transpiled/action-reducer';

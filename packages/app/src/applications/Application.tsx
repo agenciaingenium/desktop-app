@@ -12,7 +12,7 @@ import * as throttle from 'lodash.throttle';
 import * as path from 'path';
 import { noop, compact } from 'ramda-adjunct';
 import * as React from 'react';
-import { compose } from 'react-apollo';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 // @ts-ignore no declaration file
@@ -342,7 +342,7 @@ class ApplicationImpl extends React.PureComponent {
 
   async handleDomReady() {
 
-    const webviewInjectJS = require(`!!raw-loader!../static/preload/webview-inject.js`).default
+    const webviewInjectJS = require(`../static/preload/webview-inject.js`)
     this.webView.view.executeJavaScript(webviewInjectJS); //`(function(){\n${bxNotifJS}\n})()`);
 
     const js = await injectJS(this.props.legacyServiceId);

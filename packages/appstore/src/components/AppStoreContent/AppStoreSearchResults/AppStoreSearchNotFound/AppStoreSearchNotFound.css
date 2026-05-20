@@ -1,0 +1,20 @@
+.appStoreSearchNotFoundPage::before {
+  display: block;
+  content: "";
+  position: absolute;
+  bottom: 65px;
+  right: -10px;
+  width: 286px;
+  height: 334px;
+  background-image: url(/static/astro-shrug.png);
+  background-repeat: no-repeat;
+  background-size: 286px;
+  background-position: center;
+  z-index: 0;
+}
+
+@media (max-width: 1023px) {
+  .appStoreSearchNotFoundPage::before {
+    display: none;
+  }
+}

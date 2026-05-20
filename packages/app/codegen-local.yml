@@ -2,6 +2,9 @@
 # for the **local** GraphQL API
 schema: ./src/graphql/schema.graphql
 overwrite: true
+hooks:
+  afterAllFileWrite:
+    - node codegen-plugins/add-observable.js
 generates:
   ./src/graphql/resolvers-types.generated.ts:
     config:
@@ -14,7 +17,7 @@ generates:
         StationUserIdentity: ../user-identities/types#StationUserIdentity
     plugins:
       - typescript
-      - typescript-reactive-resolvers
+      - typescript-resolvers
 
   ./src/settings/components/SettingsAutoLaunch/queries@local.gql.generated.tsx:
     documents: ./src/settings/components/SettingsAutoLaunch/queries@local.gql

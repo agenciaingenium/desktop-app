@@ -46,6 +46,10 @@ mac:
   entitlements: 'build/entitlements.mac.plist'
   entitlementsInherit: 'build/entitlements.mac.plist'
   singleArchFiles: '*'
+  extendInfo:
+    NSCameraUsageDescription: 'Station necesita acceso a la cámara para videollamadas dentro de tus aplicaciones.'
+    NSMicrophoneUsageDescription: 'Station necesita acceso al micrófono para llamadas y notas de voz dentro de tus aplicaciones.'
+    NSAudioCaptureUsageDescription: 'Station necesita capturar audio para llamadas y notas de voz dentro de tus aplicaciones.'
   
 win:
   target:

@@ -1,5 +1,4 @@
-import { addResolveFunctionsToSchema } from 'graphql-tools';
-import { GraphQLSchema } from 'graphql';
+import { mergeResolvers } from '@graphql-tools/merge';
 import { Resolvers } from './resolvers-types.generated';
 
 import appResolvers from '../app/resolvers';
@@ -13,32 +12,20 @@ import resourcesResolvers from '../resources/worker/resolvers';
 import favoriteResolver from '../favorites/resolvers';
 import onboardingResolver from '../onboarding/resolvers';
 
-// Classic `addResolveFunctionsToSchema` does not support reactive resolvers
-// (resolvers that returns Observable) whereas it's definitely fine.
-// Let's override its declaration to make make typing happy
-declare module 'graphql-tools' {
-  interface IAddResolveFunctionsToSchemaOptions {
-    schema: GraphQLSchema;
-    resolvers: Resolvers;
-    // not complete
-  }
-  function addResolveFunctionsToSchema(
-    options: IAddResolveFunctionsToSchemaOptions | GraphQLSchema,
-  ): GraphQLSchema;
-}
-
 /**
- * Import and add Station resolvers to the schema.
+ * Merge and return all Station resolvers.
  */
-export function addAllResolvers(schema: GraphQLSchema) {
-  addResolveFunctionsToSchema({ schema, resolvers: appResolvers });
-  addResolveFunctionsToSchema({ schema, resolvers: autoUpdateResolvers });
-  addResolveFunctionsToSchema({ schema, resolvers: applicationsResolvers });
-  addResolveFunctionsToSchema({ schema, resolvers: abstractApplicationsResolvers });
-  addResolveFunctionsToSchema({ schema, resolvers: activityResolvers });
-  addResolveFunctionsToSchema({ schema, resolvers: tabWebContentResolvers });
-  addResolveFunctionsToSchema({ schema, resolvers: tabsResolvers });
-  addResolveFunctionsToSchema({ schema, resolvers: resourcesResolvers });
-  addResolveFunctionsToSchema({ schema, resolvers: favoriteResolver });
-  addResolveFunctionsToSchema({ schema, resolvers: onboardingResolver });
+export function getAllResolvers(): Resolvers {
+  return mergeResolvers([
+    appResolvers,
+    autoUpdateResolvers,
+    applicationsResolvers,
+    abstractApplicationsResolvers,
+    activityResolvers,
+    tabWebContentResolvers,
+    tabsResolvers,
+    resourcesResolvers,
+    favoriteResolver,
+    onboardingResolver,
+  ]);
 }

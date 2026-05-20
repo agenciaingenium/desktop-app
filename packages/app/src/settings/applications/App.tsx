@@ -2,7 +2,7 @@ import { Hint, IconSymbol, Size, Switcher, TEXT, theme, Tooltip, ButtonIcon, Sty
 import * as classNames from 'classnames';
 import { List } from 'immutable';
 import * as React from 'react';
-import { compose } from 'react-apollo';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { oc } from 'ts-optchain';

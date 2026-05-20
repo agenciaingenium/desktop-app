@@ -10,7 +10,7 @@ export const injectJS = memoize(
 
     if (scriptsFiles) {
       return scriptsFiles.map(
-        (script: string) => require(`!!raw-loader!./injected-js/${script}.js`).default
+        (script: string) => require(`./injected-js/${script}.js`)
       )
       .map(s => `(function(){\n${s}\n})()`)
       .join(' ');

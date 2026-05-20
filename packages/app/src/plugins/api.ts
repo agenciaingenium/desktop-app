@@ -5,12 +5,21 @@ import { BxAppManifest } from '../applications/manifest-provider/bxAppManifest';
 
 import { Transformer } from '../utils/fp';
 import { SDKConsumer } from './SDKProvider';
+import notionRuntime from '../../manifests/runtime/notion/main';
+import slackRuntime from '../../manifests/runtime/slack/main';
+import sliteRuntime from '../../manifests/runtime/slite/main';
 
 type SDKActivator = (sdk: SDK, bx?: SDKConsumer) => Promise<void> | Observable<Error> | Promise<Observable<Error>> | any;
 type SDKDeactivator = (sdk: SDK, bx?: SDKConsumer) => void;
 
 type Activator = (sdk: SDK, bx?: SDKConsumer) => Promise<Observable<Error>>;
 type Deactivator = SDKDeactivator;
+
+const runtimes: Record<string, SDKServiceRuntime> = {
+  'notion/main': notionRuntime,
+  'slack/main': slackRuntime,
+  'slite/main': sliteRuntime,
+};
 
 /**
  * Describe the shape of a service runtime (sdk side).
@@ -47,10 +56,8 @@ export const getServiceRuntime = async (manifest: BxAppManifest): Promise<Servic
   if (!manifest || !manifest.main) return;
   if (!/^[a-z0-9_-]+\/[a-z0-9_-]+$/i.test(manifest.main)) return;
 
-  // eslint-disable-next-line no-unsanitized/method
-  const sdkRuntime: ServiceRuntime = await import(
-    `../../manifests/runtime/${manifest.main}`)
-    .then(({ default: main }) => main);
+  const sdkRuntime = runtimes[manifest.main];
+  if (!sdkRuntime) return;
 
   return ensureRuntime(sdkRuntime);
 };

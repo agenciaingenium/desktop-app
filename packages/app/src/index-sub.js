@@ -4,8 +4,7 @@ import './dotenv';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { ApolloProvider } from 'react-apollo';
-import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
+import { ApolloProvider } from '@apollo/client';
 import { BrowserXThemeProvider } from '@getstation/theme';
 import './theme/css/app.global.css';
 import '../../../node_modules/font-awesome/css/font-awesome.min.css';
@@ -59,11 +58,9 @@ const render = (store) => {
       <ConsoleErrorBoundary>
         <ActionsBusReactContext.Provider value={{ actionsBus }}>
           <ApolloProvider client={client}>
-            <ApolloHooksProvider client={client}>
-              <BrowserXThemeProvider>
-                <AppSub subData={currentWindow.subData} />
-              </BrowserXThemeProvider>
-            </ApolloHooksProvider>
+            <BrowserXThemeProvider>
+              <AppSub subData={currentWindow.subData} />
+            </BrowserXThemeProvider>
           </ApolloProvider>
         </ActionsBusReactContext.Provider>
       </ConsoleErrorBoundary>

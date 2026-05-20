@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { findDOMNode } from 'react-dom';
-import { compose } from 'react-apollo';
+import { compose } from 'redux';
 import { oc } from 'ts-optchain';
 
 import { withGetApplication, GetApplicationQuery } from '../queries@local.gql.generated';

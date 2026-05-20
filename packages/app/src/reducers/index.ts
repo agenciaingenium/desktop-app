@@ -1,6 +1,46 @@
-// @ts-ignore: no declaration file
-import { combineReducers } from 'redux-immutable';
+import { Map } from 'immutable';
 import { reducer as reduxUI } from 'redux-ui';
+
+/**
+ * Replacement for `redux-immutable`'s combineReducers.
+ * Works with Immutable.js Map state: each key's reducer operates on its
+ * slice via `state.get(key)` and updates via `state.set(key, result)`.
+ */
+function combineReducersImmutable(reducers: Record<string, (state: any, action: any) => any>) {
+  const reducerKeys = Object.keys(reducers);
+
+  return (state: Map<string, any> | undefined, action: any): Map<string, any> => {
+    if (state === undefined) {
+      state = Map();
+    }
+
+    let nextState = state;
+    let hasChanged = false;
+
+    for (const key of reducerKeys) {
+      const previousStateForKey = state.get(key);
+      const nextStateForKey = reducers[key](previousStateForKey, action);
+
+      if (nextStateForKey !== previousStateForKey) {
+        hasChanged = true;
+        nextState = nextState.set(key, nextStateForKey);
+      }
+    }
+
+    // On init (or when a new key appears), ensure every slice is initialized
+    if (!hasChanged && state.count() !== reducerKeys.length) {
+      for (const key of reducerKeys) {
+        if (!state.has(key)) {
+          const nextStateForKey = reducers[key](undefined, action);
+          nextState = nextState.set(key, nextStateForKey);
+          hasChanged = true;
+        }
+      }
+    }
+
+    return hasChanged ? nextState : state;
+  };
+}
 import app from '../app/duck';
 import applicationSettings from '../application-settings/duck';
 import applications from '../applications/duck';
@@ -36,7 +76,7 @@ import userIdentities from '../user-identities/duck';
 import windows from '../windows/duck';
 import { combineAll } from './api';
 
-const rootReducer = combineReducers({
+const rootReducer = combineReducersImmutable({
   app,
   applications,
   tabs,

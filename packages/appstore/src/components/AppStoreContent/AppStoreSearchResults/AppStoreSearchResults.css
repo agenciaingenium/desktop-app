@@ -1,0 +1,8 @@
+@media (min-width: 600px) {
+  .appStoreSearchResultsSection {
+    padding: 34px 38px 0 42px;
+  }
+  .appStoreSearchResultsButtonContainer {
+    margin-bottom: 70px;
+  }
+}

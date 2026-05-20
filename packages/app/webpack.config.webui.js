@@ -1,66 +1,68 @@
 /**
- * webui compoments can't be build through electron-webpack yet because it doesn't support `target: 'web'`.
- * So we have to build it manually.
+ * Webpack 5 configuration for webui components.
+ * Uses webpack.config.base.5.js as the shared base.
  */
-require('./webpack.monkeypatch-crypto');
 const path = require('path');
 const webpack = require('webpack');
-const merge = require('webpack-merge');
-const WriteFilePlugin = require('write-file-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const baseConfig = require('./webpack.config.base');
+const { getBaseConfig } = require('./webpack.config.base.5');
 
-module.exports = (env, argv) => merge.smart(baseConfig(env, argv), {
-  target: 'web',
+module.exports = (env, argv) => {
+  const isProd = argv.mode === 'production';
+  const isDev = !isProd;
 
-  node: {
-    global: true,
-    __dirname: 'mock',
-  },
+  return {
+    ...getBaseConfig(env, argv),
 
-  plugins: [
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new HtmlWebpackPlugin({
-      chunks: ['multiInstanceConfiguration'],
-      filename: 'multi-instance-configuration.html',
-      template: './src/app-sub.html',
-    }),
-    new webpack.NamedModulesPlugin(),
-    new WriteFilePlugin(),
-  ],
+    name: 'webui',
+    target: 'web',
 
-  entry: {
-    multiInstanceConfiguration: './src/applications/multi-instance-configuration/webui/index.tsx',
-  },
-
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.graphql', '.svg']
-  },
-
-  externals: [
-    {
-      fs: '{ join: () => {} }',
+    entry: {
+      multiInstanceConfiguration: './src/applications/multi-instance-configuration/webui/index.tsx',
     },
-  ],
 
+    output: {
+      filename: '[name].js',
+      path: path.resolve(__dirname, 'dist', 'renderer'),
+      chunkFilename: '[name].bundle.js',
+    },
 
-  output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'dist', 'renderer'),
-    chunkFilename: '[name].bundle.js',
-  },
+    node: {
+      __dirname: 'mock',
+      __filename: 'mock',
+    },
 
-  optimization: {
-    runtimeChunk: 'single',
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'webui-vendor',
-          enforce: true,
+    resolve: {
+      ...getBaseConfig(env, argv).resolve,
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.graphql', '.svg'],
+    },
+
+    externals: [
+      {
+        fs: '{ join: () => {} }',
+      },
+    ],
+
+    plugins: [
+      new HtmlWebpackPlugin({
+        chunks: ['multiInstanceConfiguration'],
+        filename: 'multi-instance-configuration.html',
+        template: './src/app-sub.html',
+      }),
+    ],
+
+    optimization: {
+      runtimeChunk: 'single',
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'webui-vendor',
+            enforce: true,
+          },
         },
       },
     },
-  },
-});
+  };
+};

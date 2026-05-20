@@ -5,7 +5,7 @@ import { BxAppManifest } from '../src/applications/manifest-provider/bxAppManife
 import { ApplicationItem } from '../src/urlrouter/types';
 import { getPrivateApplicationById, getPrivateManifests } from './private';
 
-const reqIcon = require.context('!url-loader!./icons', true, /\.(png|svg)$/);
+const reqIcon = require.context('./icons', true, /\.(png|svg)$/);
 const reqManifest = require.context('./definitions', true, /\.json$/);
 
 export type Manifest = Omit<BxAppManifest, 'icons'> & { id: string, icon: string };
@@ -75,14 +75,10 @@ export function getApplicationById(id: string): Manifest {
 
   const svgIconName = `./${id}.svg`;
   const pngIconName = `./${id}.png`;
-  // `url-loader` can return either a string URL or an ES module object
-  // depending on loader defaults/version. Normalize to a plain string.
-  const rawIconData = reqIcon.keys().indexOf(svgIconName) >= 0
+  // Webpack 5 asset modules always return a string URL
+  const iconData: string = reqIcon.keys().indexOf(svgIconName) >= 0
     ? reqIcon(svgIconName)
     : reqIcon(pngIconName);
-  const iconData: string = typeof rawIconData === 'string'
-    ? rawIconData
-    : rawIconData.default;
   const manifest: BxAppManifest = reqManifest(`./${id}.json`);
 
   delete manifest.icons;

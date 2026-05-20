@@ -2,7 +2,7 @@ import { Button, theme } from '@getstation/theme';
 import * as React from 'react';
 import DOMPurify = require('dompurify');
 
-const releaseNotesRaw = require('!!raw-loader!../../app/resources/release-notes.html').default;
+const releaseNotesRaw = require('../../app/resources/release-notes.html');
 const releaseNotesHTML = DOMPurify.sanitize(releaseNotesRaw);
 
 export interface Props {

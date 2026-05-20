@@ -1,13 +1,13 @@
 import { GradientType, withGradient } from '@getstation/theme';
 import * as React from 'react';
 import DOMPurify = require('dompurify');
-import { compose } from 'react-apollo';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { CSSTransition } from 'react-transition-group';
 import { StationState } from '../../types';
 import { isLoadingScreenVisible } from '../selectors';
 
-const announcementRaw = require('!!raw-loader!../../app/resources/announcement.html').default;
+const announcementRaw = require('../../app/resources/announcement.html');
 const announcementHTML = DOMPurify.sanitize(announcementRaw);
 
 interface StateProps {

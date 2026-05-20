@@ -2,10 +2,26 @@ import { storage } from '@getstation/sdk';
 import { StorageConsumer } from '@getstation/sdk/lib/storage/consumer';
 import * as Immutable from 'immutable';
 import { createStore } from 'redux';
-// @ts-ignore: no declaration file
-import { combineReducers } from 'redux-immutable';
 import { serviceDataReducer } from '../../../src/plugins/duck';
 import StorageProvider from '../../../src/sdk/storage/StorageProvider';
+
+function combineReducersImmutable(reducers: Record<string, (state: any, action: any) => any>) {
+  const reducerKeys = Object.keys(reducers);
+  return (state: Immutable.Map<string, any> | undefined, action: any): Immutable.Map<string, any> => {
+    if (state === undefined) state = Immutable.Map();
+    let nextState = state;
+    let hasChanged = false;
+    for (const key of reducerKeys) {
+      const previousStateForKey = state.get(key);
+      const nextStateForKey = reducers[key](previousStateForKey, action);
+      if (nextStateForKey !== previousStateForKey) {
+        hasChanged = true;
+        nextState = nextState.set(key, nextStateForKey);
+      }
+    }
+    return hasChanged ? nextState : state;
+  };
+}
 
 let data!: {
   storage: storage.StorageConsumer,
@@ -15,7 +31,7 @@ const initialStore = Immutable.fromJS({
   servicesData: {},
 });
 
-const reducers = combineReducers({
+const reducers = combineReducersImmutable({
   servicesData: serviceDataReducer,
 });
 

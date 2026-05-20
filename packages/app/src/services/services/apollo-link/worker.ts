@@ -1,4 +1,4 @@
-import { ApolloLink, execute } from 'apollo-link';
+import { ApolloLink, execute } from '@apollo/client/link/core';
 import { parse } from 'graphql';
 import { PubSub } from 'graphql-subscriptions';
 import ManifestProvider from '../../../applications/manifest-provider/manifest-provider';

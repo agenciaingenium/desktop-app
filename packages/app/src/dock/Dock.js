@@ -7,7 +7,7 @@ import { findIndex, prop, propEq, tail } from 'ramda';
 import React from 'react';
 import { findDOMNode } from 'react-dom';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { compose } from 'react-apollo';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed';

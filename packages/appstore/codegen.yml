@@ -8,7 +8,8 @@ overwrite: true
 documents: "./src/**/*.gql"
 generates:
   ./src/types.generated.ts:
-    - typescript
+    plugins:
+      - typescript
   ./src/:
     preset: near-operation-file
     presetConfig:

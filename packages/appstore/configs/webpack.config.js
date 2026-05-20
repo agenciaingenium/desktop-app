@@ -93,6 +93,20 @@ module.exports = (env = {}) => {
           include: /node_modules/,
           type: 'javascript/auto'
         },
+        // graphql v16 uses modern syntax in .mjs that needs transpilation
+        {
+          test: /\.mjs$/,
+          include: /node_modules\/graphql/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              configFile: false,
+              babelrc: false,
+              presets: [['@babel/preset-env', { targets: { node: '14' } }]],
+              plugins: ['@babel/plugin-proposal-class-properties'],
+            },
+          },
+        },
         // js
         {
           test: /\.js$/,

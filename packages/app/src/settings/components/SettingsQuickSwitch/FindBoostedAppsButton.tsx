@@ -1,6 +1,6 @@
 import { Button, Size, Style } from '@getstation/theme';
 import * as React from 'react';
-import { compose } from 'react-apollo';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getAppStoreTab } from '../../../app-store/selectors';

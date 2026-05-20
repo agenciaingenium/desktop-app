@@ -1,0 +1,58 @@
+.appStoreAllAppsListNavPrevCategoryBtn::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 0;
+  width: 3px;
+  height: 3px;
+  border: solid #3c505d;
+  border-width: 0 3px 3px 0;
+  border-radius: 1.2px;
+  padding: 3px;
+  opacity: 0.5;
+  transform: rotate(135deg);
+}
+
+.appStoreAllAppsListNavNextCategoryBtn::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 3px;
+  right: 0;
+  width: 3px;
+  height: 3px;
+  border: solid #3c505d;
+  border-width: 0 3px 3px 0;
+  border-radius: 1.2px;
+  padding: 3px;
+  opacity: 0.5;
+  transform: rotate(-45deg);
+}
+
+@media (min-width: 600px) {
+  .appStoreAllAppsListContainer {
+    padding: 100px 35px 140px 45px;
+  }
+  .appStoreAllAppsListResultsContent {
+    padding: 40px 0 50px;
+  }
+}
+
+@media (min-width: 768px) {
+  .appStoreAllAppsListResultsNav {
+    justify-content: space-between;
+  }
+  .appStoreAllAppsListNavPrevCategoryBtn {
+    display: block;
+  }
+  .appStoreAllAppsListNavNextCategoryBtn {
+    display: block;
+  }
+}
+
+@media (min-width: 1024px) {
+  .appStoreAllAppsListContainer {
+    padding: 50px 35px 140px 0;
+  }
+}

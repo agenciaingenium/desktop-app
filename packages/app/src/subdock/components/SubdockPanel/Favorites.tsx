@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as ReactApolloHooks from 'react-apollo-hooks';
+import { MutationFn } from '@apollo/client';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import * as classNames from 'classnames';
 
@@ -56,11 +56,11 @@ const contentStyle: React.CSSProperties = {
 // PROPS
 
 export interface RawFavoriteActions {
-  onSelect: ReactApolloHooks.MutationFn<SelectFavoriteMutation, SelectFavoriteMutationVariables>,
-  onClose: ReactApolloHooks.MutationFn<CloseFavoriteMutation, CloseFavoriteMutationVariables>,
-  onClickFavorite: ReactApolloHooks.MutationFn<UnpinFavoriteMutation, UnpinFavoriteMutationVariables>,
+  onSelect: MutationFn<SelectFavoriteMutation, SelectFavoriteMutationVariables>,
+  onClose: MutationFn<CloseFavoriteMutation, CloseFavoriteMutationVariables>,
+  onClickFavorite: MutationFn<UnpinFavoriteMutation, UnpinFavoriteMutationVariables>,
   onClickAttach: SubdockActionsProps['onAttachTab'],
-  onClickDetach: ReactApolloHooks.MutationFn<DetachFavoriteMutation, DetachFavoriteMutationVariables>,
+  onClickDetach: MutationFn<DetachFavoriteMutation, DetachFavoriteMutationVariables>,
 }
 
 export type OwnProps = SubdockActionsProps & {

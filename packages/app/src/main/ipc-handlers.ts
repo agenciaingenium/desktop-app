@@ -16,7 +16,15 @@ function getSenderWindow(event: Electron.IpcMainEvent | Electron.IpcMainInvokeEv
   return BrowserWindow.fromWebContents(event.sender);
 }
 
+let registered = false;
+
+export function _resetRegistration() {
+  registered = false;
+}
+
 export function registerStationIpcHandlers() {
+  if (registered) return;
+  registered = true;
   // ====== App ======
   ipcMain.on('station:app-getName', (event) => {
     event.returnValue = app.name;

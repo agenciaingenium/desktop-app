@@ -1,4 +1,4 @@
-import { useSubscription } from 'react-apollo-hooks';
+import { useSubscription } from '@apollo/client';
 import { OnApplicationInstalledDocument, OnApplicationInstalledQuery } from './queries@local.gql.generated';
 
 type Props = {
