@@ -127,7 +127,7 @@ export type BangActions =
 
 // Helpers
 const ensureItemHasType = (item: SearchResultSerialized | ActivityEntry): SearchResultSerialized =>
-  item.type ? item : { ...item, type: 'integration-result' };
+  !item ? item : item.type ? item : { ...item, type: 'integration-result' };
 
 // Action creators
 

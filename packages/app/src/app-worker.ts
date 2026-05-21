@@ -122,9 +122,10 @@ export class BrowserXAppWorker {
 
   initApolloClient() {
     // local apollo client
+    // addTypename: false — reactive-graphql doesn't support the __typename meta-field
     this.apolloClient = new ApolloClient({
       link: (services.apolloLink as ApolloLinkServiceImpl).link!,
-      cache: new InMemoryCache(),
+      cache: new InMemoryCache({ addTypename: false }),
       // see apollographql/apollo-client#4322
       queryDeduplication: false,
     });

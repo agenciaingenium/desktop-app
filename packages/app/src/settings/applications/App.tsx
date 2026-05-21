@@ -2,7 +2,7 @@ import { Hint, IconSymbol, Size, Switcher, TEXT, theme, Tooltip, ButtonIcon, Sty
 import * as classNames from 'classnames';
 import { List } from 'immutable';
 import * as React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { oc } from 'ts-optchain';
 import { uninstallAllInstances } from '../../abstract-application/duck';
@@ -112,7 +112,7 @@ const App: React.FC<OwnProps> = ({ highlighted = false, manifestURL, attachAppRe
   const extensionState = useSelector((state: StationState) =>
     applicationCxExtensionId ? getExtensionState(state, applicationCxExtensionId) : undefined
   );
-  const applications = useSelector((state: StationState) => getApplicationsForDock(state));
+  const applications = useSelector((state: StationState) => getApplicationsForDock(state), shallowEqual);
 
   const dispatch = useDispatch();
   const boundActions = React.useMemo(() => bindActionCreators({

@@ -72,7 +72,6 @@ const externalsWhitelist = [
   'transit-immutable-js',
   'transit-js',
   'redux-observers',
-  'redux-ui',
   'redux-logger',
   'react-immutable-proptypes',
   'graphql',
@@ -208,6 +207,38 @@ function getEnvDefinePlugin(isProd) {
   if (!isProd) {
     defines['__station_dev_main_path__'] = JSON.stringify(path.resolve(__dirname, 'dist/main'));
     defines['__station_dev_public_path__'] = JSON.stringify(path.resolve(__dirname, 'dist/renderer'));
+  }
+
+  return new webpack.DefinePlugin(defines);
+}
+
+function getWorkerEnvDefinePlugin(isProd) {
+  const dotenvVars = loadDotenvVars(isProd);
+  const envVars = {
+    APP_STORE_MANIFEST_URL: JSON.stringify(dotenvVars.APP_STORE_MANIFEST_URL || process.env.APP_STORE_MANIFEST_URL),
+    STATION_NO_CHECK_FOR_UPDATE: JSON.stringify(dotenvVars.STATION_NO_CHECK_FOR_UPDATE || process.env.STATION_NO_CHECK_FOR_UPDATE),
+    STATION_REDUX_LOGGER: JSON.stringify(dotenvVars.STATION_REDUX_LOGGER || process.env.STATION_REDUX_LOGGER),
+    STATION_NO_WEBVIEWS: JSON.stringify(dotenvVars.STATION_NO_WEBVIEWS || process.env.STATION_NO_WEBVIEWS),
+    STATION_MAX_ACTIVE_TABS: JSON.stringify(dotenvVars.STATION_MAX_ACTIVE_TABS || process.env.STATION_MAX_ACTIVE_TABS),
+    STATION_BACKEND_SYNC_INTERVAL_DELAY: JSON.stringify(dotenvVars.STATION_BACKEND_SYNC_INTERVAL_DELAY || process.env.STATION_BACKEND_SYNC_INTERVAL_DELAY),
+    STATION_QUICK_TRANSITIONS: JSON.stringify(dotenvVars.STATION_QUICK_TRANSITIONS || process.env.STATION_QUICK_TRANSITIONS),
+    STATION_REACT_PERF: JSON.stringify(dotenvVars.STATION_REACT_PERF || process.env.STATION_REACT_PERF),
+    STATION_DISABLE_ECX: JSON.stringify(dotenvVars.STATION_DISABLE_ECX || process.env.STATION_DISABLE_ECX),
+    AUTH_CLIENT_ID: JSON.stringify(dotenvVars.AUTH_CLIENT_ID || process.env.AUTH_CLIENT_ID),
+    AUTH_AUDIENCE: JSON.stringify(dotenvVars.AUTH_AUDIENCE || process.env.AUTH_AUDIENCE),
+    STATION_API_AUTHPROXY_ENDPOINT: JSON.stringify(dotenvVars.STATION_API_AUTHPROXY_ENDPOINT || process.env.STATION_API_AUTHPROXY_ENDPOINT),
+    GOOGLE_CLIENT_ID: JSON.stringify(process.env.GOOGLE_CLIENT_ID),
+  };
+
+  const defines = {
+    'process.type': JSON.stringify('renderer'),
+    'process.env.IS_PACKAGED': JSON.stringify(String(isProd)),
+  };
+
+  for (const [key, value] of Object.entries(envVars)) {
+    if (value !== 'undefined') {
+      defines[`process.env.${key}`] = value;
+    }
   }
 
   return new webpack.DefinePlugin(defines);
@@ -431,13 +462,7 @@ module.exports = (env, argv) => {
 
     plugins: [
       ...getSharedPlugins(isProd),
-      new webpack.DefinePlugin({
-        'process.env.GOOGLE_CLIENT_ID': JSON.stringify(process.env.GOOGLE_CLIENT_ID),
-        // Worker runs as electron-renderer with nodeIntegration: true,
-        // so env.ts uses the renderer branch (process.type === 'renderer')
-        'process.type': JSON.stringify('renderer'),
-        'process.env.IS_PACKAGED': JSON.stringify(String(isProd)),
-      }),
+      getWorkerEnvDefinePlugin(isProd),
 
       // Worker window
       new HtmlWebpackPlugin({
@@ -453,6 +478,12 @@ module.exports = (env, argv) => {
     rendererConfig.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/ }));
     workerConfig.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/ }));
   }
+
+  // ws optional native deps — not needed, silences warnings
+  rendererConfig.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /^bufferutil$/, contextRegExp: /ws\/lib$/ }));
+  rendererConfig.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /^utf-8-validate$/, contextRegExp: /ws\/lib$/ }));
+  workerConfig.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /^bufferutil$/, contextRegExp: /ws\/lib$/ }));
+  workerConfig.plugins.push(new webpack.IgnorePlugin({ resourceRegExp: /^utf-8-validate$/, contextRegExp: /ws\/lib$/ }));
 
   if (isDev) {
     workerConfig.plugins.push(

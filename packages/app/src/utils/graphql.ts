@@ -37,7 +37,8 @@ export class ServicesLink extends ApolloLink {
 }
 
 export function getGQlClient() {
-  const cache = new InMemoryCache();
+  // addTypename: false — reactive-graphql doesn't support the __typename meta-field
+  const cache = new InMemoryCache({ addTypename: false });
 
   const link = ApolloLink.from([
     onError(({ graphQLErrors, networkError }) => {

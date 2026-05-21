@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { bindActionCreators } from 'redux';
 // @ts-ignore: no declaration file
 import { updateUI } from '../ui/redux-ui-compat';
@@ -52,7 +52,7 @@ const BangSubdock: React.FC<OwnProps> = ({ onQuit = () => {} }) => {
   const searchSessionId = useSelector((state: StationState) => getSearchSessionId(state));
   const searchValue = useSelector((state: StationState) => getSearchValue(state));
   const highlightedItemId = useSelector((state: StationState) => getUIQSHighlightedItemId(state));
-  const items = useSelector((state: StationState) => getResultsJS(state));
+  const items = useSelector((state: StationState) => getResultsJS(state), shallowEqual);
   const isVis = useSelector((state: StationState) => isVisible(state));
   const shouldShowInsert = useSelector((state: StationState) => canShowInsert(state));
   const focus = useSelector((state: StationState) => getFocus(state));

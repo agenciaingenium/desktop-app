@@ -46,7 +46,8 @@
   },
   "resolutions": {
     "foreground-child/cross-spawn": "^7.0.6",
-    "rimraf/glob": "^10.5.0"
+    "rimraf/glob": "^10.5.0",
+    "graphql": "^16.14.0"
   },
   "engines": {
     "node": ">=22.0.0",

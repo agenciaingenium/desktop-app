@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as Immutable from 'immutable';
 import { oc } from 'ts-optchain';
@@ -43,10 +43,10 @@ const PasswordManagerView: React.FC = () => {
   const shouldDisplayBanner = useSelector((state: Immutable.Map<string, any>) => getDisplayBanner(state));
   const shouldDisplayRemoveLinkBanner = useSelector((state: Immutable.Map<string, any>) => getDisplayRemoveLinkBanner(state));
   const isLoadingCredentials = useSelector((state: Immutable.Map<string, any>) => getLoadingCredentials(state));
-  const unlockProcess = useSelector((state: Immutable.Map<string, any>) => getUnlockProcess(state));
-  const passwordManager = useSelector((state: Immutable.Map<string, any>) => getPasswordManager(state));
-  const processAccounts = useSelector((state: Immutable.Map<string, any>) => getAccounts(state));
-  const provider = useSelector((state: Immutable.Map<string, any>) => getProviderJS(state));
+  const unlockProcess = useSelector((state: Immutable.Map<string, any>) => getUnlockProcess(state), shallowEqual);
+  const passwordManager = useSelector((state: Immutable.Map<string, any>) => getPasswordManager(state), shallowEqual);
+  const processAccounts = useSelector((state: Immutable.Map<string, any>) => getAccounts(state), shallowEqual);
+  const provider = useSelector((state: Immutable.Map<string, any>) => getProviderJS(state), shallowEqual);
 
   const dispatch = useDispatch();
   const boundActions = React.useMemo(() => bindActionCreators({

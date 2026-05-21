@@ -1,10 +1,12 @@
 // dotenv is a Node.js module that reads .env files from disk.
-// It's only needed in the main process and worker.
-// The renderer (target: web) gets env vars via webpack DefinePlugin instead.
+// It's needed in the main process and in the hidden worker window.
+// The visible renderer (target: web) gets env vars via webpack DefinePlugin instead.
 
 import { isPackaged } from './utils/env';
 
-if (process.type !== 'renderer') {
+const shouldLoadDotenv = process.type !== 'renderer' || Boolean((process as any).worker);
+
+if (shouldLoadDotenv) {
   // @ts-ignore: no declaration file
   const dotenv = require('dotenv');
   const { resolve } = require('path');

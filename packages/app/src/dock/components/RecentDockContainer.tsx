@@ -73,6 +73,7 @@ class RecentDockContainer extends React.PureComponent<Props, State> {
       clearTimeout(this.timeoutSubdock);
       this.timeoutSubdock = null;
     }
+    if (recentApplications.length === 0) return;
     this.handleSelectItem(recentApplications[0], 'click-recent-dock-icon', 0);
   }
 
