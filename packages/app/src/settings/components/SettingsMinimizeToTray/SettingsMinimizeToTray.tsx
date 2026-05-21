@@ -1,13 +1,6 @@
 import { Switcher } from '@getstation/theme';
 import * as React from 'react';
-import { compose } from 'redux';
-import { withGetMinimizeToTrayStatus, withEnableMinimizeToTray } from './queries@local.gql.generated';
-
-export interface Props {
-  isMinimizeToTray: boolean,
-  onMinimizeToTray: (enabled: boolean) => any
-  loading: boolean,
-}
+import { useGetMinimizeToTrayStatusQuery, useEnableMinimizeToTrayMutation } from './queries@local.gql.generated';
 
 const containerStyle: React.CSSProperties = {
   maxWidth: '600px',
@@ -22,42 +15,30 @@ const settingNameStyle: React.CSSProperties = {
   fontWeight: 'bold',
 };
 
-class SettingsMinimizeToTray extends React.Component<Props, {}> {
-  render() {
-    const { loading, isMinimizeToTray } = this.props;
+const SettingsMinimizeToTray: React.FC = () => {
+  const { data, loading } = useGetMinimizeToTrayStatusQuery();
+  const [enableMinimizeToTray] = useEnableMinimizeToTrayMutation();
 
-    const handleSwitcherChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-      this.props.onMinimizeToTray(e.target.checked);
-    return (
-      <div style={containerStyle}>
+  const isMinimizeToTray = !!data && Boolean(data.minimizeToTray);
+
+  const handleSwitcherChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    enableMinimizeToTray({ variables: { enabled: e.target.checked } });
+
+  return (
+    <div style={containerStyle}>
+      <div>
+        <p style={settingNameStyle}>TRAY ICON</p>
+        <Switcher
+          disabled={loading}
+          checked={isMinimizeToTray}
+          onChange={handleSwitcherChange}
+        />
         <div>
-          <p style={settingNameStyle}>TRAY ICON</p>
-          <Switcher
-            disabled={loading}
-            checked={isMinimizeToTray}
-            onChange={handleSwitcherChange}
-          />
-          <div>
-            Minimize application to tray
-          </div>
+          Minimize application to tray
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-const connect = compose(
-  withGetMinimizeToTrayStatus({
-    props: ({ data }) => ({
-      loading: !data || data.loading,
-      isMinimizeToTray: !!data && Boolean(data.minimizeToTray),
-    }),
-  }),
-  withEnableMinimizeToTray({
-    props: ({ mutate }) => ({
-      onMinimizeToTray: (enabled: boolean) => mutate && mutate({ variables: { enabled } }),
-    }),
-  }),
-);
-
-export default connect(SettingsMinimizeToTray);
+export default SettingsMinimizeToTray;

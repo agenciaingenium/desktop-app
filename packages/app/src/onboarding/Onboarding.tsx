@@ -6,20 +6,19 @@ import { validate as validateEmail } from 'isemail';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
-import ui from 'redux-ui';
+import { updateUI } from '../ui/redux-ui-compat';
 import {
   MinimalApplication,
-  Props as WithMyApplicationsProps,
 } from '../applications/graphql/withApplications';
 import { isDarwin } from '../utils/process';
 import { appStoreStepFinished, startOnboarding } from './duck';
 import Presenter from './Presenter';
 
 import {
-  withGetDefaultApplicationsForOnboarding,
-  withInstallApplication,
+  useGetDefaultApplicationsForOnboardingQuery,
+  useInstallApplicationMutation,
   InstallApplicationMutationVariables,
-  withOnboardingDone,
+  useOnboardingDoneMutation,
 } from './queries@local.gql.generated';
 
 import { OnboardingType } from '../ui/types';
@@ -47,21 +46,9 @@ export interface UIProps {
 
 type InstallApplicationInput = InstallApplicationMutationVariables['input'];
 
-type InstallApplicationProps = {
-  installApplication: (input: InstallApplicationInput) => Promise<void>,
-};
-
-type OnboardingDoneProps = {
-  onboardingDone: (nbInstalledApps: number) => Promise<void>,
-};
-
 export type Props =
-  StateToProps
-  & DispatchFromProps
+  DispatchFromProps
   & UIProps
-  & InstallApplicationProps
-  & OnboardingDoneProps
-  & WithMyApplicationsProps<MinimalApplication>
   & withGradientProps
   & WithApolloClient<{}>;
 
@@ -84,7 +71,6 @@ class OnboardingImpl extends React.PureComponent<Props, State> {
       currentSearchedApplicationsResult: null,
     };
 
-    // Get initial focus state (async)
     window.station.window.isFocused().then((focused) => {
       this.setState({ isWindowFocused: focused });
     });
@@ -108,15 +94,8 @@ class OnboardingImpl extends React.PureComponent<Props, State> {
   }
 
   async componentDidUpdate(_: Props, prevState: State) {
-    // here. we are re-implementing what a `AppolloReact.Query` would
-    // have done better than us, but given the fact that the data displayed in
-    // `applications` are coming from 3 different queries depending on conditions
-    // it would have required a big refactor
-    // todo: do the big refactor that combines the 3 different queries
-    // better-todo: augnent the `search` API query to combine the 3 different queries
     if (this.state.searchInputValue !== prevState.searchInputValue) {
       if (this.state.searchInputValue === '') {
-        // reset the currentSearchedApplicationsResult to display default results
         this.setState({ currentSearchedApplicationsResult: null });
       } else {
         this.updateSearchedApplications(this.state.searchInputValue);
@@ -148,9 +127,7 @@ class OnboardingImpl extends React.PureComponent<Props, State> {
   }
 
   getApplications(): MinimalApplication[] {
-    const {
-      applications,
-    } = this.props;
+    const applications = this.props['applications' as keyof Props] as MinimalApplication[] | undefined;
 
     if (!applications) return [];
 
@@ -181,11 +158,14 @@ class OnboardingImpl extends React.PureComponent<Props, State> {
 
   render() {
     const {
-      onClickLogin, onAppStoreStepFinished, firstName,
-      installApplication, onboardingDone,
+      onClickLogin, onAppStoreStepFinished,
       ui: { step, emails, loginButtonDisabled, loginError, showWelcomeBack },
     } = this.props;
     const { isWindowFocused, searchInputValue } = this.state;
+
+    // Get installApplication and onboardingDone from the wrapper component
+    const installApplication = this.props['installApplication' as keyof Props] as ((input: InstallApplicationInput) => Promise<void>) | undefined;
+    const onboardingDone = this.props['onboardingDone' as keyof Props] as ((nbInstalledApps: number, onboardeeId?: string) => Promise<void>) | undefined;
 
     return (
       <Presenter
@@ -193,10 +173,9 @@ class OnboardingImpl extends React.PureComponent<Props, State> {
         onClickLogin={onClickLogin}
         error={loginError}
         showWelcomeBack={showWelcomeBack}
-        firstName={firstName}
         step={step}
         onAppStoreStepFinished={onAppStoreStepFinished}
-        onboardingDone={onboardingDone}
+        onboardingDone={onboardingDone!}
         emails={emails}
         onEmailsChange={this.updateEmails}
         loginButtonDisabled={loginButtonDisabled}
@@ -209,57 +188,61 @@ class OnboardingImpl extends React.PureComponent<Props, State> {
         validateEmail={validateEmail}
         searchInputValue={searchInputValue}
         handleSearchInputValue={this.handleSearchInputValue}
-        installApplication={installApplication}
+        installApplication={installApplication!}
       />
     );
   }
 }
 
+// Wrapper component that uses hooks for GraphQL and passes them down
+const OnboardingWithHooks: React.FC<any> = (props) => {
+  const { data } = useGetDefaultApplicationsForOnboardingQuery();
+  const [installAppMutation] = useInstallApplicationMutation();
+  const [onboardingDoneMutation] = useOnboardingDoneMutation();
+
+  const applications = data?.applications ?? [];
+
+  const installApplication = async (input: InstallApplicationInput): Promise<void> => {
+    await installAppMutation({ variables: { input } });
+  };
+
+  const onboardingDone = async (nbInstalledApps: number, onboardeeId?: string): Promise<void> => {
+    await onboardingDoneMutation({ variables: { nbInstalledApps, onboardeeId } });
+  };
+
+  return (
+    <OnboardingImpl
+      {...props}
+      applications={applications}
+      installApplication={installApplication}
+      onboardingDone={onboardingDone}
+    />
+  );
+};
+
 const Onboarding = compose(
-  withInstallApplication({
-    props: ({ mutate }): InstallApplicationProps => {
-      const installApplication = async (input: InstallApplicationInput): Promise<void> => {
-        mutate && await mutate({ variables: { input } });
-      };
-      return { installApplication };
-    },
-  }),
-  withOnboardingDone({
-    props: ({ mutate }) => {
-      const onboardingDone = async (nbInstalledApps: number, onboardeeId?: string): Promise<void> => {
-        mutate && await mutate({ variables: { nbInstalledApps, onboardeeId } });
-      };
-      return { onboardingDone };
-    },
-  }),
-  withGetDefaultApplicationsForOnboarding({
-    props:({ data }) => ({
-      applications: !!data && data.applications,
-    }),
-  }),
-  withApollo,
   connect<{}, DispatchFromProps, {}>(
-    (_state: Immutable.Map<string, any>) => ({}),
+    (state: Immutable.Map<string, any>) => ({
+      ui: state.getIn(['ui', 'onboarding'], Immutable.Map({
+        onboardingType: OnboardingType.Undefined,
+        step: 0,
+        emails: ['', '', ''],
+        loginButtonDisabled: false,
+        loginError: undefined,
+        showWelcomeBack: false,
+        onboardingSessionId: undefined,
+      })).toJS(),
+    }),
     dispatch => bindActionCreators(
       {
         onAppStoreStepFinished: appStoreStepFinished,
+        updateUI: (uiState: Object) => updateUI('onboarding', uiState),
       },
       dispatch
     )
   ),
-  ui({
-    key: 'onboarding',
-    state: {
-      onboardingType: OnboardingType.Undefined,
-      step: 0,
-      emails: ['', '', ''],
-      loginButtonDisabled: false,
-      loginError: undefined,
-      showWelcomeBack: false,
-      onboardingSessionId: undefined,
-    },
-  }),
+  withApollo,
   withGradient(GradientType.normal)
-)(OnboardingImpl);
+)(OnboardingWithHooks);
 
 export default Onboarding;

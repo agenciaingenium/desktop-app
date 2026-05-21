@@ -1,8 +1,7 @@
 import * as Immutable from 'immutable';
 import { SagaIterator } from 'redux-saga';
 import { all, call, put, select } from 'redux-saga/effects';
-// @ts-ignore : no declaration file
-import { UPDATE_UI_STATE, updateUI } from 'redux-ui/transpiled/action-reducer';
+import { UPDATE_UI_STATE, updateUI } from './redux-ui-compat';
 import {
   SET_VISIBILITY as BANG_SET_VISIBILITY,
   setVisibility as bangSetVisibility,

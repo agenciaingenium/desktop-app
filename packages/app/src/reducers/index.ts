@@ -1,5 +1,5 @@
 import { Map } from 'immutable';
-import { reducer as reduxUI } from 'redux-ui';
+import { reducer as reduxUI } from '../ui/redux-ui-compat';
 
 /**
  * Replacement for `redux-immutable`'s combineReducers.

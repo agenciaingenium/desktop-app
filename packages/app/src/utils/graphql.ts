@@ -37,10 +37,7 @@ export class ServicesLink extends ApolloLink {
 }
 
 export function getGQlClient() {
-  const cache = new InMemoryCache({
-    // reactive-graphql does not like this
-    addTypename: false,
-  });
+  const cache = new InMemoryCache();
 
   const link = ApolloLink.from([
     onError(({ graphQLErrors, networkError }) => {

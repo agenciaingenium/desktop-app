@@ -2,22 +2,8 @@ import { Button, Size } from '@getstation/theme';
 import ms = require('ms');
 import * as React from 'react';
 import {
-  withGetAutoUpdateStatus, withCheckForUpdatesMutation, withQuitAndInstallMutation,
+  useGetAutoUpdateStatusQuery, useCheckForUpdatesMutationMutation, useQuitAndInstallMutationMutation,
 } from './queries@local.gql.generated';
-import { compose } from 'redux';
-
-export interface Props {
-  isDownloadingUpdate: boolean,
-  isCheckingUpdate: boolean,
-  isUpdateAvailable: boolean,
-  releaseName: string,
-  checkForUpdates: () => any,
-  quitAndInstall: () => any,
-}
-
-export interface State {
-  justCheckedForUpdate: boolean,
-}
 
 const updateButtonStyle: React.CSSProperties = {
   minWidth: 200,
@@ -44,92 +30,68 @@ const infoStyle: React.CSSProperties = {
   textAlign: 'center' as const,
 };
 
-class SettingsUpdatesButton extends React.PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props);
+const SettingsUpdatesButton: React.FC = () => {
+  const [justCheckedForUpdate, setJustCheckedForUpdate] = React.useState(false);
+  const prevCheckingRef = React.useRef<boolean>(false);
 
-    this.state = {
-      justCheckedForUpdate: false,
-    };
-  }
+  const { data } = useGetAutoUpdateStatusQuery();
+  const [checkForUpdates] = useCheckForUpdatesMutationMutation();
+  const [quitAndInstall] = useQuitAndInstallMutationMutation();
 
-  componentDidUpdate(prevProps: any) {
-    if (prevProps.isCheckingUpdate && !this.props.isCheckingUpdate) {
-      this.setState({ justCheckedForUpdate: true });
+  const status = data?.autoUpdateStatus;
+  const isDownloadingUpdate = status?.isDownloadingUpdate ?? false;
+  const isCheckingUpdate = status?.isCheckingUpdate ?? false;
+  const isUpdateAvailable = status?.isUpdateAvailable ?? false;
+  const releaseName = status?.releaseName ?? null;
 
-      setTimeout(
-        () => this.setState({ justCheckedForUpdate: false }),
-        ms('1min')
-      );
+  React.useEffect(() => {
+    if (prevCheckingRef.current && !isCheckingUpdate) {
+      setJustCheckedForUpdate(true);
+      const timer = setTimeout(() => setJustCheckedForUpdate(false), ms('1min'));
+      return () => clearTimeout(timer);
     }
-  }
+    prevCheckingRef.current = isCheckingUpdate;
+  }, [isCheckingUpdate]);
 
-  render() {
-    if (this.props.isCheckingUpdate) {
-      return (
-        <Button style={updateButtonStyle} btnSize={Size.SMALL} disabled={this.props.isCheckingUpdate}>
-          <span style={checkingStyle} />
-          {this.props.isDownloadingUpdate ? 'Downloading...' : 'Checking...'}
-        </Button>
-      );
-    }
-
-    if (this.props.isUpdateAvailable) {
-      return (
-        <div>
-          <Button style={updateButtonStyle} btnSize={Size.SMALL} onClick={this.props.quitAndInstall} download={true}>
-            Quit to install the latest version
-          </Button>
-
-          <p style={infoStyle}>New version available ({this.props.releaseName})</p>
-        </div>
-      );
-    }
-
-    if (!this.props.isUpdateAvailable && this.state.justCheckedForUpdate) {
-      return (
-        <div>
-          <Button style={updateButtonStyle} btnSize={Size.SMALL} onClick={this.props.checkForUpdates}>
-            No new updates
-          </Button>
-
-          <p style={infoStyle}>You have the most recent version</p>
-        </div>
-
-      );
-    }
-
+  if (isCheckingUpdate) {
     return (
-      <Button style={updateButtonStyle} btnSize={Size.SMALL} onClick={this.props.checkForUpdates}>
-        Check for updates
+      <Button style={updateButtonStyle} btnSize={Size.SMALL} disabled={isCheckingUpdate}>
+        <span style={checkingStyle} />
+        {isDownloadingUpdate ? 'Downloading...' : 'Checking...'}
       </Button>
     );
   }
-}
 
-const connect = compose(
-  withGetAutoUpdateStatus({
-    props: ({ data }) => ({
-      isDownloadingUpdate: data && data.autoUpdateStatus && data.autoUpdateStatus.isDownloadingUpdate ?
-        data.autoUpdateStatus.isDownloadingUpdate : false,
-      isCheckingUpdate: data && data.autoUpdateStatus && data.autoUpdateStatus.isCheckingUpdate ?
-        data.autoUpdateStatus.isCheckingUpdate : false,
-      isUpdateAvailable: data && data.autoUpdateStatus && data.autoUpdateStatus.isUpdateAvailable ?
-        data.autoUpdateStatus.isUpdateAvailable : false,
-      releaseName: data && data.autoUpdateStatus && data.autoUpdateStatus.releaseName ?
-        data.autoUpdateStatus.releaseName : null,
-    }),
-  }),
-  withCheckForUpdatesMutation({
-    props: ({ mutate }) => ({
-      checkForUpdates: () => mutate && mutate({ variables: { } }),
-    }),
-  }),
-  withQuitAndInstallMutation({
-    props: ({ mutate }) => ({
-      quitAndInstall: () => mutate && mutate({ variables: { } }),
-    }),
-  }),
-);
+  if (isUpdateAvailable) {
+    return (
+      <div>
+        <Button style={updateButtonStyle} btnSize={Size.SMALL} onClick={() => quitAndInstall({ variables: {} })} download={true}>
+          Quit to install the latest version
+        </Button>
 
-export default connect(SettingsUpdatesButton);
+        <p style={infoStyle}>New version available ({releaseName})</p>
+      </div>
+    );
+  }
+
+  if (!isUpdateAvailable && justCheckedForUpdate) {
+    return (
+      <div>
+        <Button style={updateButtonStyle} btnSize={Size.SMALL} onClick={() => checkForUpdates({ variables: {} })}>
+          No new updates
+        </Button>
+
+        <p style={infoStyle}>You have the most recent version</p>
+      </div>
+
+    );
+  }
+
+  return (
+    <Button style={updateButtonStyle} btnSize={Size.SMALL} onClick={() => checkForUpdates({ variables: {} })}>
+      Check for updates
+    </Button>
+  );
+};
+
+export default SettingsUpdatesButton;

@@ -3,10 +3,14 @@ import * as path from 'path';
 import * as log from 'electron-log';
 
 function getUserDataPath(): string {
-  if (process.type === 'renderer' && typeof window !== 'undefined' && (window as any).station) {
+  if (typeof window !== 'undefined' && (window as any).station?.app?.getPath) {
     return (window as any).station.app.getPath('userData');
   }
-  return require('electron').app.getPath('userData');
+  // Fallback for main process / worker
+  if (process.type !== 'renderer') {
+    return require('electron').app.getPath('userData');
+  }
+  throw new Error('Cannot determine userData path: no electron app access in renderer');
 }
 
 export enum FILE {

@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserXThemeProvider } from '@getstation/theme';
 
@@ -11,7 +11,6 @@ import configureStore from '../store/configureStore.client';
 import ReduxBasedGradientProvider from '../theme/ReduxBasedGradientProvider';
 import { handleError } from '../services/api/helpers';
 import ConsoleErrorBoundary from '../common/containers/ConsoleErrorBoundary';
-
 configureStore().then(store => {
   // for debug purpose, gives us a way to easily access the store
   window.stationStore = store;
@@ -32,7 +31,7 @@ document.addEventListener('keydown', event => {
 
 const render = (store) => {
   const AboutWindowContainer = require('./Container').default; // eslint-disable-line global-require
-  ReactDOM.render(
+  createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <ConsoleErrorBoundary>
         <BrowserXThemeProvider>
@@ -42,7 +41,6 @@ const render = (store) => {
         </BrowserXThemeProvider>
       </ConsoleErrorBoundary>
     </Provider>
-    , document.getElementById('root')
   );
 
   window.station.ipc.send('bx-ready-to-show');

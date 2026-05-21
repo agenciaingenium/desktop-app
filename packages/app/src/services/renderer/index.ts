@@ -36,7 +36,7 @@ export const getMainPeerHandler = () => {
 };
 
 export const getWorkerPeerHandler = () => {
-  const ipc = (typeof window !== 'undefined' && (window as any).station?.ipc) || (require('electron') as any).ipcRenderer;
+  const ipc = (typeof window !== 'undefined' && (window as any).station?.ipc);
   const workerWebContentsId = ipc.sendSync('get-worker-contents-id-sync');
   const duplex = new ElectronIpcRendererDuplex(workerWebContentsId, servicesDuplexNamespace);
   const channel: RPCChannel = rpcchannel(duplex, {

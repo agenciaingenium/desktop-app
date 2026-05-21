@@ -1,13 +1,6 @@
 import { Switcher } from '@getstation/theme';
 import * as React from 'react';
-import { compose } from 'redux';
-import { withGetHideMainMenuStatus, withEnableHideMainMenu } from './queries@local.gql.generated';
-
-export interface Props {
-  isHideMainMenu: boolean,
-  onHideMainMenu: (hide: boolean) => any
-  loading: boolean,
-}
+import { useGetHideMainMenuStatusQuery, useEnableHideMainMenuMutation } from './queries@local.gql.generated';
 
 const containerStyle: React.CSSProperties = {
   maxWidth: '600px',
@@ -22,42 +15,30 @@ const settingNameStyle: React.CSSProperties = {
   fontWeight: 'bold',
 };
 
-class SettingsHideMainMenu extends React.Component<Props, {}> {
-  render() {
-    const { loading, isHideMainMenu } = this.props;
+const SettingsHideMainMenu: React.FC = () => {
+  const { data, loading } = useGetHideMainMenuStatusQuery();
+  const [enableHideMainMenu] = useEnableHideMainMenuMutation();
 
-    const handleSwitcherChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-      this.props.onHideMainMenu(e.target.checked);
-    return (
-      <div style={containerStyle}>
+  const isHideMainMenu = !!data && Boolean(data.hideMainMenu);
+
+  const handleSwitcherChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    enableHideMainMenu({ variables: { hide: e.target.checked } });
+
+  return (
+    <div style={containerStyle}>
+      <div>
+        <p style={settingNameStyle}>main menu</p>
+        <Switcher
+          disabled={loading}
+          checked={isHideMainMenu}
+          onChange={handleSwitcherChange}
+        />
         <div>
-          <p style={settingNameStyle}>main menu</p>
-          <Switcher
-            disabled={loading}
-            checked={isHideMainMenu}
-            onChange={handleSwitcherChange}
-          />
-          <div>
-            Hide main menu
-          </div>
+          Hide main menu
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-const connect = compose(
-  withGetHideMainMenuStatus({
-    props: ({ data }) => ({
-      loading: !data || data.loading,
-      isHideMainMenu: !!data && Boolean(data.hideMainMenu),
-    }),
-  }),
-  withEnableHideMainMenu({
-    props: ({ mutate }) => ({
-      onHideMainMenu: (hide: boolean) => mutate && mutate({ variables: { hide } }),
-    }),
-  }),
-);
-
-export default connect(SettingsHideMainMenu);
+export default SettingsHideMainMenu;

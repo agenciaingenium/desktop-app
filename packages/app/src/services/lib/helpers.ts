@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { RPCChannelPeer } from 'stream-json-rpc';
 import { ServiceBase, ServiceObserver as RealServiceObserver, ServicePeerHandler } from './class';
 import { bxnotifier, namespace } from './const';

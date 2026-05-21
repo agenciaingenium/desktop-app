@@ -1,87 +1,50 @@
 import { Modal } from '@getstation/theme';
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators, compose } from 'redux';
-// @ts-ignore: no declaration file
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateUI } from '../../ui/redux-ui-compat';
 import { oc } from 'ts-optchain';
 import { StationState } from '../../types';
-import { resetApplication, ResetApplicationAction } from '../duck';
-import { withGetApplication } from '../queries@local.gql.generated';
+import { resetApplication } from '../duck';
+import { useGetApplicationQuery } from '../queries@local.gql.generated';
 import { getUIConfirmResetApplicationModalIsVisible } from '../selectors';
 
 const currentWindowId = window.station.window.getId();
 
-interface InputProps {
+interface OwnProps {
   applicationId: string,
-
-}
-interface StateProps {
-  isVisible: boolean,
 }
 
-interface DispatchProps {
-  onReset: (applicationId: string) => ResetApplicationAction,
-  onCancel: () => void,
-}
+const ConfirmResetApplication: React.FC<OwnProps> = ({ applicationId }) => {
+  const isVisible = useSelector((state: StationState) =>
+    getUIConfirmResetApplicationModalIsVisible(state, currentWindowId)
+  );
+  const dispatch = useDispatch();
 
-interface GqlProps {
-  applicationName: string | null,
-  loading: boolean,
-}
+  const { data, loading } = useGetApplicationQuery({
+    variables: { applicationId },
+  });
 
-type Props = InputProps & StateProps & DispatchProps & GqlProps;
+  const applicationName = oc(data).application.manifestData.name();
 
-interface State {
-}
+  const onReset = (id: string) => dispatch(resetApplication(id, 'help'));
+  const onCancel = () => dispatch(updateUI('confirmResetApplicationModal', 'isVisible', false));
 
-class ConfirmResetApplicationImpl extends React.Component<Props, State> {
-  constructor(args: Props) {
-    super(args);
+  if (!loading && isVisible) {
+    return (
+      <Modal
+        title={`Reset ${applicationName}`}
+        onCancel={onCancel}
+        onContinue={() => applicationId && onReset(applicationId)}
+        cancelContent={'Cancel'}
+        continueContent={'Continue'}
+      >
+        <p style={{ textAlign: 'center', width: '80%', margin: 'auto' }}>
+          This will clear all of {applicationName} pages and send you back home.
+        </p>
+      </Modal>
+    );
   }
+  return null;
+};
 
-  render() {
-    const { applicationName, applicationId, onReset, onCancel, isVisible, loading } = this.props;
-
-    if (!loading && isVisible) {
-      return (
-        <Modal
-          title={`Reset ${applicationName}`}
-          onCancel={onCancel}
-          onContinue={() => applicationId && onReset(applicationId)}
-          cancelContent={'Cancel'}
-          continueContent={'Continue'}
-        >
-          <p style={{ textAlign: 'center', width: '80%', margin: 'auto' }}>
-            This will clear all of {applicationName} pages and send you back home.
-          </p>
-        </Modal>
-      );
-    }
-    return null;
-  }
-}
-
-const connector = compose(
-  connect<StateProps, DispatchProps, InputProps>(
-    (state: StationState) => ({
-      isVisible: getUIConfirmResetApplicationModalIsVisible(state, currentWindowId),
-    }),
-    (dispatch) => bindActionCreators(
-      {
-        onReset: (applicationId: string) => resetApplication(applicationId, 'help'),
-        onCancel: () => updateUI('confirmResetApplicationModal', 'isVisible', false),
-      },
-      dispatch
-    ),
-  ),
-  withGetApplication({
-    options: (props: InputProps & StateProps & DispatchProps) => ({ variables: { applicationId: props.applicationId } }),
-    props: ({ data }) => ({
-      loading: !data,
-      applicationName: oc(data).application.manifestData.name(),
-    }),
-  }),
-);
-
-export default connector(ConfirmResetApplicationImpl);
+export default ConfirmResetApplication;

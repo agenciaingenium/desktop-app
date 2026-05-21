@@ -250,3 +250,53 @@
 - [x] `webpack.config.js` — babel-loader para graphql v16 .mjs (class fields con `targets: { node: '14' }` + `@babel/plugin-proposal-class-properties`); webpack 4 no soporta ES2022 class field syntax nativamente
 - [x] Build de appstore validado — compila exitosamente con 0 errores
 - [x] Build completo del monorepo validado — `yarn build` pasa con 0 errores
+
+---
+
+## Fase 7: Runtime Recovery (Dev + Production)
+
+### 7.1 reflect-metadata — fix de raíz
+- [x] Reemplazado `Reflect.getOwnMetadata`/`Reflect.defineMetadata`/`Reflect.getMetadata` con WeakMap-based `metadataStore` en `decorator.ts`
+- [x] Agregado `getAllMetadata` (prototype chain walk) y `deleteMetadata` a `decorator.ts`
+- [x] Actualizado `class.ts`: reemplazado `Reflect.getMetadata` con `getAllMetadata` (2 llamadas)
+- [x] Actualizado `getNode.ts`: reemplazado `Reflect.getMetadata` con `getAllMetadata`
+- [x] Actualizado `test/jest/services/test-decorator.ts`: reemplazadas todas las llamadas a Reflect metadata API
+- [x] Removido `import 'reflect-metadata'` de `main.ts` y `app-worker.ts`
+- [x] Eliminado `src/reflect-metadata-shim.js` y revertidos los entry points de webpack
+- [x] **Razón:** `Reflect.decorate` de reflect-metadata rompía `tslib.__decorate` usado por `@withUI` de redux-ui. El WeakMap evita necesitar reflect-metadata en el renderer.
+
+### 7.2 redux-ui crash fix
+- [x] Creado `LegacyStoreProvider` que provee el store de Redux vía legacy `childContextTypes` API
+- [x] Agregado a los 3 entry points del renderer (index.js, index-sub.js, about.js)
+- [x] **Razón:** react-redux v8 usa nueva Context API, pero redux-ui lee `this.context.store` vía `contextTypes` legacy. El bridge permite redux-ui funcionar con React 18. Warning de legacy context es tradeoff esperado.
+
+### 7.3 Apollo Client v3 fixes
+- [x] `distinctConsecutiveResultsLink.ts`: import `Observable` cambiado de `@apollo/client/link/core` → `@apollo/client/core` (no exporta `Observable` en v3)
+- [x] `OnApplicationInstalled.tsx`: cambiado de `useSubscription(QueryDocument)` → `useOnApplicationInstalledQuery()` hook (el documento es Query `@live @local`, no Subscription)
+- [x] 12 archivos: `import Maybe from 'graphql/tsutils/Maybe'` → `import { Maybe } from 'graphql/jsutils/Maybe'` (graphql v16 movió la exportación)
+- [x] Agregado `withHOC: true` a los 16 bloques de codegen-local.yml (genera HOCs alongside hooks)
+
+### 7.4 React 18 createRoot migration
+- [x] Migrado `ReactDOM.render` → `createRoot` en 4 entry points: index.js, index-sub.js, about.js, multi-instance-configuration/webui/index.tsx
+
+### 7.5 Guards defensivos
+- [x] `app-store/sagas.ts`: null guard en `sagaShowAppStore` — `appStoreApp` puede ser undefined antes de instalar App Store
+
+### 7.6 Producción: IS_PACKAGED fix (crítico)
+- [x] Fix `process.env.IS_PACKAGED` DefinePlugin values en renderer y worker configs
+- [x] `JSON.stringify(isProd)` → `JSON.stringify(String(isProd))` — asegura reemplazo con string `"true"` no boolean `true`
+- [x] Agregado `process.type: 'renderer'` y `process.env.IS_PACKAGED` al worker webpack DefinePlugin (faltaba)
+- [x] **Razón:** `process.env.IS_PACKAGED === 'true'` en env.ts compara con string. DefinePlugin reemplazaba con boolean `true`, entonces `true === 'true'` → `false`. App empaquetada cargaba de `localhost:9080` en vez de `file://` URLs → pantalla blanca.
+
+### 7.7 Estado actual
+- [x] Build de producción: 0 errores
+- [x] `yarn dev`: app arranca sin crashes fatales
+- [x] `yarn release`: app empaquetada carga correctamente con `file://` URLs
+- [x] `reflect-metadata` completamente eliminado del renderer bundle
+- [x] 574 TypeScript type errors (mayoría pre-existentes, no bloquean runtime)
+
+### Pendientes post-Phase 7
+- [x] Migrar codegen HOCs a hooks (~17 componentes usando `withQuery`/`withMutation`)
+- [x] Reemplazar `redux-ui` con React Context (elimina dependencia de legacy context)
+- [x] Jest snapshot updates (`yarn test -u`) para React 18
+- [x] Fix TypeScript type errors restantes

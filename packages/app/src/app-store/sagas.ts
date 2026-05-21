@@ -33,6 +33,7 @@ const APP_STORE_MANIFEST_URL = process.env.APP_STORE_MANIFEST_URL!;
 function* sagaShowAppStore(action: ShowAppStoreAction): SagaIterator {
   if (action.visible) {
     const appStoreApp = yield select(getAppStoreApplication);
+    if (!appStoreApp) return;
     const appStoreApplicationId = appStoreApp.get('applicationId');
     const appStoreTabId = appStoreApp.get('activeTab');
 

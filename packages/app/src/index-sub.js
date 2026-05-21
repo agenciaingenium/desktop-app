@@ -2,7 +2,7 @@
 import './utils/stat-cache';
 import './dotenv';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { ApolloProvider } from '@apollo/client';
 import { BrowserXThemeProvider } from '@getstation/theme';
@@ -53,7 +53,7 @@ configureStore(actionsEmitter)
 const render = (store) => {
   const AppSub = require('./containers/AppSub').default; // eslint-disable-line global-require
 
-  ReactDOM.render(
+  createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <ConsoleErrorBoundary>
         <ActionsBusReactContext.Provider value={{ actionsBus }}>
@@ -64,8 +64,7 @@ const render = (store) => {
           </ApolloProvider>
         </ActionsBusReactContext.Provider>
       </ConsoleErrorBoundary>
-    </Provider>,
-    document.getElementById('root')
+    </Provider>
   );
 
   window.station.ipc.send('bx-ready-to-show');

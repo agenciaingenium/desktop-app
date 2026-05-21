@@ -21,6 +21,8 @@ generates:
 
   ./src/settings/components/SettingsAutoLaunch/queries@local.gql.generated.tsx:
     documents: ./src/settings/components/SettingsAutoLaunch/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -28,6 +30,8 @@ generates:
 
   ./src/settings/components/SettingsHideMainMenu/queries@local.gql.generated.tsx:
     documents: ./src/settings/components/SettingsHideMainMenu/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -35,6 +39,8 @@ generates:
 
   ./src/settings/components/SettingsMinimizeToTray/queries@local.gql.generated.tsx:
     documents: ./src/settings/components/SettingsMinimizeToTray/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -42,6 +48,8 @@ generates:
 
   ./src/settings/components/SettingsDownloads/queries@local.gql.generated.tsx:
     documents: ./src/settings/components/SettingsDownloads/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -49,6 +57,8 @@ generates:
 
   ./src/settings/components/SettingsUpdatesButton/queries@local.gql.generated.tsx:
     documents: ./src/settings/components/SettingsUpdatesButton/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -56,6 +66,8 @@ generates:
 
   ./src/applications/queries@local.gql.generated.tsx:
     documents: ./src/applications/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -65,6 +77,8 @@ generates:
     documents: ./src/abstract-application/queries@local.gql
     mappers:
       AbstractApplication: ../abstract-application/types#AbstractApplication
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -74,6 +88,8 @@ generates:
     documents: ./src/activity/queries@local.gql
     mappers:
       ActivityEntry: ../activity/types#ActivityEntry
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -81,6 +97,8 @@ generates:
 
   ./src/notifications/queries@local.gql.generated.tsx:
     documents: ./src/notifications/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -88,6 +106,8 @@ generates:
 
   ./src/password-managers/queries@local.gql.generated.tsx:
     documents: ./src/password-managers/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -95,6 +115,8 @@ generates:
 
   ./src/dialogs/queries@local.gql.generated.tsx:
     documents: ./src/dialogs/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -102,6 +124,8 @@ generates:
 
   ./src/dl-toaster/queries@local.gql.generated.tsx:
     documents: ./src/dl-toaster/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -109,15 +133,18 @@ generates:
 
   ./src/dock/queries@local.gql.generated.tsx:
     documents: ./src/dock/queries@local.gql
+    config:
+      withHOC: true
+      withHooks: true
     plugins:
       - typescript
       - typescript-operations
       - typescript-react-apollo
-    config:
-      withHooks: true
 
   ./src/notification-center/queries@local.gql.generated.tsx:
     documents: ./src/notification-center/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -125,15 +152,18 @@ generates:
 
   ./src/subdock/queries@local.gql.generated.tsx:
     documents: ./src/subdock/queries@local.gql
+    config:
+      withHOC: true
+      withHooks: true
     plugins:
       - typescript
       - typescript-operations
       - typescript-react-apollo
-    config:
-      withHooks: true
 
   ./src/tabs/queries@local.gql.generated.tsx:
     documents: ./src/tabs/queries@local.gql
+    config:
+      withHOC: true
     plugins:
       - typescript
       - typescript-operations
@@ -141,9 +171,10 @@ generates:
 
   ./src/onboarding/queries@local.gql.generated.tsx:
     documents: ./src/onboarding/queries@local.gql
+    config:
+      withHOC: true
+      withHooks: true
     plugins:
       - typescript
       - typescript-operations
       - typescript-react-apollo
-    config:
-      withHooks: true

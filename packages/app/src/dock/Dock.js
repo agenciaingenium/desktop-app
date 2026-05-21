@@ -1,4 +1,4 @@
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
+import { updateUI } from '../ui/redux-ui-compat';
 import classNames from 'classnames';
 import memoize from 'memoizee';
 import mod from 'mod-op';

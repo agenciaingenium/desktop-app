@@ -37,9 +37,9 @@ export function forwardToServer(): Middleware {
     // Skip replayed actions (from worker) to prevent forwarding loops
     if (action.meta?.[REPLAYED_FLAG]) return next(action);
 
-    // Skip @@ internal actions (except @@redux-ui and redux-form)
+    // Skip @@ internal actions and redux-form
     const type = action.type || '';
-    if (type.substr(0, 2) === '@@' && type.substr(0, 10) !== '@@redux-ui') {
+    if (type.substr(0, 2) === '@@') {
       return next(action);
     }
     if (type.substr(0, 10) === 'redux-form') {

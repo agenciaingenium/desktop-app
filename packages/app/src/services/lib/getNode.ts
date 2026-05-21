@@ -1,6 +1,6 @@
 import { ServicePeer, ServicePeerHandler } from './class';
 import { bxnotifier, endpoints, namespace } from './const';
-import { service } from './decorator';
+import { service, getAllMetadata } from './decorator';
 import { getFullUri, tryGetRequestMethod } from './helpers';
 import { Endpoint, EndpointMap } from './types';
 
@@ -61,7 +61,7 @@ const getConstructor = <K extends ServicePeer>(
     construct: (target: typeof klass, args: any[]) => {
       return new Proxy(
         new klass(args[0], args[1]),
-        getObjectHandler(Reflect.getMetadata(endpoints, target.prototype) || new Map(), attributes)
+        getObjectHandler(getAllMetadata(endpoints, target.prototype) || new Map(), attributes)
       );
     },
   });

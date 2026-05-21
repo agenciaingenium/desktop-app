@@ -1,5 +1,5 @@
 import { Button, Style } from '@getstation/theme';
-import Maybe from 'graphql/tsutils/Maybe';
+import { Maybe } from 'graphql/jsutils/Maybe';
 import * as React from 'react';
 
 export interface Props {

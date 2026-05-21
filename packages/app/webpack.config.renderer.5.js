@@ -110,6 +110,8 @@ const rendererOnlyExternals = [
   'electron-chrome-extension',
   'electron-window-state',
   // Node.js-only packages that can't run in browser context
+  'fs-extra',
+  'fs',
   '@getstation/fetch-favicon',
   'x-ray',
   'x-ray-crawler',
@@ -196,6 +198,18 @@ function getEnvDefinePlugin(isProd) {
     }
   }
 
+  // Renderer uses target: web — no access to require('electron').
+  // Inject compile-time constants so env.ts doesn't try to call electron APIs.
+  defines['process.type'] = JSON.stringify('renderer');
+  defines['process.env.IS_PACKAGED'] = JSON.stringify(String(isProd));
+
+  // Dev-mode path constants (only used when !isPackaged in source code).
+  // In production builds, these are dead-code eliminated.
+  if (!isProd) {
+    defines['__station_dev_main_path__'] = JSON.stringify(path.resolve(__dirname, 'dist/main'));
+    defines['__station_dev_public_path__'] = JSON.stringify(path.resolve(__dirname, 'dist/renderer'));
+  }
+
   return new webpack.DefinePlugin(defines);
 }
 
@@ -211,9 +225,9 @@ module.exports = (env, argv) => {
     target: 'web',
 
     entry: {
-      mainRenderer: './src/index.js',
-      subRenderer: './src/index-sub.js',
-      aboutRenderer: './src/about-window/about.js',
+      mainRenderer: ['./src/index.js'],
+      subRenderer: ['./src/index-sub.js'],
+      aboutRenderer: ['./src/about-window/about.js'],
     },
 
     output: {
@@ -226,6 +240,12 @@ module.exports = (env, argv) => {
     // that need stream/events/buffer even in browser context.
     resolve: {
       ...getBaseConfig(env, argv).resolve,
+      alias: {
+        ...getBaseConfig(env, argv).resolve.alias,
+        // Force redux-ui to use the same react-redux as the app (v8).
+        // redux-ui bundles its own react-redux v4 which is incompatible.
+        'react-redux': path.resolve(__dirname, 'node_modules/react-redux'),
+      },
       fallback: {
         stream: require.resolve('readable-stream'),
         buffer: require.resolve('buffer/'),
@@ -309,6 +329,22 @@ module.exports = (env, argv) => {
       new webpack.ProvidePlugin({
         process: 'process/browser',
         Buffer: ['buffer', 'Buffer'],
+        // TypeScript helpers used by SDK and other compiled packages (noEmitHelpers: true)
+        __exportStar: ['tslib', '__exportStar'],
+        __awaiter: ['tslib', '__awaiter'],
+        __generator: ['tslib', '__generator'],
+        __values: ['tslib', '__values'],
+        __extends: ['tslib', '__extends'],
+        __rest: ['tslib', '__rest'],
+        __decorate: ['tslib', '__decorate'],
+        __param: ['tslib', '__param'],
+        __metadata: ['tslib', '__metadata'],
+        __spread: ['tslib', '__spread'],
+        __spreadArrays: ['tslib', '__spreadArrays'],
+        __makeTemplateObject: ['tslib', '__makeTemplateObject'],
+        __importDefault: ['tslib', '__importDefault'],
+        __importStar: ['tslib', '__importStar'],
+        __createBinding: ['tslib', '__createBinding'],
       }),
 
       // Main window
@@ -343,6 +379,13 @@ module.exports = (env, argv) => {
             from: '**/*',
             to: 'appstore',
           },
+        ],
+      }),
+
+      // Copy static HTML files (not webpack entry points)
+      new CopyWebpackPlugin({
+        patterns: [
+          { from: 'src/services/doc/cli.html', to: 'cli.html' },
         ],
       }),
     ],
@@ -390,6 +433,10 @@ module.exports = (env, argv) => {
       ...getSharedPlugins(isProd),
       new webpack.DefinePlugin({
         'process.env.GOOGLE_CLIENT_ID': JSON.stringify(process.env.GOOGLE_CLIENT_ID),
+        // Worker runs as electron-renderer with nodeIntegration: true,
+        // so env.ts uses the renderer branch (process.type === 'renderer')
+        'process.type': JSON.stringify('renderer'),
+        'process.env.IS_PACKAGED': JSON.stringify(String(isProd)),
       }),
 
       // Worker window
@@ -410,8 +457,8 @@ module.exports = (env, argv) => {
   if (isDev) {
     workerConfig.plugins.push(
       new webpack.DefinePlugin({
-        __webpack_public_path__: JSON.stringify(workerConfig.output.path),
-        __webpack_main_path__: JSON.stringify(path.resolve(workerConfig.output.path, '../main')),
+        __station_dev_public_path__: JSON.stringify(workerConfig.output.path),
+        __station_dev_main_path__: JSON.stringify(path.resolve(workerConfig.output.path, '../main')),
       })
     );
 

@@ -3,8 +3,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 import { oc } from 'ts-optchain';
-import { pure } from 'recompose';
-import Maybe from 'graphql/tsutils/Maybe';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 import { createNewEmptyTab, installApplication, navigateToApplicationTabAutomatically, toggleNotifications } from '../applications/duck';
 import { getApplicationActiveTab } from '../applications/get';
@@ -20,7 +19,7 @@ import { requestSignInThenAddApplication } from '../user-identities/duck';
 
 import Subdock from './components/Subdock';
 import { Application } from './types';
-import { withGetApplicationForSubdock } from './queries@local.gql.generated';
+import { useGetApplicationForSubdockQuery } from './queries@local.gql.generated';
 
 export interface ITabSelectedInfo {
   isHome: boolean,
@@ -32,22 +31,20 @@ export interface ActiveTab {
   url: Maybe<string>,
 }
 
-interface GraphQLProps {
-  loading: boolean,
-  application: Application,
-}
-
 export interface OuterProps {
   applicationId: string,
   onOverStateChange: (change: boolean) => void,
   handleHideSubdock: () => void,
-  onLoaded?: () => void, // used to inform parent component when subdock is fully loaded,
+  onLoaded?: () => void,
 }
 
-export interface OwnProps {
+interface StateProps {
   activeTab: ActiveTab,
+  notificationCount: number,
   notificationsEnabled: boolean | undefined,
-  themeGradient: string,
+}
+
+interface DispatchProps {
   onSelectTab: (tabId: string) => any,
   onDetachTab: () => any,
   onAttachTab: () => any,
@@ -62,65 +59,58 @@ export interface OwnProps {
   onOpenNewTab: () => void,
 }
 
-type Props = OuterProps & OwnProps & GraphQLProps;
+type ConnectedProps = OuterProps & StateProps & DispatchProps;
 
-class SubdockContainerImpl extends React.PureComponent<Props, {}> {
-  constructor(args: Props) {
-    super(args);
+const SubdockContainerInner: React.FC<ConnectedProps> = (props) => {
+  const { applicationId, onLoaded } = props;
 
-    this.onSelectFavorite = this.onSelectFavorite.bind(this);
-    this.onSelectTab = this.onSelectTab.bind(this);
-    this.onCloseTab = this.onCloseTab.bind(this);
-  }
+  const { data, loading } = useGetApplicationForSubdockQuery({
+    variables: { applicationId },
+  });
 
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.loading && !this.props.loading) {
-      this.props.onLoaded && this.props.onLoaded();
+  const application = oc(data).application();
+  const prevLoadingRef = React.useRef(loading);
+
+  React.useEffect(() => {
+    if (prevLoadingRef.current && !loading) {
+      onLoaded && onLoaded();
     }
-  }
+    prevLoadingRef.current = loading;
+  }, [loading, onLoaded]);
 
-  onSelectFavorite(favoriteId: string) {
-    const { onSelectFavorite } = this.props;
+  const onSelectFavorite = React.useCallback((favoriteId: string) => {
+    props.onSelectFavorite(favoriteId);
+  }, [props.onSelectFavorite]);
 
-    onSelectFavorite(favoriteId);
-  }
+  const onSelectTab = React.useCallback((tabId: string) => {
+    props.onSelectTab(tabId);
+    props.handleHideSubdock();
+  }, [props.onSelectTab, props.handleHideSubdock]);
 
-  onSelectTab(tabId: string) {
-    const { onSelectTab, handleHideSubdock } = this.props;
+  const onCloseTab = React.useCallback((tabId: string) => {
+    props.onCloseTab(tabId);
+  }, [props.onCloseTab]);
 
-    onSelectTab(tabId);
-    handleHideSubdock();
-  }
+  if (loading) return null;
 
-  onCloseTab(tabId: string) {
-    const { onCloseTab } = this.props;
-
-    onCloseTab(tabId);
-  }
-
-  render() {
-    const { loading } = this.props;
-    if (loading) return null;
-
-    return (
-      <Subdock
-        {...this.props}
-        onSelectFavorite={this.onSelectFavorite}
-        onSelectTab={this.onSelectTab}
-        onCloseTab={this.onCloseTab}
-      />
-    );
-  }
-}
+  return (
+    <Subdock
+      {...props}
+      loading={loading}
+      application={application}
+      onSelectFavorite={onSelectFavorite}
+      onSelectTab={onSelectTab}
+      onCloseTab={onCloseTab}
+    />
+  );
+};
 
 const SubdockContainer = compose(
-  pure,
   connect(
-    (state: StationState, ownProps: Props) => {
+    (state: StationState, ownProps: ConnectedProps) => {
       const { applicationId } = ownProps;
       const application = getApplicationByIdSelector(state, applicationId);
 
-      // By default, its elements are null, but fill them if it exists
       let activeTab: ActiveTab = { id: null, url: null };
       if (application) {
         const activeTabId = getApplicationActiveTab(application);
@@ -157,14 +147,7 @@ const SubdockContainer = compose(
       }, dispatch);
     }
   ),
-  withGetApplicationForSubdock<OuterProps, Partial<Props>>({
-    options: (props) => ({ variables: { applicationId: props.applicationId } }),
-    props: ({ data }) => ({
-      loading: !data || data.loading,
-      application: oc(data).application(),
-    }),
-  }),
   withGradient(GradientType.withDarkOverlay),
-)(SubdockContainerImpl);
+)(SubdockContainerInner);
 
 export default SubdockContainer as React.ComponentType<OuterProps>;

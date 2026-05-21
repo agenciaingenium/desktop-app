@@ -1,15 +1,8 @@
 import { Icon, IconSymbol, theme } from '@getstation/theme';
 import * as React from 'react';
-import { compose } from 'redux';
 import { oc } from 'ts-optchain';
-import { withGetApplication } from '../queries@local.gql.generated';
+import { useGetApplicationQuery } from '../queries@local.gql.generated';
 import AppIcon from '../../dock/components/AppIcon';
-
-export interface InjectedProps {
-  loading: boolean,
-  interpretedIconUrl: string,
-  themeColor: string,
-}
 
 interface OnFinished {
   doTheJob: () => void,
@@ -26,8 +19,6 @@ export interface Props {
   themeColor: string,
   failed?: boolean,
 }
-
-export type FullProps = Props & InjectedProps;
 
 const noop = () => {};
 
@@ -58,108 +49,98 @@ const closeStyle: React.CSSProperties = {
   outline: 'none',
 };
 
-class DownloadToast extends React.PureComponent<FullProps> {
+const DownloadToast: React.FC<Props> = ({ applicationId, filename, completionPercent, onClickOpen, onClickHide, onFinished, themeColor: propThemeColor, failed }) => {
+  const { data, loading } = useGetApplicationQuery({
+    variables: { applicationId },
+  });
 
-  handleClickOpen() {
-    const { onClickOpen, onClickHide } = this.props;
+  const interpretedIconUrl = oc(data).application.manifestData.interpretedIconURL();
+  const themeColor = oc(data).application.manifestData.theme_color() || propThemeColor;
+
+  const completed = completionPercent === 100;
+  const finished = completed || failed;
+
+  if (loading) return null;
+  if (completed && onFinished) {
+    setTimeout(onFinished.doTheJob, onFinished.delay);
+  }
+
+  const handleClickOpen = () => {
     onClickOpen();
     onClickHide();
-  }
+  };
 
-  render() {
-    const { completionPercent, filename, onClickHide, interpretedIconUrl, failed, loading, themeColor, onFinished } = this.props;
-    const completed = completionPercent === 100;
-    const finished = completed || failed;
+  const containerStyle: React.CSSProperties = {
+    position: 'relative',
+    width: 265,
+    height: 65,
+    backgroundColor: failed ? 'darkred' : theme.mixinDarkenColor(themeColor, 0.3),
+    borderRadius: 4,
+    marginTop: 5,
+  };
 
-    if (loading) return null;
-    if (completed && onFinished && typeof onFinished === 'function') {
-      setTimeout(onFinished.doTheJob, onFinished.delay);
-    }
+  const progressStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    width: `${completionPercent}%`,
+    backgroundColor: 'rgba(0, 0, 0, .3)',
+    borderRadius: 4,
+    transition: '200ms',
+  };
 
-    const containerStyle: React.CSSProperties = {
-      position: 'relative',
-      width: 265,
-      height: 65,
-      backgroundColor: failed ? 'darkred' : theme.mixinDarkenColor(themeColor, 0.3),
-      borderRadius: 4,
-      marginTop: 5,
-    };
+  const wrapperStyle: React.CSSProperties = {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 15,
+    color: 'white',
+    fontSize: 12,
+    zIndex: 1,
+  };
 
-    const progressStyle: React.CSSProperties = {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      bottom: 0,
-      width: `${completionPercent}%`,
-      backgroundColor: 'rgba(0, 0, 0, .3)',
-      borderRadius: 4,
-      transition: '200ms',
-    };
+  const successWrapperStyle = {
+    ...theme.mixins.ellipsis(2),
+    cursor: 'pointer',
+  } as React.CSSProperties;
 
-    const wrapperStyle: React.CSSProperties = {
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: 15,
-      color: 'white',
-      fontSize: 12,
-      zIndex: 1,
-    };
-
-    const successWrapperStyle = {
-      ...theme.mixins.ellipsis(2),
-      cursor: 'pointer',
-    } as React.CSSProperties;
-
-    return (
-      <div style={containerStyle}>
-        <div style={wrapperStyle}>
-          { interpretedIconUrl &&
-            <AppIcon
-              imgUrl={interpretedIconUrl}
-              themeColor={themeColor}
-            />
+  return (
+    <div style={containerStyle}>
+      <div style={wrapperStyle}>
+        { interpretedIconUrl &&
+          <AppIcon
+            imgUrl={interpretedIconUrl}
+            themeColor={themeColor}
+          />
+        }
+        <div style={contentStyle} onClick={finished ? handleClickOpen : noop}>
+          {
+            !finished ? (
+              <div>
+                <div>Downloading</div>
+                <div style={filenameStyle}>{filename}</div>
+              </div>
+            ) : (
+              <div style={successWrapperStyle}>
+                <div>{failed ? 'Failed download' : 'Successful download'}!</div>
+                <div style={filenameSuccessStyle}>{filename}</div>
+              </div>
+            )
           }
-          <div style={contentStyle} onClick={finished ? this.handleClickOpen.bind(this) : noop}>
-            {
-              !finished ? (
-                <div>
-                  <div>Downloading</div>
-                  <div style={filenameStyle}>{filename}</div>
-                </div>
-              ) : (
-                <div style={successWrapperStyle}>
-                  <div>{failed ? 'Failed download' : 'Successful download'}!</div>
-                  <div style={filenameSuccessStyle}>{filename}</div>
-                </div>
-              )
-            }
-          </div>
-
-          <button style={closeStyle} onClick={onClickHide}>
-            <Icon symbolId={IconSymbol.CROSS} size={25} />
-          </button>
         </div>
 
-        <div style={progressStyle} />
+        <button style={closeStyle} onClick={onClickHide}>
+          <Icon symbolId={IconSymbol.CROSS} size={25} />
+        </button>
       </div>
-    );
-  }
-}
 
-const connector = compose(
-  withGetApplication({
-    options: (props: Props) => ({ variables: { applicationId: props.applicationId } }),
-    props: ({ data }) => ({
-      loading: !data || data.loading,
-      interpretedIconUrl: oc(data).application.manifestData.interpretedIconURL(),
-      themeColor: oc(data).application.manifestData.theme_color(),
-    }),
-  }),
+      <div style={progressStyle} />
+    </div>
+  );
+};
 
-);
-
-export default connector(DownloadToast);
+export default DownloadToast;

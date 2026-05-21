@@ -66,3 +66,4 @@ yalc.lock
 # Dev artifacts
 errors
 .claude/
+.claude.json

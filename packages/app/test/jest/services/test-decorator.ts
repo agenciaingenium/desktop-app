@@ -1,6 +1,6 @@
-import 'reflect-metadata';
 import { endpoints, namespace } from '../../../src/services/lib/const';
 import { allServicesRegistry } from '../../../src/services/lib/registry';
+import { getAllMetadata, deleteMetadata } from '../../../src/services/lib/decorator';
 import { TestService } from './mock';
 
 describe('decorators', () => {
@@ -15,7 +15,7 @@ describe('decorators', () => {
 
   beforeEach(() => {
     allServicesRegistry.clear();
-    Reflect.deleteMetadata(endpoints, TestService.prototype);
+    deleteMetadata(endpoints, TestService.prototype);
     delete TestService.prototype.constructor[namespace];
   });
 
@@ -45,7 +45,7 @@ describe('decorators', () => {
     it('should register all function props as endpoints', () => {
       service('test')(TestService);
 
-      const endpointsMetadata = Reflect.getMetadata(endpoints, TestService.prototype);
+      const endpointsMetadata = getAllMetadata(endpoints, TestService.prototype);
 
       expect(endpointsMetadata).toBeTruthy();
       expect(Array.from(endpointsMetadata.keys())).toEqual(['getName', 'throwError', 'addObserver']);
@@ -66,7 +66,7 @@ describe('decorators', () => {
     it('should register given method as a request', () => {
       endpoint()(TestService.prototype, 'getName');
 
-      const endpointsMetadata = Reflect.getMetadata(endpoints, TestService.prototype);
+      const endpointsMetadata = getAllMetadata(endpoints, TestService.prototype);
 
       expect(endpointsMetadata.get('getName')).toHaveProperty('type', 'request');
     });
@@ -74,7 +74,7 @@ describe('decorators', () => {
     it('should register given method as a notification', () => {
       endpoint({ type: 'notification' })(TestService.prototype, 'getName');
 
-      const endpointsMetadata = Reflect.getMetadata(endpoints, TestService.prototype);
+      const endpointsMetadata = getAllMetadata(endpoints, TestService.prototype);
 
       expect(endpointsMetadata.get('getName')).toHaveProperty('type', 'notification');
     });

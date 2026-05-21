@@ -6,7 +6,7 @@ import * as slack from 'slack';
 import { GradientType, withGradient } from '@getstation/theme';
 import ElectronWebview from '../common/components/ElectronWebview';
 import * as classNames from 'classnames';
-import Maybe from 'graphql/tsutils/Maybe';
+import { Maybe } from 'graphql/jsutils/Maybe';
 // @ts-ignore
 import * as throttle from 'lodash.throttle';
 import * as path from 'path';
@@ -16,7 +16,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 // @ts-ignore no declaration file
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
+import { updateUI } from '../ui/redux-ui-compat';
 import { filter, map } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
 import { oc } from 'ts-optchain';
@@ -44,7 +44,7 @@ import { isPackaged } from '../utils/env';
 import ApplicationContainer from './components/ApplicationContainer';
 import { navigateToApplicationTab, setConfigData, uninstallApplication, updateApplicationIcon } from './duck';
 import LazyWebview from './LazyWebview';
-import { withGetApplicationState } from './queries@local.gql.generated';
+import { useGetApplicationStateQuery } from './queries@local.gql.generated';
 import { getApplicationDescription } from './selectors';
 import { ApplicationImmutable } from './types';
 // @ts-ignore no declaration file
@@ -57,9 +57,9 @@ type WebviewMethods = {
 
 // preload file can only be loaded though file:// URL.
 // When using webpack-dev-server, we need to force it.
-declare const __webpack_main_path__: string;
+declare const __station_dev_main_path__: string;
 const preloadUrl = isPackaged ? './preload.js' : formatUrl({
-  pathname: path.join(__webpack_main_path__, 'preload.js'),
+  pathname: path.join(__station_dev_main_path__, 'preload.js'),
   protocol: 'file',
   slashes: true,
 });
@@ -480,101 +480,113 @@ class ApplicationImpl extends React.PureComponent {
   }
 }
 
-const Application = compose(
-  withGetApplicationState({
-    options: ({ application, tab }: Props) => ({
-      variables: {
-        applicationId: application.get('applicationId'),
-        tabId: tab.get('tabId'),
-      },
-    }),
-    props: ({ data }) => {
-      if (!data) return { loading: true };
-      const { application, stationStatus } = oc(data);
-      const manifestData = application.manifestData;
-
-      return {
-        manifestURL: application.manifestURL(),
-        appstoreApplicationId: application.appstoreApplicationId(),
-        applicationId: data.variables.applicationId,
-        applicationName: manifestData.name(),
-        applicationIcon: manifestData.interpretedIconURL(),
-        themeColor: manifestData.theme_color(),
-        notUseNativeWindowOpen: manifestData.bx_not_use_native_window_open_on_host(),
-        useDefaultSession: manifestData.bx_use_default_session(),
-
-        isOnline: stationStatus.isOnline(),
-        appFocus: stationStatus.focus(),
-
-        loading: data.loading,
-        legacyServiceId: manifestData.bx_legacy_service_id(),
-      };
+// Wrapper that uses the hook for GraphQL data and passes it to the class component
+const ApplicationWithGql: React.FC<OuterProps> = (outerProps) => {
+  const { application, tab } = outerProps;
+  const { data, loading: gqlLoading } = useGetApplicationStateQuery({
+    variables: {
+      applicationId: application.get('applicationId'),
+      tabId: tab.get('tabId'),
     },
-  }),
-  connect<StateProps, DispatchProps, OwnProps>(
-    (state: StationState, ownProps: OwnProps): StateProps => {
-      const { application, tab } = ownProps;
-      const tabId = getTabId(tab);
-      const tabWebcontents = getTabWebcontentsById(state, tabId);
+  });
 
-      if (tabWebcontents) {
-        return {
-          errorCode: tabWebcontents.get('errorCode'),
-          errorDescription: tabWebcontents.get('errorDescription'),
-          crashed: tabWebcontents.get('crashed'),
+  const gqlProps: Partial<OwnProps> = React.useMemo(() => {
+    if (!data) return { loading: true };
+    const { application: app, stationStatus } = oc(data);
+    const manifestData = app.manifestData;
 
-          // ApplicationContainer
-          email: getApplicationDescription(state, application),
-          promptBasicAuth: getWebcontentsAuthState(tabWebcontents),
-          basicAuthInfo: getWebcontentsAuthInfo(tabWebcontents),
-          canGoBack: getForeFrontNavigationStateProperty(state, 'canGoBack'),
-        };
-      }
+    return {
+      manifestURL: app.manifestURL(),
+      appstoreApplicationId: app.appstoreApplicationId(),
+      applicationId: application.get('applicationId'),
+      applicationName: manifestData.name(),
+      applicationIcon: manifestData.interpretedIconURL(),
+      themeColor: manifestData.theme_color(),
+      notUseNativeWindowOpen: manifestData.bx_not_use_native_window_open_on_host(),
+      useDefaultSession: manifestData.bx_use_default_session(),
 
+      isOnline: stationStatus.isOnline(),
+      appFocus: stationStatus.focus(),
+
+      loading: gqlLoading,
+      legacyServiceId: manifestData.bx_legacy_service_id(),
+    };
+  }, [data, gqlLoading, application]);
+
+  return <ConnectedApplicationImpl {...outerProps} {...gqlProps} />;
+};
+
+type OuterProps = {
+  application: ApplicationImmutable,
+  tab: StationTabImmutable,
+  hidden: boolean,
+  loading: boolean,
+};
+
+const ConnectedApplicationImpl = connect<StateProps, DispatchProps, OwnProps>(
+  (state: StationState, ownProps: OwnProps): StateProps => {
+    const { application, tab } = ownProps;
+    const tabId = getTabId(tab);
+    const tabWebcontents = getTabWebcontentsById(state, tabId);
+
+    if (tabWebcontents) {
       return {
-        // ApplicationContainer
+        errorCode: tabWebcontents.get('errorCode'),
+        errorDescription: tabWebcontents.get('errorDescription'),
+        crashed: tabWebcontents.get('crashed'),
+
         email: getApplicationDescription(state, application),
+        promptBasicAuth: getWebcontentsAuthState(tabWebcontents),
+        basicAuthInfo: getWebcontentsAuthInfo(tabWebcontents),
         canGoBack: getForeFrontNavigationStateProperty(state, 'canGoBack'),
-      } as StateProps;
-    },
-    (dispatch: any, ownProps: OwnProps): DispatchProps => {
-      const { applicationId, tab } = ownProps;
-      const tabId = getTabId(tab);
-
-      return bindActionCreators(
-        {
-          onTitleUpdated: (title) => updateTabTitle(tabId, title),
-          onURLUpdated: (url) => updateTabURL(tabId, url),
-          onBadgeUpdated: (badge) => updateTabBadge(tabId, badge),
-          onFaviconUpdated: (favicons) => updateTabFavicons(tabId, favicons),
-          onLoadingStateChanged: (isLoading) => updateLoadingState(tabId, isLoading),
-          onLoadingError: (errorCode, errorDescription) => setLoadingError(tabId, errorCode, errorDescription),
-          onNotificationClicked: () => navigateToApplicationTab(applicationId, tabId),
-          onUpdateApplicationIcon: (imageURL) => updateApplicationIcon(applicationId, imageURL),
-          onWebcontentsAttached: (webcontentsId) => attachWebcontentsToTab(tabId, webcontentsId, Date.now()),
-          onWebcontentsCrashed: () => setCrashed(tabId),
-          onWebcontentsOk: () => setNotCrashed(tabId),
-          performBasicAuth: (username, password) => performBasicAuthAction(username, password, tabId),
-          onChooseAccount: (identityId) => setConfigData(applicationId, { identityId }),
-          onApplicationRemoved: uninstallApplication,
-          updateResetAppModal: (appFocus) => updateUI('confirmResetApplicationModal', 'isVisible', appFocus),
-          disableSslCertVerification: disableSslCertVerification,
-        },
-        dispatch
-      );
-    },
-    (stateProps: StateProps, dispatchProps: DispatchProps, ownProps: OwnProps): Props => {
-      const { appFocus } = ownProps;
-      return {
-        ...ownProps,
-        ...stateProps,
-        ...dispatchProps,
-        askResetApplication: () => dispatchProps.updateResetAppModal(appFocus),
       };
-    },
-  ),
+    }
+
+    return {
+      email: getApplicationDescription(state, application),
+      canGoBack: getForeFrontNavigationStateProperty(state, 'canGoBack'),
+    } as StateProps;
+  },
+  (dispatch: any, ownProps: OwnProps): DispatchProps => {
+    const { applicationId, tab } = ownProps;
+    const tabId = getTabId(tab);
+
+    return bindActionCreators(
+      {
+        onTitleUpdated: (title) => updateTabTitle(tabId, title),
+        onURLUpdated: (url) => updateTabURL(tabId, url),
+        onBadgeUpdated: (badge) => updateTabBadge(tabId, badge),
+        onFaviconUpdated: (favicons) => updateTabFavicons(tabId, favicons),
+        onLoadingStateChanged: (isLoading) => updateLoadingState(tabId, isLoading),
+        onLoadingError: (errorCode, errorDescription) => setLoadingError(tabId, errorCode, errorDescription),
+        onNotificationClicked: () => navigateToApplicationTab(applicationId, tabId),
+        onUpdateApplicationIcon: (imageURL) => updateApplicationIcon(applicationId, imageURL),
+        onWebcontentsAttached: (webcontentsId) => attachWebcontentsToTab(tabId, webcontentsId, Date.now()),
+        onWebcontentsCrashed: () => setCrashed(tabId),
+        onWebcontentsOk: () => setNotCrashed(tabId),
+        performBasicAuth: (username, password) => performBasicAuthAction(username, password, tabId),
+        onChooseAccount: (identityId) => setConfigData(applicationId, { identityId }),
+        onApplicationRemoved: uninstallApplication,
+        updateResetAppModal: (appFocus) => updateUI('confirmResetApplicationModal', 'isVisible', appFocus),
+        disableSslCertVerification: disableSslCertVerification,
+      },
+      dispatch
+    );
+  },
+  (stateProps: StateProps, dispatchProps: DispatchProps, ownProps: OwnProps): Props => {
+    const { appFocus } = ownProps;
+    return {
+      ...ownProps,
+      ...stateProps,
+      ...dispatchProps,
+      askResetApplication: () => dispatchProps.updateResetAppModal(appFocus),
+    };
+  },
+)(ApplicationImpl);
+
+const Application = compose(
   withActionsBus(),
   withGradient(GradientType.normal),
-)(ApplicationImpl);
+)(ApplicationWithGql);
 
 export default Application;

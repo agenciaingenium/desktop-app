@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Maybe from 'graphql/tsutils/Maybe';
+import { Maybe } from 'graphql/jsutils/Maybe';
 import { getHighlightGradient, Icon, IconSymbol, theme } from '@getstation/theme';
 import * as classNames from 'classnames';
 // @ts-ignore: no declaration file

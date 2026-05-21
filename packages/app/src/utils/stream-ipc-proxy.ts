@@ -1,9 +1,20 @@
-import { ipcMain, ipcRenderer } from 'electron';
 import { Duplex } from 'stream';
 
-const GET_CURRENT_WEB_CONTENTS_ID = 'stream-electron-ipc.get-current-web-contents-id';
-
+// Only import electron in Node.js contexts (main process / worker).
+// Renderer uses window.station.ipc via contextBridge.
 const isRenderer = process.type === 'renderer';
+let ipcMain: any = null;
+let ipcRenderer: any = null;
+
+if (!isRenderer) {
+  try {
+    const electron = require('electron');
+    ipcMain = electron.ipcMain;
+    ipcRenderer = electron.ipcRenderer;
+  } catch {}
+}
+
+const GET_CURRENT_WEB_CONTENTS_ID = 'stream-electron-ipc.get-current-web-contents-id';
 
 // When contextIsolation is enabled, ipcRenderer is not available in the page context.
 // Use the station bridge instead.

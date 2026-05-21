@@ -7,8 +7,7 @@ import { SagaIterator } from 'redux-saga';
 import { delay } from 'redux-saga/effects';
 import { all, call, fork, put, select, getContext } from 'redux-saga/effects';
 import { Selector } from 'reselect';
-// @ts-ignore: no declaration file
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
+import { updateUI } from '../ui/redux-ui-compat';
 import { flatten, uniqBy } from 'ramda';
 import { noop } from 'ramda-adjunct';
 import { Subscription, Subject, combineLatest } from 'rxjs';

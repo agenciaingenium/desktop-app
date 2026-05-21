@@ -7,7 +7,7 @@ import ApplicationBasicAuth from './ApplicationBasicAuth';
 import ApplicationError from './ApplicationError';
 import ApplicationLoading from './ApplicationLoading';
 import ApplicationAboutBlank from './ApplicationAboutBlank';
-import Maybe from 'graphql/tsutils/Maybe';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 export interface OwnProps {
   ready: boolean,

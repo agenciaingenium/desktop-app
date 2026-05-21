@@ -1,7 +1,6 @@
 import { SagaIterator } from 'redux-saga';
 import { all, delay, fork, put, putResolve, select, take } from 'redux-saga/effects';
-// @ts-ignore: no declaration file
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
+import { updateUI } from '../../ui/redux-ui-compat';
 import { setLoadingScreenVisibility, setShowLogin } from '../../app/duck';
 import { getShowLogin } from '../../app/selectors';
 import { changeSelectedApp } from '../../applications/duck';

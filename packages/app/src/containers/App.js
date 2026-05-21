@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 // @ts-ignore: no declaration file
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
+import { updateUI } from '../ui/redux-ui-compat';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { isFullScreen, isKbdShortcutsOverlayVisible } from '../app/selectors';

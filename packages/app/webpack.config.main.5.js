@@ -7,6 +7,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { getBaseConfig, getExternals } = require('./webpack.config.base.5');
 
 // Preload entry points (compiled alongside main process)
@@ -76,6 +77,11 @@ module.exports = (env, argv) => {
         'process.env.GOOGLE_CLIENT_ID': JSON.stringify(process.env.GOOGLE_CLIENT_ID),
       }),
       new StripSourceMapSupportFromPreloadsPlugin(),
+      new CopyWebpackPlugin({
+        patterns: [
+          { from: 'src/static/preload/dev-preload.js', to: 'dev-preload.js' },
+        ],
+      }),
     ],
   };
 
@@ -83,8 +89,8 @@ module.exports = (env, argv) => {
     config.devtool = 'source-map';
     config.plugins.push(
       new webpack.DefinePlugin({
-        __webpack_public_path__: JSON.stringify(path.resolve(config.output.path, '../renderer')),
-        __webpack_main_path__: JSON.stringify(config.output.path),
+        __station_dev_public_path__: JSON.stringify(path.resolve(config.output.path, '../renderer')),
+        __station_dev_main_path__: JSON.stringify(config.output.path),
       })
     );
   }

@@ -3,8 +3,7 @@ import { DragSource, DragSourceMonitor, DropTarget } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import SubdockItem, { BareApplication, WrappedActions } from './SubdockItem';
 import { findDOMNode } from 'react-dom';
-import { compose } from 'redux';
-import { withReorderFavoriteMutation, withReorderTabMutation } from '../../tabs/queries@local.gql.generated';
+import { useReorderTabMutationMutation, useReorderFavoriteMutationMutation } from '../../tabs/queries@local.gql.generated';
 
 // PROPS
 
@@ -30,33 +29,23 @@ interface DndProps {
   isDragging: boolean,
 }
 
-type Props = OwnProps & GqlProps & DndProps;
+type InnerProps = OwnProps & GqlProps & DndProps;
 
 // DRAG SOURCE CONTRACTS
-// https://react-dnd.github.io/react-dnd/docs/api/drag-source#drag-source-specification
 
 const dockAppSource = {
-  beginDrag(props: Props) {
+  beginDrag(props: InnerProps) {
     const { item, tabId } = props;
     return {
       index: props.index,
-      application: { id: props.application.id },
+      application: { id: props.application.id },
       item: { title: item.title },
       tabId: tabId,
     };
   },
-  endDrag(_props: Props, monitor: DragSourceMonitor) {
+  endDrag(_props: InnerProps, monitor: DragSourceMonitor) {
     const dropResult = monitor.getDropResult();
-
     if (!dropResult) return;
-
-    /* Add here any effects you would like.
-    For example:
-
-    if (dropResult.type === 'SOMETHING') {
-      ...do something here
-    }
-    */
   },
 };
 
@@ -64,59 +53,38 @@ const SubdockItemTarget = {
   drop: () => ({
     type: 'DND_SUBDOCK',
   }),
-  hover(props: Props, monitor: any, component: any) {
+  hover(props: InnerProps, monitor: any, component: any) {
     const { favorite, reorderTab, reorderFavorite } = props;
     const { tabId, index: dragIndex } = monitor.getItem();
     const hoverIndex = props.index;
 
-    // Don't replace items with themselves
     if (dragIndex === hoverIndex) {
       return;
     }
 
-    // Determine rectangle on screen
     const domNode = findDOMNode(component);
     if (!domNode) return;
     const hoverBoundingRect = domNode.getBoundingClientRect();
 
-    // Get vertical middle
     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
-    // Determine mouse position
     const clientOffset = monitor.getClientOffset();
 
-    // Get pixels to the top
     const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
-    // Only perform the move when the mouse has crossed half of the items height
-    // When dragging downwards, only move when the cursor is below 50%
-    // When dragging upwards, only move when the cursor is above 50%
-
-    // Dragging downwards
     if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
       return;
     }
 
-    // Dragging upwards
     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
       return;
     }
 
-    // console.log(`dragIndex: ${dragIndex}, hoverIndex: ${hoverIndex}`);
-
-    // Time to actually perform the action
     favorite ? reorderFavorite(tabId, hoverIndex) : reorderTab(tabId, hoverIndex);
 
-    // Note: we're mutating the monitor item here!
-    // Generally it's better to avoid mutations,
-    // but it's good here for the sake of performance
-    // to avoid expensive index searches.
     monitor.getItem().index = hoverIndex;
   },
 };
-
-// DRAG COLLECT
-// https://react-dnd.github.io/react-dnd/docs/api/drag-source#the-collecting-function
 
 const collectTarget = (connect: any) => ({
   connectDropTarget: connect.dropTarget(),
@@ -130,18 +98,14 @@ const collectSource = (connect: any, monitor: any) => ({
 
 // COMPONENT
 
-@DropTarget(({ dragType }: Props) => dragType, SubdockItemTarget, collectTarget)
-@DragSource(({ dragType }: Props) => dragType, dockAppSource, collectSource)
-class DraggableSubdockItemImpl extends React.PureComponent<Props> {
+@DropTarget(({ dragType }: InnerProps) => dragType, SubdockItemTarget, collectTarget)
+@DragSource(({ dragType }: InnerProps) => dragType, dockAppSource, collectSource)
+class DraggableSubdockItemInner extends React.PureComponent<InnerProps> {
   componentDidMount() {
-    // Use empty image as a drag preview so browsers don't draw it
-    // and we can draw whatever we want on the custom drag layer instead.
     this.props.connectDragPreview(getEmptyImage());
   }
 
   componentDidUpdate() {
-    // Used in componentDidUpdate too because of an issue (https://github.com/react-dnd/react-dnd/issues/1428).
-    // There are high chances that this is fixed in more recent versions of DnD
     this.props.connectDragPreview(getEmptyImage());
   }
 
@@ -165,25 +129,27 @@ class DraggableSubdockItemImpl extends React.PureComponent<Props> {
   }
 }
 
-// COMPOSE
+// WRAPPER WITH HOOKS
 
-const DraggableSubdockItem = compose(
-  withReorderTabMutation({
-    props: ({ mutate }) => ({
-      reorderTab: (tabId: string, newPosition: number) =>
-        // @ts-ignore tabId exists on ownProps
-        mutate && mutate({ variables: { tabId, newPosition } }),
-    }),
-  }),
-  withReorderFavoriteMutation({
-    props: ({ mutate }) => ({
-      reorderFavorite: (favoriteId: string, newPosition: number) =>
-        // @ts-ignore tabId exists on ownProps
-        mutate && mutate({ variables: { favoriteId, newPosition } }),
-    }),
-  }),
-)(DraggableSubdockItemImpl);
+const DraggableSubdockItem: React.FC<OwnProps> = (props) => {
+  const [reorderTabMutation] = useReorderTabMutationMutation();
+  const [reorderFavoriteMutation] = useReorderFavoriteMutationMutation();
+
+  const reorderTab = (tabId: string, newPosition: number) =>
+    reorderTabMutation({ variables: { tabId, newPosition } });
+
+  const reorderFavorite = (favoriteId: string, newPosition: number) =>
+    reorderFavoriteMutation({ variables: { favoriteId, newPosition } });
+
+  return (
+    <DraggableSubdockItemInner
+      {...props}
+      reorderTab={reorderTab}
+      reorderFavorite={reorderFavorite}
+    />
+  );
+};
 
 // EXPORT
 
-export default DraggableSubdockItem as React.ComponentType<OwnProps>;
+export default DraggableSubdockItem;

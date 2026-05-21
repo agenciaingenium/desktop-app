@@ -4,19 +4,63 @@ import { Endpoint, EndpointOptions, ServiceDecoratorOptions } from './types';
 
 const d = require('debug')('service:utils:decorator');
 
+// Simple Map-based metadata storage — replaces Reflect.getOwnMetadata/Reflect.defineMetadata
+// to avoid requiring reflect-metadata in the renderer bundle.
+const metadataStore = new WeakMap<object, Map<string | symbol, Map<string, any>>>();
+
+function getStore(target: object): Map<string | symbol, Map<string, any>> {
+  let store = metadataStore.get(target);
+  if (!store) {
+    store = new Map();
+    metadataStore.set(target, store);
+  }
+  return store;
+}
+
 export const setMetadata = (m: symbol | string, key: string, value: any, aclass: any) => {
-  let md: Map<string, any> | undefined = Reflect.getOwnMetadata(m, aclass);
+  const store = getStore(aclass);
+  let md = store.get(m);
   if (!md) {
     md = new Map();
-    Reflect.defineMetadata(m, md, aclass);
+    store.set(m, md);
   }
   md.set(key, value);
 };
 
 export const getMetadata = (m: symbol | string, key: string, aclass: any) => {
-  const md: Map<string, any> | undefined = Reflect.getOwnMetadata(m, aclass);
+  const store = metadataStore.get(aclass);
+  if (!store) return undefined;
+  const md = store.get(m);
   if (!md) return undefined;
   return md.get(key);
+};
+
+// Get all metadata for a key, including inherited (replaces Reflect.getMetadata)
+export const getAllMetadata = (m: symbol | string, aclass: any): Map<string, any> => {
+  const result = new Map<string, any>();
+  // Walk prototype chain (like Reflect.getMetadata does)
+  let target: any = aclass;
+  while (target !== null && target !== undefined) {
+    const store = metadataStore.get(target);
+    if (store) {
+      const md = store.get(m);
+      if (md) {
+        for (const [key, value] of md) {
+          if (!result.has(key)) result.set(key, value);
+        }
+      }
+    }
+    target = Object.getPrototypeOf(target);
+  }
+  return result;
+};
+
+// Delete metadata for a key on a target (replaces Reflect.deleteMetadata)
+export const deleteMetadata = (m: symbol | string, aclass: any) => {
+  const store = metadataStore.get(aclass);
+  if (store) {
+    store.delete(m);
+  }
 };
 
 export const bindServiceEndpoints = (aclass: any, options: ServiceDecoratorOptions) => {
@@ -65,7 +109,7 @@ export const endpoint = (options: EndpointOptions = {}) => {
       throw new Error(`Namespace of ${aclass.constructor.name} must not be undefined`);
     }
     const fullUriGetter = () => `${aclass.constructor[namespace]}:${options.methodIdentifier || methodName}`;
-    // Retieve additional metadata
+    // Retrieve additional metadata
     const existingMd = getMetadata(metadata, methodName, aclass);
     const infos: Endpoint = {
       getId: fullUriGetter,

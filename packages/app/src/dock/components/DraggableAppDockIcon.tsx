@@ -2,10 +2,9 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { findDOMNode } from 'react-dom';
-import { compose } from 'redux';
 import { oc } from 'ts-optchain';
 
-import { withGetApplication, GetApplicationQuery } from '../queries@local.gql.generated';
+import { useGetApplicationQuery, GetApplicationQuery } from '../queries@local.gql.generated';
 
 import AppDockIcon from './ConnectedAppDockIcon';
 
@@ -22,10 +21,6 @@ interface AppDockIconProps {
   dramaticEnter?: boolean,
 }
 
-interface InjectedProps {
-  application: GetApplicationQuery['application'],
-}
-
 interface OwnProps extends AppDockIconProps {
   manifestURL: string,
   index: number,
@@ -40,7 +35,7 @@ interface DndProps {
   isDragging: boolean,
 }
 
-type Props = OwnProps & InjectedProps & DndProps;
+type Props = OwnProps & DndProps & { application: GetApplicationQuery['application'] };
 
 const dockAppSource = {
   beginDrag(props: Props) {
@@ -61,48 +56,30 @@ const dockAppTarget = {
     const { index: dragIndex, applicationId: dragApplicationId, manifestURL } = monitor.getItem();
     const hoverIndex = props.index;
 
-    // Don't replace items with themselves
     if (dragIndex === hoverIndex) {
       return;
     }
 
-    // Determine rectangle on screen
     const domNode = findDOMNode(component);
     if (!domNode) return;
     const hoverBoundingRect = domNode.getBoundingClientRect();
 
-    // Get vertical middle
     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
-    // Determine mouse position
     const clientOffset = monitor.getClientOffset();
 
-    // Get pixels to the top
     const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
-    // Only perform the move when the mouse has crossed half of the items height
-    // When dragging downwards, only move when the cursor is below 50%
-    // When dragging upwards, only move when the cursor is above 50%
-
-    // Dragging downwards
     if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
       return;
     }
 
-    // Dragging upwards
     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
       return;
     }
 
-    // console.log(`dragIndex: ${dragIndex}, hoverIndex: ${hoverIndex}`);
-
-    // Time to actually perform the action
     props.moveIcon(dragApplicationId, hoverIndex, manifestURL);
 
-    // Note: we're mutating the monitor item here!
-    // Generally it's better to avoid mutations,
-    // but it's good here for the sake of performance
-    // to avoid expensive index searches.
     monitor.getItem().index = hoverIndex;
   },
 };
@@ -115,16 +92,12 @@ const dockAppTarget = {
   connectDragPreview: connect.dragPreview(),
   isDragging: monitor.isDragging(),
 }))
-class DraggableAppDockIcon extends React.PureComponent<Props> {
+class DraggableAppDockIconInner extends React.PureComponent<Props> {
   componentDidMount() {
-    // Use empty image as a drag preview so browsers don't draw it
-    // and we can draw whatever we want on the custom drag layer instead.
     this.props.connectDragPreview(getEmptyImage());
   }
 
   componentDidUpdate() {
-    // Used in componentDidUpdate too because of an issue (https://github.com/react-dnd/react-dnd/issues/1428).
-    // There are high chances that this is fixed in more recent versions of DnD
     this.props.connectDragPreview(getEmptyImage());
   }
 
@@ -156,15 +129,14 @@ class DraggableAppDockIcon extends React.PureComponent<Props> {
   }
 }
 
-const connector = compose(
-  withGetApplication({
-    options: ({ applicationId }: Props) => ({ variables: { applicationId } }),
-    props: ({ data }) => ({
-      loading: !data || data.loading,
-      application: oc(data).application(),
-    }),
-  }),
+const DraggableAppDockIcon: React.FC<OwnProps> = (props) => {
+  const { data } = useGetApplicationQuery({
+    variables: { applicationId: props.applicationId },
+  });
 
-);
+  const application = oc(data).application();
 
-export default connector(DraggableAppDockIcon);
+  return <DraggableAppDockIconInner {...props} application={application} />;
+};
+
+export default DraggableAppDockIcon;

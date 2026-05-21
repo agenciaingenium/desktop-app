@@ -5,7 +5,7 @@ import { filter, take } from 'rxjs/operators';
 import { RPCChannel, RPCChannelPeer } from 'stream-json-rpc';
 import { bxnotifier, bxsubscription, endpoints } from './const';
 import { Debugger } from './debug';
-import { service } from './decorator';
+import { service, getAllMetadata } from './decorator';
 import { getRequestMethod, serviceFullURI } from './helpers';
 import { serialize, unserialize } from './serialization';
 import { Endpoint, EndpointMap, IServiceBase, RPC, ServiceBaseConstructorOptions, SubscriptionConstructorParam } from './types';
@@ -16,7 +16,7 @@ const d = require('debug')('service:utils:class');
 const getRequestsMetadata = (constructor: Function | undefined): EndpointMap => {
   if (constructor) {
     d('target interface', constructor.name);
-    return Reflect.getMetadata(endpoints, constructor.prototype) || new Map();
+    return getAllMetadata(endpoints, constructor.prototype);
   }
   return new Map();
 };
@@ -110,7 +110,7 @@ export class ServicePeerHandler extends EventEmitter {
   }
 
   protected bindAllRemoteMethodHandlers(srvc: ServiceBase, peer: RPCChannelPeer) {
-    const endpointsMetadata: EndpointMap = Reflect.getMetadata(endpoints, srvc) || new Map();
+    const endpointsMetadata: EndpointMap = getAllMetadata(endpoints, srvc);
 
     // Some weird behavior here, we're unable to loop onto md
     // without putting it through `Array.from`...

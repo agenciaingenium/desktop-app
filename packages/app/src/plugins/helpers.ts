@@ -1,5 +1,5 @@
 import memoize = require('memoizee');
-import Maybe from 'graphql/tsutils/Maybe';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 import { JAVASCRIPT_INJECTIONS } from '../applications/manifest-provider/const';
 

@@ -1,4 +1,4 @@
-import Maybe from 'graphql/tsutils/Maybe';
+import { Maybe } from 'graphql/jsutils/Maybe';
 import ApplicationResourceResolver from './ApplicationResourceResolver';
 import ResourceRouterDispatcher from './ResourceRouterDispatcher';
 import { ResourceMetaData, ResourceResolver, ResourceRouter } from './types';

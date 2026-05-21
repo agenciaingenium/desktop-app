@@ -71,30 +71,30 @@ describe('bang:search', () => {
         searchQuery: 'intercom'
       });
       expect(searchLabels(case1.i, 1)).toMatchInlineSnapshot(`
-                Array [
-                  "Apps - Intercom ()",
-                ]
-            `);
+        [
+          "Apps - Intercom ()",
+        ]
+      `);
     });
 
     test('right results with the first letter (i)', () => {
       expect(searchLabels(case1.i, 3)).toMatchInlineSnapshot(`
-                        Array [
-                          "Apps - Intercom ()",
-                          "Apps - Invision ()",
-                          "Intercom - Intercom | The easiest way to see and talk to your users ()",
-                        ]
-                  `);
+        [
+          "Apps - Intercom ()",
+          "Apps - Invision ()",
+          "Intercom - Intercom | The easiest way to see and talk to your users ()",
+        ]
+      `);
     });
 
     test('right results with the first letter (s)', () => {
       expect(searchLabels(case1.s, 3)).toMatchInlineSnapshot(`
-                        Array [
-                          "Apps - Slack (ycfounders.slack.com)",
-                          "Apps - Spendesk ()",
-                          "Apps - Station Community ()",
-                        ]
-                  `);
+        [
+          "Apps - Slack (ycfounders.slack.com)",
+          "Apps - Spendesk ()",
+          "Apps - Station Community ()",
+        ]
+      `);
     });
   });
 
@@ -106,21 +106,21 @@ describe('bang:search', () => {
         searchLabels(case2.spe),
         searchLabels(case2.spen)
       ]).toMatchInlineSnapshot(`
-                        Array [
-                          Array [
-                            "Apps - Slack (ycfounders.slack.com)",
-                          ],
-                          Array [
-                            "Apps - Spendesk ()",
-                          ],
-                          Array [
-                            "Apps - Spendesk ()",
-                          ],
-                          Array [
-                            "Apps - Spendesk ()",
-                          ],
-                        ]
-                  `);
+        [
+          [
+            "Apps - Slack (ycfounders.slack.com)",
+          ],
+          [
+            "Apps - Spendesk ()",
+          ],
+          [
+            "Apps - Spendesk ()",
+          ],
+          [
+            "Apps - Spendesk ()",
+          ],
+        ]
+      `);
     });
 
     test('agora pulse (first results)', () => {
@@ -130,21 +130,21 @@ describe('bang:search', () => {
         searchLabels(case2.ago),
         searchLabels(case2.agor)
       ]).toMatchInlineSnapshot(`
-                        Array [
-                          Array [
-                            "Apps - Agora Pulse ()",
-                          ],
-                          Array [
-                            "Apps - Agora Pulse ()",
-                          ],
-                          Array [
-                            "Apps - Agora Pulse ()",
-                          ],
-                          Array [
-                            "Apps - Agora Pulse ()",
-                          ],
-                        ]
-                  `);
+        [
+          [
+            "Apps - Agora Pulse ()",
+          ],
+          [
+            "Apps - Agora Pulse ()",
+          ],
+          [
+            "Apps - Agora Pulse ()",
+          ],
+          [
+            "Apps - Agora Pulse ()",
+          ],
+        ]
+      `);
     });
 
     test('agora pulse (with alexandre in global frecency data)', () => {
@@ -157,17 +157,17 @@ describe('bang:search', () => {
         searchLabels(case2.ago),
         searchLabels(case2.agor)
       ]).toMatchInlineSnapshot(`
-        Array [
-          Array [
+        [
+          [
             "Slack: Station - Alexandre Lachèze (Slack > Station)",
           ],
-          Array [
+          [
             "Apps - Agora Pulse ()",
           ],
-          Array [
+          [
             "Apps - Agora Pulse ()",
           ],
-          Array [
+          [
             "Apps - Agora Pulse ()",
           ],
         ]
@@ -185,27 +185,27 @@ describe('bang:search', () => {
         searchLabels(case3and4.alexandr),
         searchLabels(case3and4.alexandre)
       ]).toMatchInlineSnapshot(`
-                        Array [
-                          Array [
-                            "Slack: Station - Alexandre Lachèze (Slack > Station)",
-                          ],
-                          Array [
-                            "Slack: Station - Alexandre Lachèze (Slack > Station)",
-                          ],
-                          Array [
-                            "Slack: Station - Alexandre Lachèze (Slack > Station)",
-                          ],
-                          Array [
-                            "Slack: Station - Alexandre Lachèze (Slack > Station)",
-                          ],
-                          Array [
-                            "Slack: Station - Alexandre Lachèze (Slack > Station)",
-                          ],
-                          Array [
-                            "Slack: Station - Alexandre Lachèze (Slack > Station)",
-                          ],
-                        ]
-                  `);
+        [
+          [
+            "Slack: Station - Alexandre Lachèze (Slack > Station)",
+          ],
+          [
+            "Slack: Station - Alexandre Lachèze (Slack > Station)",
+          ],
+          [
+            "Slack: Station - Alexandre Lachèze (Slack > Station)",
+          ],
+          [
+            "Slack: Station - Alexandre Lachèze (Slack > Station)",
+          ],
+          [
+            "Slack: Station - Alexandre Lachèze (Slack > Station)",
+          ],
+          [
+            "Slack: Station - Alexandre Lachèze (Slack > Station)",
+          ],
+        ]
+      `);
     });
 
     // "expired frecency data" is synonym to: "no frecency data" in term of computation
@@ -221,23 +221,23 @@ describe('bang:search', () => {
         searchLabels(case3and4.alexandr),
         searchLabels(case3and4.alexandre)
       ]).toMatchInlineSnapshot(`
-        Array [
-          Array [
+        [
+          [
             "Slack: Station - Alexandre Lachèze (Slack > Station)",
           ],
-          Array [
+          [
             "Slack: YC Founders - Alexa (Slack > YC Founders)",
           ],
-          Array [
+          [
             "Slack: Station - Alexandre Lachèze (Slack > Station)",
           ],
-          Array [
+          [
             "Slack: Station - Alexandre Lachèze (Slack > Station)",
           ],
-          Array [
+          [
             "Slack: Station - Alexandre Lachèze (Slack > Station)",
           ],
-          Array [
+          [
             "Slack: The Network - Alexandre (Slack > The Network)",
           ],
         ]
@@ -249,15 +249,15 @@ describe('bang:search', () => {
     test('hugo', () => {
       expect([searchLabels(case5.hug), searchLabels(case5.hugo)])
         .toMatchInlineSnapshot(`
-                        Array [
-                          Array [
-                            "Slack: Station - Hugo Mano (Slack > Station)",
-                          ],
-                          Array [
-                            "Slack: Station - Hugo Mano (Slack > Station)",
-                          ],
-                        ]
-                  `);
+        [
+          [
+            "Slack: Station - Hugo Mano (Slack > Station)",
+          ],
+          [
+            "Slack: Station - Hugo Mano (Slack > Station)",
+          ],
+        ]
+      `);
     });
 
     // "expired frecency data" is synonym to: "no frecency data" in term of computation
@@ -265,43 +265,43 @@ describe('bang:search', () => {
       dateStub.returns(now);
       expect([searchLabels(case5.hug), searchLabels(case5.hugo)])
         .toMatchInlineSnapshot(`
-                        Array [
-                          Array [
-                            "Slack: Station - Hugo Mano (Slack > Station)",
-                          ],
-                          Array [
-                            "Google Drive - julien@getstation.com - Hugo (julien@getstation.com)",
-                          ],
-                        ]
-                  `);
+        [
+          [
+            "Slack: Station - Hugo Mano (Slack > Station)",
+          ],
+          [
+            "Google Drive - julien@getstation.com - Hugo (julien@getstation.com)",
+          ],
+        ]
+      `);
     });
   });
 
   describe('case 6 (3-4 letters relevant first result)', () => {
     test('investors', () => {
       expect(searchLabels(case6.inves)).toMatchInlineSnapshot(`
-                        Array [
-                          "YC Bookface - Investments | Bookface ()",
-                        ]
-                  `);
+        [
+          "YC Bookface - Investments | Bookface ()",
+        ]
+      `);
     });
 
     test('todoist (relevancy only)', () => {
       expect(searchLabels(case6.tod)).toMatchInlineSnapshot(`
-                        Array [
-                          "Apps - Todoist ()",
-                        ]
-                  `);
+        [
+          "Apps - Todoist ()",
+        ]
+      `);
     });
   });
 
   describe('case 7 (rst result relevancy)', () => {
     test('ats b', () => {
       expect(searchLabels(case7.ats_b)).toMatchInlineSnapshot(`
-                        Array [
-                          "Notion: Station - 📄 ATS benchmark ()",
-                        ]
-                  `);
+        [
+          "Notion: Station - 📄 ATS benchmark ()",
+        ]
+      `);
     });
   });
 });

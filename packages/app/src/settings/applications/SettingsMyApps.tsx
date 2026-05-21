@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { delay } from 'redux-saga/effects';
 // @ts-ignore: no declaration file
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
+import { updateUI } from '../../ui/redux-ui-compat';
 
 import { orderedManifestsUrls } from '../../applications/selectors';
 import { getUISettingsManifestURL } from '../../ui/selectors';

@@ -54,7 +54,7 @@ const loadWorker = () => {
     .setWorkerBrowserWindow(worker)
     .catch(handleError());
 
-  worker.loadURL(getUrlToLoad('index.html'));
+  worker.loadURL(getUrlToLoad('worker.html'));
 
   if (!isPackaged) {
     worker.webContents.openDevTools({

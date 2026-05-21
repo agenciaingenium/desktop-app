@@ -4,8 +4,7 @@ import './dotenv';
 import { ipcRenderer } from 'electron';
 import { InMemoryCache, NormalizedCacheObject, ApolloClient } from '@apollo/client';
 import { PubSub } from 'graphql-subscriptions';
-// @ts-ignore no declaration file
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
+import { updateUI } from './ui/redux-ui-compat';
 // @ts-ignore no declaration file
 import { openProcessManager, setFullScreenState, setOnlineStatus, toggleKbdShortcuts } from './app/duck';
 import { getFocus } from './app/selectors';
@@ -125,10 +124,7 @@ export class BrowserXAppWorker {
     // local apollo client
     this.apolloClient = new ApolloClient({
       link: (services.apolloLink as ApolloLinkServiceImpl).link!,
-      cache: new InMemoryCache({
-        // reactive-graphql does not like this
-        addTypename: false,
-      }),
+      cache: new InMemoryCache(),
       // see apollographql/apollo-client#4322
       queryDeduplication: false,
     });

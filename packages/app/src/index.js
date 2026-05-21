@@ -2,7 +2,7 @@
 import './utils/stat-cache';
 import './dotenv';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { ApolloProvider } from '@apollo/client';
 import { BrowserXThemeProvider } from '@getstation/theme';
@@ -56,7 +56,7 @@ configureStore(actionsEmitter)
 const render = (store) => {
   const App = require('./containers/App').default; // eslint-disable-line global-require
 
-  ReactDOM.render(
+  createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <ActionsBusReactContext.Provider value={{ actionsBus }}>
         <ApolloProvider client={apolloClient}>
@@ -69,8 +69,7 @@ const render = (store) => {
           </BrowserXThemeProvider>
         </ApolloProvider>
       </ActionsBusReactContext.Provider>
-    </Provider>,
-    document.getElementById('root')
+    </Provider>
   );
 
   window.station.ipc.send('bx-ready-to-show');

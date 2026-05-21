@@ -1,7 +1,6 @@
 import { SagaIterator } from 'redux-saga';
 import { all, call, fork, getContext, put, select } from 'redux-saga/effects';
-// @ts-ignore: no declaration file
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
+import { updateUI } from '../../ui/redux-ui-compat';
 import { nanoid } from 'nanoid';
 import { BrowserXAppWorker } from '../../app-worker';
 import { changeAppFocusState } from '../../app/duck';

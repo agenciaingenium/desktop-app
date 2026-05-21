@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { tap, compose } from 'ramda';
-import Maybe from 'graphql/tsutils/Maybe';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 import { SUBDOCK_ITEM_HEIGHT } from '../SubdockItem';
 

@@ -1,7 +1,6 @@
 import log from 'electron-log';
 import { all, call, fork, put, select } from 'redux-saga/effects';
-// @ts-ignore - no typing for redux-ui
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
+import { updateUI } from '../ui/redux-ui-compat';
 import { READY } from '../app/duck';
 import services from '../services/servicesManager';
 import { dispatchUrlSaga } from '../urlrouter/sagas';

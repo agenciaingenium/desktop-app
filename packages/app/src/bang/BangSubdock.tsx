@@ -1,15 +1,14 @@
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { bindActionCreators } from 'redux';
 // @ts-ignore: no declaration file
-import { updateUI } from 'redux-ui/transpiled/action-reducer';
-import { withGetActivity } from '../activity/queries@local.gql.generated';
+import { updateUI } from '../ui/redux-ui-compat';
+import { useGetActivityQuery } from '../activity/queries@local.gql.generated';
 import { getFocus } from '../app/selectors';
 import { SHORTCUTS } from '../keyboard-shortcuts';
 import { hasGDriveTokens } from '../plugins/selectors';
-import { Omit, StationState } from '../types';
+import { StationState } from '../types';
 import { getUIQSHighlightedItemId } from '../ui/selectors';
 import BangInput from './components/BangInput';
 import BangPresenter from './components/BangPresenter';
@@ -30,255 +29,212 @@ import { canShowInsert, getResultsJS, getSearchSessionId, getSearchValue, isVisi
 const kbShortcut = SHORTCUTS.bang.kbd.replace(' ', '+');
 
 export interface OwnProps {
-  onQuit: () => void,
+  onQuit?: () => void,
 }
-
-export interface StateProps {
-  highlightedItemId?: string;
-  searchSessionId: string;
-  searchValue: string;
-  items: SearchSectionSerialized[];
-  historyItems: SearchResultSerialized[];
-  isVisible: boolean;
-  shouldShowInsert: boolean;
-  focus: number | undefined;
-  isGDriveConnected: boolean;
-}
-
-export interface DispatchProps {
-  onSearchValueChange: typeof setSearchValue;
-  onSelectItem: typeof selectItem;
-  onShowSettings: () => void;
-  setHighlightedItemId: (id?: string) => void;
-  cyclingStep: typeof cyclingStep;
-}
-
-export type Props = OwnProps & StateProps & DispatchProps;
 
 function* getFlatItemsIterator(items: SearchSectionSerialized[]) {
   for (const item of items) {
     if (!item.results) continue;
-    yield* item.results;
+    for (const result of item.results) {
+      if (result) yield result;
+    }
   }
 }
 
-class BangSubdockImpl extends React.PureComponent<Props> {
-  static defaultProps = {
-    setHighlightedItemId: () => {},
-    onQuit: () => {},
-  };
+const BangSubdock: React.FC<OwnProps> = ({ onQuit = () => {} }) => {
+  const inputRef = React.useRef<BangInput | null>(null);
+  const flatItemsRef = React.useRef<SearchResultSerialized[]>([]);
+  const prevVisibleAndFocusRef = React.useRef<boolean>(false);
 
-  private input: BangInput | null;
-  private flatItems: SearchResultSerialized[];
+  const { data } = useGetActivityQuery();
+  const historyItems = (data?.activity ?? []).filter((item): item is NonNullable<typeof item> => item != null) as unknown as SearchResultSerialized[];
 
-  constructor(props: Props) {
-    super(props);
+  const searchSessionId = useSelector((state: StationState) => getSearchSessionId(state));
+  const searchValue = useSelector((state: StationState) => getSearchValue(state));
+  const highlightedItemId = useSelector((state: StationState) => getUIQSHighlightedItemId(state));
+  const items = useSelector((state: StationState) => getResultsJS(state));
+  const isVis = useSelector((state: StationState) => isVisible(state));
+  const shouldShowInsert = useSelector((state: StationState) => canShowInsert(state));
+  const focus = useSelector((state: StationState) => getFocus(state));
+  const isGDriveConnected = useSelector((state: StationState) => hasGDriveTokens(state));
 
-    this.flatItems = [];
+  const dispatch = useDispatch();
+  const actions = React.useMemo(() => bindActionCreators({
+    cyclingStep,
+    onSearchValueChange: setSearchValue,
+    onSelectItem: selectItem,
+    setHighlightedItemId: (id?: string) => updateUI('qs', 'highlightedItemId', id),
+  }, dispatch), [dispatch]);
 
-    this.setRef = this.setRef.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.resetHighlightedItem = this.resetHighlightedItem.bind(this);
-    this.handleEnter = this.handleEnter.bind(this);
-  }
+  const onShowSettings = React.useCallback(() => {
+    dispatch(updateUI('settings', 'activeTabTitle', 'Quick-Switch'));
+    dispatch(updateUI('settings', 'isVisible', true));
+    dispatch(setVisibility('center-modal', false, 'topbar_menu_or_keyboard_shortcut'));
+  }, [dispatch]);
 
-  setRef(ref: BangInput | null) {
-    this.input = ref;
-  }
+  const getFlatItems = React.useCallback((props?: { searchValue: string; historyItems: SearchResultSerialized[]; items: SearchSectionSerialized[] }): SearchResultSerialized[] => {
+    const sv = props?.searchValue ?? searchValue;
+    const hi = props?.historyItems ?? historyItems;
+    const it = props?.items ?? items;
+    if (sv === '') return hi;
+    return Array.from(getFlatItemsIterator(it)) as SearchResultSerialized[];
+  }, [searchValue, historyItems, items]);
 
-  getFlatItems(props: Props = this.props): SearchResultSerialized[] {
-    if (props.searchValue === '') return props.historyItems;
-    return Array.from(getFlatItemsIterator(props.items));
-  }
-
-  setFlatItems(items: SearchResultSerialized[]): void {
-    this.flatItems = items;
-    if (items.length >= 1) {
-      this.props.setHighlightedItemId(getId(items[0]));
+  const setFlatItems = React.useCallback((newItems: SearchResultSerialized[]) => {
+    flatItemsRef.current = newItems;
+    if (newItems.length >= 1) {
+      actions.setHighlightedItemId(getId(newItems[0]));
     } else {
-      this.props.setHighlightedItemId(undefined);
+      actions.setHighlightedItemId(undefined);
     }
-  }
+  }, [actions]);
 
-  componentDidMount() {
-    this.setFlatItems(this.getFlatItems());
-    if (this.input) {
-      this.input.focus();
-      this.input.selectAll();
+  const getHighlightedItemIndex = React.useCallback(() => {
+    const flatItems = flatItemsRef.current;
+    if (highlightedItemId === null) return null;
+    const index = flatItems.findIndex(item => getId(item) === highlightedItemId);
+    if (index === -1) return null;
+    return index;
+  }, [highlightedItemId]);
+
+  const getNextHighlightedItemIndex = React.useCallback((direction: SearchPaneItemsListCycleDirection, cycling: boolean = false): number | null => {
+    const flatItems = flatItemsRef.current;
+    const start = 0;
+    const end = flatItems.length - 1;
+    if (end < 0) return null;
+
+    const currentIndex = getHighlightedItemIndex() || 0;
+    const nextIndex = direction === 'down' ? currentIndex + 1 : currentIndex - 1;
+
+    if (!cycling) {
+      if (nextIndex < start) return null;
+      if (nextIndex > end) return null;
     }
-  }
+    if (nextIndex < start) return end;
+    if (nextIndex > end) return start;
 
-  componentWillUnmount() {
-    this.props.setHighlightedItemId(undefined);
-  }
+    return nextIndex;
+  }, [getHighlightedItemIndex]);
 
-  componentDidUpdate(prevProps: Props) {
-    const items = this.flatItems;
-    const nextItems = this.getFlatItems(this.props);
+  const selectItem_ = React.useCallback((itemId: string, position: number, via: SearchPaneItemSelectedVia) => {
+    const item = findItemById(itemId, flatItemsRef.current);
+    if (!item) return;
+    actions.onSelectItem(item, position, via, 'center-modal', searchValue);
+  }, [actions, searchValue]);
 
-    const itemIds = Immutable.Set(items.map(getId));
-    const nextItemIds = Immutable.Set(nextItems.map(getId));
-    if (!nextItemIds.equals(itemIds)) {
-      this.setFlatItems(nextItems);
+  const selectNextItem = React.useCallback((via: SearchPaneItemsListCycleVia, direction: SearchPaneItemsListCycleDirection) => {
+    const flatItems = flatItemsRef.current;
+    const cycling = via !== 'keyboard-arrow';
+    const nextIndex = getNextHighlightedItemIndex(direction, cycling);
+    if (nextIndex === null || !flatItems[nextIndex]) return;
+    actions.cyclingStep(flatItems[nextIndex], nextIndex, direction, 'center-modal', via, searchValue);
+  }, [getNextHighlightedItemIndex, actions, searchValue]);
+
+  const selectNextItemArrowDown = React.useCallback(() => selectNextItem('keyboard-arrow', 'down'), [selectNextItem]);
+  const selectNextItemArrowUp = React.useCallback(() => selectNextItem('keyboard-arrow', 'up'), [selectNextItem]);
+  const selectNextItemTabDown = React.useCallback(() => selectNextItem('keyboard-tab', 'down'), [selectNextItem]);
+  const selectNextItemTabUp = React.useCallback(() => selectNextItem('keyboard-tab', 'up'), [selectNextItem]);
+
+  const setRef = React.useCallback((ref: BangInput | null) => {
+    inputRef.current = ref;
+  }, []);
+
+  const handleClick = React.useCallback((itemId: string, position: number) => {
+    const item = findItemById(itemId, flatItemsRef.current);
+    if (!item) return;
+    selectItem_(itemId, position, 'click');
+  }, [selectItem_]);
+
+  const focusInput = React.useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
+  }, []);
 
-    const prevVisibleAndFocus = prevProps.isVisible && prevProps.focus;
-    const visibleAndFocus = this.props.isVisible && this.props.focus;
+  const handleEnter = React.useCallback(async () => {
+    if (!highlightedItemId) return;
+    const item = findItemById(highlightedItemId, flatItemsRef.current);
+    if (!item) return;
+    const position = flatItemsRef.current.indexOf(item);
+    selectItem_(highlightedItemId, position, 'keyboard-enter');
+  }, [highlightedItemId, selectItem_]);
+
+  const resetHighlightedItem = React.useCallback(() => {
+    const flatItems = flatItemsRef.current;
+    actions.setHighlightedItemId(getId(flatItems[0]));
+  }, [actions]);
+
+  // componentDidMount equivalent
+  React.useEffect(() => {
+    const nextItems = getFlatItems();
+    setFlatItems(nextItems);
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.selectAll();
+    }
+    return () => {
+      actions.setHighlightedItemId(undefined);
+    };
+  }, []);
+
+  // componentDidUpdate equivalent for flatItems sync
+  React.useEffect(() => {
+    const currentIds = Immutable.Set(flatItemsRef.current.map(getId));
+    const nextItems = getFlatItems();
+    const nextIds = Immutable.Set(nextItems.map(getId));
+    if (!nextIds.equals(currentIds)) {
+      setFlatItems(nextItems);
+    }
+  }, [searchValue, historyItems, items, getFlatItems, setFlatItems]);
+
+  // componentDidUpdate equivalent for focus/blur
+  React.useEffect(() => {
+    const visibleAndFocus = isVis && focus;
+    const prevVisibleAndFocus = prevVisibleAndFocusRef.current;
+    prevVisibleAndFocusRef.current = !!visibleAndFocus;
+
     // on get visible, focus
     if (!prevVisibleAndFocus && !visibleAndFocus) {
-      if (this.input) {
-        this.input.focus();
-        this.input.selectAll();
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.selectAll();
       }
     }
     // on get hidden, blur
     if (prevVisibleAndFocus && !visibleAndFocus) {
-      if (this.input) this.input.blur();
+      if (inputRef.current) inputRef.current.blur();
     }
-  }
+  }, [isVis, focus]);
 
-  getHighlightedItemIndex() {
-    const items = this.flatItems;
-    const { highlightedItemId } = this.props;
+  return (
+    <BangPresenter
+      highlightedItemId={highlightedItemId}
+      searchSessionId={searchSessionId}
+      searchValue={searchValue}
+      items={items}
+      historyItems={historyItems}
+      isVisible={isVis}
+      shouldShowInsert={shouldShowInsert}
+      focus={focus}
+      isGDriveConnected={isGDriveConnected}
+      onSearchValueChange={actions.onSearchValueChange}
+      onSelectItem={actions.onSelectItem}
+      onShowSettings={onShowSettings}
+      setHighlightedItemId={actions.setHighlightedItemId}
+      cyclingStep={actions.cyclingStep}
+      onQuit={onQuit}
+      kbShortcut={kbShortcut}
+      setRef={setRef}
+      handleArrowDown={selectNextItemArrowDown}
+      handleArrowUp={selectNextItemArrowUp}
+      handleTab={selectNextItemTabDown}
+      handleShiftTab={selectNextItemTabUp}
+      handleEnter={handleEnter}
+      handleClick={handleClick}
+      resetHighlightedItem={resetHighlightedItem}
+      onCollapseSection={focusInput}
+    />
+  );
+};
 
-    if (highlightedItemId === null) return null;
-
-    const index = items.findIndex(item => getId(item) === highlightedItemId);
-
-    // not found
-    if (index === -1) return null;
-
-    return index;
-  }
-
-  getNextHighlightedItemIndex(direction: SearchPaneItemsListCycleDirection, cycling: boolean = false): number | null {
-    const items = this.flatItems;
-
-    const start = 0;
-    const end = items.length - 1;
-    if (end < 0) return null; // no items
-
-    const currentIndex = this.getHighlightedItemIndex() || 0;
-    const nextIndex = direction === 'down' ? currentIndex + 1 : currentIndex - 1;
-
-    if (!cycling) {
-      if (nextIndex < start) return null; // no next index
-      if (nextIndex > end) return null; // no next index
-    }
-    if (nextIndex < start) return end; // cycle to end
-    if (nextIndex > end) return start; // cycle to start
-
-    return nextIndex; // otherwise, move index
-  }
-
-  resetHighlightedItem() {
-    const items = this.flatItems;
-    this.props.setHighlightedItemId(getId(items[0]));
-  }
-
-  selectNextItem = (via: SearchPaneItemsListCycleVia, direction: SearchPaneItemsListCycleDirection) => {
-    const items = this.flatItems;
-    const { searchValue } = this.props;
-
-    const cycling = via !== 'keyboard-arrow';
-    const nextIndex = this.getNextHighlightedItemIndex(direction, cycling);
-
-    // do nothing if no nextIndex
-    if (nextIndex === null || !items[nextIndex]) return;
-
-    this.props.cyclingStep(items[nextIndex], nextIndex, direction, 'center-modal', via, searchValue);
-  }
-
-  selectNextItemArrowDown = () => this.selectNextItem('keyboard-arrow', 'down');
-  selectNextItemArrowUp = () => this.selectNextItem('keyboard-arrow', 'up');
-  selectNextItemTabDown = () => this.selectNextItem('keyboard-tab', 'down');
-  selectNextItemTabUp = () => this.selectNextItem('keyboard-tab', 'up');
-
-  handleClick(itemId: string, position: number) {
-    const item = findItemById(itemId, this.flatItems);
-    if (!item) return;
-
-    this.selectItem(itemId, position, 'click');
-  }
-
-  focusInput = () => {
-    if (this.input) {
-      this.input.focus();
-    }
-  }
-
-  handleEnter = async () => {
-    const { highlightedItemId } = this.props;
-    if (!highlightedItemId) return;
-
-    // if the item is not displayed, do nothing
-    const item = findItemById(highlightedItemId, this.flatItems);
-    if (!item) return;
-
-    const position = this.flatItems.indexOf(item);
-    this.selectItem(highlightedItemId, position, 'keyboard-enter');
-  }
-
-  selectItem(itemId: string, position: number, via: SearchPaneItemSelectedVia) {
-    const item = findItemById(itemId, this.flatItems);
-    if (!item) return;
-
-    const { searchValue } = this.props;
-    this.props.onSelectItem(item, position, via, 'center-modal', searchValue);
-  }
-
-  render() {
-    return (
-      <BangPresenter
-        {...this.props}
-        kbShortcut={kbShortcut}
-        setRef={this.setRef}
-        handleArrowDown={this.selectNextItemArrowDown}
-        handleArrowUp={this.selectNextItemArrowUp}
-        handleTab={this.selectNextItemTabDown}
-        handleShiftTab={this.selectNextItemTabUp}
-        handleEnter={this.handleEnter}
-        handleClick={this.handleClick}
-        resetHighlightedItem={this.resetHighlightedItem}
-        onCollapseSection={this.focusInput}
-      />
-    );
-  }
-}
-
-const BangSubdock = compose(
-  withGetActivity({
-    props: ({ data }) => ({
-      historyItems: data && data.activity ? data.activity : [],
-    }),
-  }),
-  connect<Omit<StateProps, 'historyItems'>, DispatchProps>(
-    (state: StationState) => ({
-      searchSessionId: getSearchSessionId(state),
-      searchValue: getSearchValue(state),
-      highlightedItemId: getUIQSHighlightedItemId(state),
-      items: getResultsJS(state),
-      isVisible: isVisible(state),
-      shouldShowInsert: canShowInsert(state),
-      focus: getFocus(state),
-      isGDriveConnected: hasGDriveTokens(state),
-    }),
-    dispatch => ({
-      ...bindActionCreators(
-        {
-          cyclingStep,
-          onSearchValueChange: setSearchValue,
-          onSelectItem: selectItem,
-          setHighlightedItemId: (id?: string) => updateUI('qs', 'highlightedItemId', id),
-        },
-        dispatch,
-      ),
-      onShowSettings: () => {
-        dispatch(updateUI('settings', 'activeTabTitle', 'Quick-Switch'));
-        dispatch(updateUI('settings', 'isVisible', true));
-        dispatch(setVisibility('center-modal', false, 'topbar_menu_or_keyboard_shortcut'));
-      },
-    })),
-)(BangSubdockImpl);
-
-export default BangSubdock as React.ComponentType<OwnProps>;
+export default BangSubdock;
