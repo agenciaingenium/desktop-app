@@ -369,7 +369,7 @@
 ## Fase 11: UX y Features
 
 ### 11.1 Experiencia de usuario
-- [ ] Loading states — LoadingScreen existe pero sin spinner/progress (solo texto estático); `index-sub.js` no tiene loading screen; failures son silenciosos (1 retry sin feedback visual); **mejora futura**: agregar spinner, progress info, y error UI
+- [x] Loading states — LoadingScreen ahora tiene spinner CSS; `index-sub.js` sigue sin loading screen; failures son silenciosos (1 retry sin feedback visual); mejora futura: error UI y loading states diferenciados por fase
 - [x] Error boundaries — `ConsoleErrorBoundary` ya existe y envuelve los 4 entry points del renderer (index, index-sub, about-window, multi-instance)
 - [ ] Offline mode — `navigator.onLine` + online/offline events ya disparan `setOnlineStatus` action; `ApplicationError` muestra error por-app con retry; **falta**: banner global de offline, service worker para cache-first, queue de requests retry
 
