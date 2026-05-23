@@ -288,7 +288,15 @@
 - [x] Agregado `process.type: 'renderer'` y `process.env.IS_PACKAGED` al worker webpack DefinePlugin (faltaba)
 - [x] **Razón:** `process.env.IS_PACKAGED === 'true'` en env.ts compara con string. DefinePlugin reemplazaba con boolean `true`, entonces `true === 'true'` → `false`. App empaquetada cargaba de `localhost:9080` en vez de `file://` URLs → pantalla blanca.
 
-### 7.7 Estado actual
+### 7.7 reactive-graphql __typename fix
+- [x] `addTypenameToSchema()` en `graphql/index.ts` — inyecta `__typename: String!` como field real en cada object type del schema post-creación, con resolver que retorna el nombre del tipo via closure
+- [x] Usa duck-typing (`getFields`) en vez de `isObjectType()` para evitar cross-realm issues con múltiples instancias del módulo `graphql`
+- [x] **Razón:** Apollo Client 3 agrega `__typename` automáticamente para cache normalization, pero `reactive-graphql` valida fields contra el schema y no soporta meta-fields de GraphQL nativamente.
+
+### 7.8 Native macOS window controls
+- [x] `MainWindowManager.ts` y `SubWindowManager.ts`: `frame: !isDarwin` → `frame: true, titleBarStyle: 'hiddenInset'` en macOS — muestra botones nativos de cerrar/minimizar/maximizar
+
+### 7.9 Estado actual
 - [x] Build de producción: 0 errores
 - [x] `yarn dev`: app arranca sin crashes fatales
 - [x] `yarn release`: app empaquetada carga correctamente con `file://` URLs
@@ -297,6 +305,88 @@
 
 ### Pendientes post-Phase 7
 - [x] Migrar codegen HOCs a hooks (~17 componentes usando `withQuery`/`withMutation`)
-- [x] Reemplazar `redux-ui` con React Context (elimina dependencia de legacy context)
+- [x] Reemplazar `redux-ui` con Redux duck compatible (mismo `@@redux-ui/UPDATE_UI_STATE` action type)
 - [x] Jest snapshot updates (`yarn test -u`) para React 18
 - [x] Fix TypeScript type errors restantes
+- [x] reactive-graphql `__typename` — fix definitivo via schema transformation
+- [x] Native macOS traffic light buttons
+
+---
+
+## Fase 8: Estabilización y Limpieza Profunda
+
+### 8.1 Resolver warnings de runtime
+- [ ] `findDOMNode` deprecation en `ElectronWebview` — migrar a ref directo en el componente webview wrapper (1 uso restante)
+- [ ] Legacy context warnings de `redux-ui` — documentar como tradeoff aceptable hasta eliminar `redux-ui` completamente
+- [ ] `superagent` `cleanHeader` crash — evaluar reemplazo de `superagent` con `fetch` nativo o `got` para requests HTTP (afecta manifest fetching)
+
+### 8.2 TypeScript: reducir errores de tipos
+- [ ] Auditoría de los ~574 errores TypeScript restantes — clasificar por severidad y área
+- [ ] Fix tipos en `configureStore.worker.ts` y `configureStore.client.ts` (Redux store typing)
+- [ ] Fix tipos en resolvers GraphQL (retornos de resolvers que devuelven Observable vs Promise)
+- [ ] Fix tipos en sagas (efectos de redux-saga mal tipados)
+- [ ] Agregar `strict: true` gradualmente al `tsconfig.json` (empezando por módulos nuevos)
+
+### 8.3 Eliminar dependencias no usadas
+- [ ] Auditoría de `package.json` — identificar dependencias que ya no se importan en ningún archivo
+- [ ] Evaluar `react-dnd` — ¿se usa realmente o es herencia de una feature removida?
+- [ ] Evaluar `connected-react-router` — ¿el router se usa o es código muerto?
+- [ ] Evaluar `redux-persist` — ¿persiste algo útil o se puede simplificar?
+- [ ] Eliminar `react-addons-perf` de `package.json` (ya no compatible con React 18, código removido)
+
+---
+
+## Fase 9: Redux Modernización Gradual
+
+### 9.1 Migrar sagas simples a `createListenerMiddleware`
+- [ ] Identificar las ~15 sagas simples (dispatch → side effect → dispatch) del análisis previo
+- [ ] Migrar 3-5 sagas de ejemplo como patrón de referencia
+- [ ] Documentar el patrón de migración saga → listener middleware
+- [ ] Migrar el resto de sagas simples gradualmente
+
+### 9.2 Redux Toolkit (opcional, largo plazo)
+- [ ] Evaluar si `createSlice` reduce boilerplate en ducks existentes
+- [ ] Migrar ducks de alto tráfico (bang, applications, tabs) a `createSlice` si hay beneficio claro
+- [ ] Mantener Immutable.js por ahora — la migración a plain objects es un esfuerzo separado y mayor
+
+---
+
+## Fase 10: Testing
+
+### 10.1 Cobertura de tests
+- [ ] Tests para componentes críticos: App, Dock, Application, Subdock
+- [ ] Tests para sagas principales (install application, select favorite, tab management)
+- [ ] Tests para resolvers GraphQL (activity, applications, favorites)
+- [ ] Tests de integración para flujo de OAuth PKCE
+
+### 10.2 Fix tests existentes
+- [ ] Fix 19 tests fallidos de persistencia (sequelize/sqlite3) — evaluar si se pueden mockear o si requieren setup de DB real
+- [ ] Actualizar snapshots de React 18 restantes
+
+---
+
+## Fase 11: UX y Features
+
+### 11.1 Experiencia de usuario
+- [ ] Loading states — evaluar si la app muestra feedback suficiente durante carga inicial
+- [ ] Error boundaries — agregar error boundaries en secciones críticas (dock, applications, settings)
+- [ ] Offline mode — ¿qué pasa cuando no hay conexión? ¿se muestra feedback?
+
+### 11.2 Performance
+- [ ] Bundle size analysis — identificar chunks grandes que se pueden code-split
+- [ ] Lazy loading de rutas/settings que no se usan en startup
+- [ ] Evaluar si `Immutable.js` es un cuello de botella en selectors frecuentes
+
+---
+
+## Fase 12: Empaquetado y Distribución
+
+### 12.1 electron-builder
+- [ ] Code signing — configurar certificado de Apple Developer para distribución
+- [ ] Auto-update — evaluar si `electron-updater` funciona correctamente con el build actual
+- [ ] Configurar `electron-builder.yml` para targets adicionales (Windows, Linux)
+
+### 12.2 CI/CD
+- [ ] Pipeline de release automatizado (build → test → package → publish)
+- [ ] Changelog automático desde conventional commits
+- [ ] Versionado semántico automatizado

@@ -8,7 +8,7 @@ const port = process.env.ELECTRON_WEBPACK_WDS_PORT || 9080;
 export const getUrlToLoad = (filename: string) => {
   if (isPackaged) {
     return formatUrl({
-      pathname: path.join(__dirname, '..', 'renderer', filename),
+      pathname: path.join(process.resourcesPath, 'app.asar', 'dist', 'renderer', filename),
       protocol: 'file',
       slashes: true,
     });

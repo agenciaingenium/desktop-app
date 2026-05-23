@@ -107,6 +107,9 @@ const resolvers: Resolvers = {
       return true;
     },
   },
+
+  Favorite: {
+  },
 };
 
 // UTILS

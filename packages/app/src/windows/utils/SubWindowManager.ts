@@ -63,7 +63,9 @@ export default class SubWindowManager extends GenericWindowManager {
 
     await super.create({
       show: false,
-      frame: !isDarwin,
+      ...(isDarwin
+        ? { frame: true, titleBarStyle: 'hiddenInset' }
+        : { frame: false }),
       acceptFirstMouse: true,
       ...await SubWindowManager.getBounds(),
     }, ...args);

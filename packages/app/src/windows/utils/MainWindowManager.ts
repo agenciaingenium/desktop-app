@@ -23,7 +23,9 @@ export default class MainWindowManager extends GenericWindowManager {
 
     await super.create({
       show: true,
-      frame: !isDarwin,
+      ...(isDarwin
+        ? { frame: true, titleBarStyle: 'hiddenInset' }
+        : { frame: false }),
       icon: getResourceIconPath(),
       acceptFirstMouse: true,
       savePosition: 'main-window',
