@@ -369,9 +369,9 @@
 ## Fase 11: UX y Features
 
 ### 11.1 Experiencia de usuario
-- [ ] Loading states — evaluar si la app muestra feedback suficiente durante carga inicial
+- [ ] Loading states — LoadingScreen existe pero sin spinner/progress (solo texto estático); `index-sub.js` no tiene loading screen; failures son silenciosos (1 retry sin feedback visual); **mejora futura**: agregar spinner, progress info, y error UI
 - [x] Error boundaries — `ConsoleErrorBoundary` ya existe y envuelve los 4 entry points del renderer (index, index-sub, about-window, multi-instance)
-- [ ] Offline mode — ¿qué pasa cuando no hay conexión? ¿se muestra feedback?
+- [ ] Offline mode — `navigator.onLine` + online/offline events ya disparan `setOnlineStatus` action; `ApplicationError` muestra error por-app con retry; **falta**: banner global de offline, service worker para cache-first, queue de requests retry
 
 ### 11.2 Performance
 - [x] Bundle size analysis — chunks grandes identificados: `lodash` (~500KB+), `graphql` modules; lazy loading parcial existe (handlebars, LazyWebview); lazy loading de routes/settings requiere refactor mayor
