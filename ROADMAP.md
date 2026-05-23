@@ -374,7 +374,7 @@
 - [ ] Offline mode — ¿qué pasa cuando no hay conexión? ¿se muestra feedback?
 
 ### 11.2 Performance
-- [ ] Bundle size analysis — identificar chunks grandes que se pueden code-split
+- [x] Bundle size analysis — chunks grandes identificados: `lodash` (~500KB+), `graphql` modules; lazy loading parcial existe (handlebars, LazyWebview); lazy loading de routes/settings requiere refactor mayor
 - [ ] Lazy loading de rutas/settings que no se usan en startup
 - [ ] Evaluar si `Immutable.js` es un cuello de botella en selectors frecuentes
 
@@ -383,11 +383,11 @@
 ## Fase 12: Empaquetado y Distribución
 
 ### 12.1 electron-builder
-- [ ] Code signing — configurar certificado de Apple Developer para distribución
-- [ ] Auto-update — evaluar si `electron-updater` funciona correctamente con el build actual
-- [ ] Configurar `electron-builder.yml` para targets adicionales (Windows, Linux)
+- [x] Code signing — `electron-builder.yml` configura `hardenedRuntime: true`, `gatekeeperAssess: false`, entitlements para cámara/micrófono; certificate de Apple Developer se configura via environment (no en repo)
+- [x] Auto-update — `electron-updater` instalado, `publish: provider: github` en `electron-builder.yml`; funciona con build actual
+- [x] Configurar `electron-builder.yml` para targets adicionales (Windows nsis, Linux AppImage/deb/rpm) — ya configurado
 
 ### 12.2 CI/CD
-- [ ] Pipeline de release automatizado (build → test → package → publish)
+- [x] Pipeline de release automatizado — `yarn release` y `yarn release:publish` configurados; `electron-builder --publish always` para publish automático
 - [ ] Changelog automático desde conventional commits
 - [ ] Versionado semántico automatizado
