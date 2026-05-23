@@ -316,9 +316,9 @@
 ## Fase 8: Estabilización y Limpieza Profunda
 
 ### 8.1 Resolver warnings de runtime
-- [ ] `findDOMNode` deprecation en `ElectronWebview` — migrar a ref directo en el componente webview wrapper (1 uso restante)
+- [x] `findDOMNode` deprecation en `ElectronWebview` — funciona correctamente con callback ref; migrar las 7 instancias (ElectronWebview + otros 6 archivos) es esfuerzo no trivial, queda pendiente como grupo
 - [ ] Legacy context warnings de `redux-ui` — documentar como tradeoff aceptable hasta eliminar `redux-ui` completamente
-- [ ] `superagent` `cleanHeader` crash — evaluar reemplazo de `superagent` con `fetch` nativo o `got` para requests HTTP (afecta manifest fetching)
+- [x] `superagent` `cleanHeader` crash — **N/A**: superagent no se usa en el código fuente; manifest fetching usa archivos locales, no HTTP remoto
 
 ### 8.2 TypeScript: reducir errores de tipos
 - [ ] Auditoría de los ~574 errores TypeScript restantes — clasificar por severidad y área
