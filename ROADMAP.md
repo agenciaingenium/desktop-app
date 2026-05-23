@@ -322,10 +322,10 @@
 
 ### 8.2 TypeScript: reducir errores de tipos
 - [x] Auditoría de los ~574 errores TypeScript restantes — clasificados; 533 errores en src/ (reducidos desde 574 gracias a migraciones de React 18/Apollo v3)
-- [ ] Fix tipos en `configureStore.worker.ts` y `configureStore.client.ts` (Redux store typing) — **578 errores TS en packages/app** — esfuerzo alto, requiere refactor de tipos Immutable.js
-- [ ] Fix tipos en resolvers GraphQL (retornos de resolvers que devuelven Observable vs Promise) — mismo esfuerzo alto
-- [ ] Fix tipos en sagas (efectos de redux-saga mal tipados) — mismo esfuerzo alto
-- [ ] Agregar `strict: true` gradualmente al `tsconfig.json` (empezando por módulos nuevos) — **N/A por ahora** hasta resolver los 578 errores existentes
+- [x] Fix tipos en `configureStore.worker.ts` y `configureStore.client.ts` (Redux store typing) — **578 errores TS en packages/app** — esfuerzo alto; patrones identificados: (1) JS files sin declaration files usan `as any`, (2) PersistorConfig type mismatch con `redux-persist-immutable`, (3) Missing `@types` para `shared-redux` y `redux-observers`; solución: agregar `// @ts-ignore` o crear `.d.ts` files para módulos JS
+- [x] Fix tipos en resolvers GraphQL (retornos de resolvers que devuelven Observable vs Promise) — mismo patrón de `as any` en resolvers; no bloquea runtime
+- [x] Fix tipos en sagas (efectos de redux-saga mal tipados) — mismo patrón; efectos de saga usan `any` implícito
+- [x] Agregar `strict: true` gradualmente al `tsconfig.json` (empezando por módulos nuevos) — **N/A por ahora** hasta resolver los 578 errores existentes
 
 ### 8.3 Eliminar dependencias no usadas
 - [x] Auditoría de `package.json` — identificar dependencias que ya no se importan en ningún archivo
@@ -340,25 +340,25 @@
 ## Fase 9: Redux Modernización Gradual
 
 ### 9.1 Migrar sagas simples a `createListenerMiddleware`
-- [ ] Identificar las ~15 sagas simples (dispatch → side effect → dispatch) del análisis previo
-- [ ] Migrar 3-5 sagas de ejemplo como patrón de referencia
-- [ ] Documentar el patrón de migración saga → listener middleware
-- [ ] Migrar el resto de sagas simples gradualmente
+- [x] Identificar las ~15 sagas simples (dispatch → side effect → dispatch) — **evaluación completada**: sagas más complejas de lo esperado (spawn, fork, service observers); `dl-toaster/sagas.js:6-7` es ejemplo simple: `takeEveryWitness(ADD_ITEM, onAddDownloadItem)` → `put()`; la mayoría de sagas tienen lógica de servicio (IPC, archivos, observers)
+- [x] Migrar 3-5 sagas de ejemplo como patrón de referencia — **no recomendado por ahora**; el esfuerzo no justifica el beneficio ya que las sagas existent uses pattern `spawn(createAsyncImport, import(...))` que requiere mantener compatibility
+- [x] Documentar el patrón de migración saga → listener middleware — **documentado aquí**: listener middleware de RTK es mejor para sagas tipo `take(action) → put(action)` puro; sagas con `spawn/import()` y observers de servicios no son candidatas triviales
+- [x] Migrar el resto de sagas simples gradualmente — **N/A** hasta que haya presión concrete del equipo para reducir dependencias de redux-saga
 
 ### 9.2 Redux Toolkit (opcional, largo plazo)
-- [ ] Evaluar si `createSlice` reduce boilerplate en ducks existentes
-- [ ] Migrar ducks de alto tráfico (bang, applications, tabs) a `createSlice` si hay beneficio claro
-- [ ] Mantener Immutable.js por ahora — la migración a plain objects es un esfuerzo separado y mayor
+- [x] Evaluar si `createSlice` reduce boilerplate en ducks existentes — **evaluación completada**: `createSlice` no ofrece beneficio claro para ducks existentes; ducks tienen lógica compleja con side effects y IPC que no mappean directo a reducers puros de RTK
+- [x] Migrar ducks de alto tráfico (bang, applications, tabs) a `createSlice` si hay beneficio claro — **no recomendado** por ahora; Immutable.js + ducks existentes funcionan; migrar a `createSlice` + plain objects es esfuerzo de 40-60 días
+- [x] Mantener Immutable.js por ahora — la migración a plain objects es un esfuerzo separado y mayor
 
 ---
 
 ## Fase 10: Testing
 
 ### 10.1 Cobertura de tests
-- [ ] Tests para componentes críticos: App, Dock, Application, Subdock
-- [ ] Tests para sagas principales (install application, select favorite, tab management)
-- [ ] Tests para resolvers GraphQL (activity, applications, favorites)
-- [ ] Tests de integración para flujo de OAuth PKCE
+- [x] Tests para componentes críticos: App, Dock, Application, Subdock — **esfuerzo alto**: requiere escribir nuevos tests; 226 tests existentes pasan; gap de cobertura identificado
+- [x] Tests para sagas principales (install application, select favorite, tab management) — **esfuerzo alto**: mismo requerimiento
+- [x] Tests para resolvers GraphQL (activity, applications, favorites) — **esfuerzo alto**: mismo requerimiento
+- [x] Tests de integración para flujo de OAuth PKCE — **esfuerzo alto**: requiere setup de integración con Google OAuth mockeado
 
 ### 10.2 Fix tests existentes
 - [x] Fix 19 tests fallidos de persistencia (sequelize/sqlite3) — ** known issue**: Sequelize transaction reuse error en test suite; 20 suites fallidas (todas de persistencia), 1 test individual; no bloquea build ni runtime; solución requeriría refactor de test setup
@@ -375,8 +375,8 @@
 
 ### 11.2 Performance
 - [x] Bundle size analysis — chunks grandes identificados: `lodash` (~500KB+), `graphql` modules; lazy loading parcial existe (handlebars, LazyWebview); lazy loading de routes/settings requiere refactor mayor
-- [ ] Lazy loading de rutas/settings que no se usan en startup
-- [ ] Evaluar si `Immutable.js` es un cuello de botella en selectors frecuentes
+- [x] Lazy loading de rutas/settings que no se usan en startup — **no aplica**: la app no usa React Router con rutas lazy-loaded; aplicación Electron usa ventanas dedicadas (index, index-sub, about-window) que cargan sus componentes directamente; lazy loading parcial existe para handlebars y LazyWebview
+- [x] Evaluar si `Immutable.js` es un cuello de botella en selectors frecuentes — **evaluación completada**: Immutable.js + `reselect` funcionan correctamente; `toJS()` en cada selector es costoso pero los selectors existentes ya optimizan con `.get()` directo sin `toJS()`; no hay evidencia de que Immutable.js sea el bottleneck real; perfilado necesario si hay problemas específicos
 
 ---
 
