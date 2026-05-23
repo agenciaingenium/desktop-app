@@ -317,22 +317,23 @@
 
 ### 8.1 Resolver warnings de runtime
 - [x] `findDOMNode` deprecation en `ElectronWebview` — funciona correctamente con callback ref; migrar las 7 instancias (ElectronWebview + otros 6 archivos) es esfuerzo no trivial, queda pendiente como grupo
-- [ ] Legacy context warnings de `redux-ui` — documentar como tradeoff aceptable hasta eliminar `redux-ui` completamente
+- [x] Legacy context warnings de `redux-ui` — ya migrado a `redux-ui-compat.ts` propio; warnings de legacy context son tradeoff aceptable (react-redux v8 new Context vs redux-ui legacy contextTypes); documentado en Phase 7.2
 - [x] `superagent` `cleanHeader` crash — **N/A**: superagent no se usa en el código fuente; manifest fetching usa archivos locales, no HTTP remoto
 
 ### 8.2 TypeScript: reducir errores de tipos
-- [ ] Auditoría de los ~574 errores TypeScript restantes — clasificar por severidad y área
+- [x] Auditoría de los ~574 errores TypeScript restantes — clasificados; 533 errores en src/ (reducidos desde 574 gracias a migraciones de React 18/Apollo v3)
 - [ ] Fix tipos en `configureStore.worker.ts` y `configureStore.client.ts` (Redux store typing)
 - [ ] Fix tipos en resolvers GraphQL (retornos de resolvers que devuelven Observable vs Promise)
 - [ ] Fix tipos en sagas (efectos de redux-saga mal tipados)
 - [ ] Agregar `strict: true` gradualmente al `tsconfig.json` (empezando por módulos nuevos)
 
 ### 8.3 Eliminar dependencias no usadas
-- [ ] Auditoría de `package.json` — identificar dependencias que ya no se importan en ningún archivo
-- [ ] Evaluar `react-dnd` — ¿se usa realmente o es herencia de una feature removida?
-- [ ] Evaluar `connected-react-router` — ¿el router se usa o es código muerto?
-- [ ] Evaluar `redux-persist` — ¿persiste algo útil o se puede simplificar?
-- [ ] Eliminar `react-addons-perf` de `package.json` (ya no compatible con React 18, código removido)
+- [x] Auditoría de `package.json` — identificar dependencias que ya no se importan en ningún archivo
+- [x] Evaluar `react-dnd` — se usa activamente en 5 archivos (dock, subdock drag/drop)
+- [x] Evaluar `connected-react-router` — **código muerto**: no se importa en ningún archivo source, solo en webpack config como external
+- [x] Evaluar `redux-persist` — se usa en `configureStore.worker.ts` para persistencia de state
+- [x] Eliminar `react-addons-perf` de `package.json` — ya no instalado; imports en `index.js`/`index-sub.js` están protegidos con try/catch y solo se activan con `STATION_REACT_PERF` (dev flag)
+- [x] Eliminar `connected-react-router` de webpack externals (código muerto)
 
 ---
 
