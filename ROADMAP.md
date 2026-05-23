@@ -322,10 +322,10 @@
 
 ### 8.2 TypeScript: reducir errores de tipos
 - [x] Auditoría de los ~574 errores TypeScript restantes — clasificados; 533 errores en src/ (reducidos desde 574 gracias a migraciones de React 18/Apollo v3)
-- [ ] Fix tipos en `configureStore.worker.ts` y `configureStore.client.ts` (Redux store typing)
-- [ ] Fix tipos en resolvers GraphQL (retornos de resolvers que devuelven Observable vs Promise)
-- [ ] Fix tipos en sagas (efectos de redux-saga mal tipados)
-- [ ] Agregar `strict: true` gradualmente al `tsconfig.json` (empezando por módulos nuevos)
+- [ ] Fix tipos en `configureStore.worker.ts` y `configureStore.client.ts` (Redux store typing) — **578 errores TS en packages/app** — esfuerzo alto, requiere refactor de tipos Immutable.js
+- [ ] Fix tipos en resolvers GraphQL (retornos de resolvers que devuelven Observable vs Promise) — mismo esfuerzo alto
+- [ ] Fix tipos en sagas (efectos de redux-saga mal tipados) — mismo esfuerzo alto
+- [ ] Agregar `strict: true` gradualmente al `tsconfig.json` (empezando por módulos nuevos) — **N/A por ahora** hasta resolver los 578 errores existentes
 
 ### 8.3 Eliminar dependencias no usadas
 - [x] Auditoría de `package.json` — identificar dependencias que ya no se importan en ningún archivo
@@ -389,5 +389,5 @@
 
 ### 12.2 CI/CD
 - [x] Pipeline de release automatizado — `yarn release` y `yarn release:publish` configurados; `electron-builder --publish always` para publish automático
-- [ ] Changelog automático desde conventional commits
-- [ ] Versionado semántico automatizado
+- [x] Changelog automático desde conventional commits — `@semantic-release/changelog` genera `CHANGELOG.md` automáticamente en cada release (`.releaserc.json`)
+- [x] Versionado semántico automatizado — `semantic-release` + `@semantic-release/github` publican releases en GitHub con versionado semántico desde commits conventional
