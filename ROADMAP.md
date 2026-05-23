@@ -371,7 +371,7 @@
 ### 11.1 Experiencia de usuario
 - [x] Loading states — LoadingScreen ahora tiene spinner CSS; `index-sub.js` sigue sin loading screen; failures son silenciosos (1 retry sin feedback visual); mejora futura: error UI y loading states diferenciados por fase
 - [x] Error boundaries — `ConsoleErrorBoundary` ya existe y envuelve los 4 entry points del renderer (index, index-sub, about-window, multi-instance)
-- [ ] Offline mode — `navigator.onLine` + online/offline events ya disparan `setOnlineStatus` action; `ApplicationError` muestra error por-app con retry; **falta**: banner global de offline, service worker para cache-first, queue de requests retry
+- [x] Offline mode — `navigator.onLine` + `online`/`offline` events disparan `setOnlineStatus`; `OfflineBanner` muestra banner global cuando está offline; **resta**: service worker para cache-first y queue de requests retry
 
 ### 11.2 Performance
 - [x] Bundle size analysis — chunks grandes identificados: `lodash` (~500KB+), `graphql` modules; lazy loading parcial existe (handlebars, LazyWebview); lazy loading de routes/settings requiere refactor mayor
