@@ -13,6 +13,7 @@ import configureStore from './store/configureStore.client';
 import ReduxBasedGradientProvider from './theme/ReduxBasedGradientProvider';
 import { getGQlClient } from './utils/graphql';
 import ConsoleErrorBoundary from './common/containers/ConsoleErrorBoundary';
+import OfflineBanner from './common/components/OfflineBanner';
 
 import { ActionsBusReactContext, createActionsEmitter, createActionsBus } from './store/actionsBus';
 
@@ -63,6 +64,7 @@ const render = (store) => {
           <BrowserXThemeProvider>
             <ReduxBasedGradientProvider>
               <ConsoleErrorBoundary>
+                <OfflineBanner />
                 <App />
               </ConsoleErrorBoundary>
             </ReduxBasedGradientProvider>

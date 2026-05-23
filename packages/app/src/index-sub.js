@@ -11,6 +11,7 @@ import '../../../node_modules/font-awesome/css/font-awesome.min.css';
 import { handleError } from './services/api/helpers';
 import configureStore from './store/configureStore.client';
 import ConsoleErrorBoundary from './common/containers/ConsoleErrorBoundary';
+import OfflineBanner from './common/components/OfflineBanner';
 import { getGQlClient } from './utils/graphql';
 
 import { ActionsBusReactContext, createActionsEmitter, createActionsBus } from './store/actionsBus';
@@ -56,7 +57,8 @@ const render = (store) => {
   createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <ConsoleErrorBoundary>
-        <ActionsBusReactContext.Provider value={{ actionsBus }}>
+              <OfflineBanner />
+              <ActionsBusReactContext.Provider value={{ actionsBus }}>
           <ApolloProvider client={client}>
             <BrowserXThemeProvider>
               <AppSub subData={currentWindow.subData} />

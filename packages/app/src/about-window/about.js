@@ -11,6 +11,7 @@ import configureStore from '../store/configureStore.client';
 import ReduxBasedGradientProvider from '../theme/ReduxBasedGradientProvider';
 import { handleError } from '../services/api/helpers';
 import ConsoleErrorBoundary from '../common/containers/ConsoleErrorBoundary';
+import OfflineBanner from '../common/components/OfflineBanner';
 configureStore().then(store => {
   // for debug purpose, gives us a way to easily access the store
   window.stationStore = store;
@@ -34,6 +35,7 @@ const render = (store) => {
   createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <ConsoleErrorBoundary>
+        <OfflineBanner />
         <BrowserXThemeProvider>
           <ReduxBasedGradientProvider>
             <AboutWindowContainer />
