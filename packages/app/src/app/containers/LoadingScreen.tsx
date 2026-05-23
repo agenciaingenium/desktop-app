@@ -68,6 +68,20 @@ class LoadingScreenImpl extends React.PureComponent<StateProps & GradientProps, 
             </p>
           </div>
           <div style={{
+            width: 40,
+            height: 40,
+            marginTop: 30,
+            border: '3px solid rgba(255,255,255,0.3)',
+            borderTopColor: '#fff',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+          }} />
+          <style>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+          <div style={{
             marginTop: 30,
             color: 'rgba(255,255,255, 0.8)',
             fontSize: 14,
