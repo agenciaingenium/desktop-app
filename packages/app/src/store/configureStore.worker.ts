@@ -30,7 +30,10 @@ function asyncInit(store: StationStoreWorker, sagaMiddleware: SagaMiddleware<any
     import('./storage'),
     import('../persistence/index'),
     import('./duck'),
-  ]).then(([logger, { default: ApiStorage }, { getInitialState }, { REHYDRATION_COMPLETE }]) => {
+  ]).catch(err => {
+    console.error('[configureStore.worker] asyncInit import failed:', err);
+    throw err;
+  }).then(([logger, { default: ApiStorage }, { getInitialState }, { REHYDRATION_COMPLETE }]) => {
     const storage = new ApiStorage();
     storage.on('error', (err, metaData) => {
       log.error(err);
@@ -50,6 +53,8 @@ function asyncInit(store: StationStoreWorker, sagaMiddleware: SagaMiddleware<any
       return sagaPromise.then(() => {
         store.dispatch(ready());
       });
+    }).catch(err => {
+      console.error('[configureStore.worker] electronApp.afterReady failed:', err);
     });
 
     store.persistor = persistor;
@@ -139,6 +144,8 @@ export function configureStore(bxApp: BrowserXAppWorker) {
   observe(store, observers);
   services.electronApp.afterReady().then(() => {
     observe(store, delayedObservers);
+  }).catch(err => {
+    console.error('[configureStore.worker] electronApp.afterReady failed:', err);
   });
 
   replayActionServer(store);

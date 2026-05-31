@@ -91,6 +91,9 @@ export class SingletonStateProxy<S extends Sequelize.Model<any, any>, T extends 
       return this.aclass.getOne().then((instance: T) => {
         this.instance = instance;
         return;
+      }).catch(err => {
+        console.error('[persistence] SingletonStateProxy.init failed:', err);
+        throw err;
       });
     }
   }
@@ -100,6 +103,9 @@ export class SingletonStateProxy<S extends Sequelize.Model<any, any>, T extends 
       return this.aclass.getOne().then((instance: T) => {
         this.instance = instance;
         return this.toState();
+      }).catch(err => {
+        console.error('[persistence] SingletonStateProxy.get failed:', err);
+        throw err;
       });
     }
     return this.toState();
@@ -107,17 +113,17 @@ export class SingletonStateProxy<S extends Sequelize.Model<any, any>, T extends 
 
   async actualSet(state: Immutable.Map<string, any>) {
     await this.init();
-    if (this.instance!.isEmpty()) {
-      // Do not insert empty singleton
+    if (!this.instance) {
+      throw new Error('SingletonStateProxy instance not initialized');
+    }
+    if (this.instance.isEmpty()) {
       if (state.size === 0) return;
       this.instance = await this.aclass.create(state);
     } else if (state.size === 0) {
-      // Was not empty in db, be now empty in state,
-      // so we must delete reference from db
       await this.aclass.truncate();
       this.clear();
     } else {
-      this.instance = await this.instance!.update(state);
+      this.instance = await this.instance.update(state);
     }
     return;
   }
@@ -151,6 +157,9 @@ export class ListStateProxy<S extends Sequelize.Model<any, any>, T extends ListP
       return this.aclass.getAll().then((instances: T[]) => {
         this.instances = instances;
         return this.toState();
+      }).catch(err => {
+        console.error('[persistence] ListStateProxy.get failed:', err);
+        throw err;
       });
     }
     return this.toState();
@@ -206,6 +215,9 @@ export class MapStateProxy<S extends Sequelize.Model<any, any>, T extends MapPro
           this.instances = this.instances.set(instance.getObjectKey(), instance);
         }
         return this.toState();
+      }).catch(err => {
+        console.error('[persistence] MapStateProxy.get failed:', err);
+        throw err;
       });
     }
     return this.toState();
@@ -291,6 +303,9 @@ export class KeyValueStateProxy<S extends Sequelize.Model<any, any>, T extends K
       return this.aclass.getAll().then((instances: T[]) => {
         this.instances = instances;
         return this.toState();
+      }).catch(err => {
+        console.error('[persistence] KeyValueStateProxy.get failed:', err);
+        throw err;
       });
     }
     return this.toState();

@@ -14,7 +14,11 @@ const RESUME_QUIT_RECOVERY_DELAY = 5000;
 
 function initProxyResolver() {
   app.on('ready', () => {
-    const defaultSession = session.defaultSession!;
+    const defaultSession = session.defaultSession;
+    if (!defaultSession) {
+      log.warn('Proxy : defaultSession not available');
+      return;
+    }
 
     // Use electron session resolver to detect proxy settings with a distant URL
     // If settings are detected, parse them then intialize a global tunnel for the whole app
@@ -24,11 +28,18 @@ function initProxyResolver() {
       } else {
         log.info('Proxy : settings detected ', proxyDetected);
         // Parse the answer, it looks like : PROXY 192.168.11.124:9976
-        const proxySettings = proxyDetected.split(' ')[1].split(':');
-        globalTunnel.initialize({
-          host: proxySettings[0],
-          port: Number(proxySettings[1]),
-        });
+        const parts = proxyDetected.split(' ');
+        const hostPort = parts[1]?.split(':');
+        if (hostPort && hostPort.length >= 2 && hostPort[0] && hostPort[1]) {
+          globalTunnel.initialize({
+            host: hostPort[0],
+            port: Number(hostPort[1]),
+          }).catch(err => {
+            log.error('Proxy : globalTunnel.initialize failed:', err);
+          });
+        } else {
+          log.warn('Proxy : failed to parse proxy settings', proxyDetected);
+        }
       }
     });
   });
@@ -39,6 +50,7 @@ export class ElectronAppServiceImpl extends ElectronAppService implements RPC.In
   private appCanQuit: boolean;
   private provider?: RPC.Node<ElectronAppServiceProviderService>;
   private tray?: Tray;
+  private trayClickHandler?: () => void;
 
   constructor(uuid?: string) {
     super(uuid, { ready: false });
@@ -64,7 +76,9 @@ export class ElectronAppServiceImpl extends ElectronAppService implements RPC.In
     this.initPrepareQuit();
     initProxyResolver();
 
-    app.whenReady().then(() => this.ready());
+    app.whenReady().then(() => this.ready()).catch(err => {
+      console.error('[electron-app] app.whenReady failed:', err);
+    });
   }
 
   async getPath(name: ElectronAppPath) {
@@ -93,7 +107,9 @@ export class ElectronAppServiceImpl extends ElectronAppService implements RPC.In
   }
 
   async dockSetBadge(badge: string) {
-    app.dock.setBadge(badge);
+    if (process.platform === 'darwin' && app.dock) {
+      app.dock.setBadge(badge);
+    }
   }
 
   async getAppMetadata() {
@@ -146,6 +162,10 @@ export class ElectronAppServiceImpl extends ElectronAppService implements RPC.In
       throw new Error('missing provider service');
     }
     if (this.tray) {
+      if (this.trayClickHandler) {
+        this.tray.removeListener('double-click', this.trayClickHandler);
+        this.trayClickHandler = undefined;
+      }
       this.tray.destroy();
       this.tray = undefined;
     }
@@ -171,12 +191,14 @@ export class ElectronAppServiceImpl extends ElectronAppService implements RPC.In
   }
 
   private getTrayIcon() {
-    const result = nativeImage.createFromPath(
-      isPackaged 
-        ? path.resolve(process.resourcesPath, 'icon-app.png')
-        : path.resolve(__dirname, '../../../static/icon-app.png')
-    );
-    result.setTemplateImage(true);
+    const iconPath = isPackaged && process.resourcesPath
+      ? path.resolve(process.resourcesPath, 'icon-app.png')
+      : path.resolve(__dirname, '../../../static/icon-app.png');
+
+    const result = nativeImage.createFromPath(iconPath);
+    if (!result.isEmpty()) {
+      result.setTemplateImage(true);
+    }
 
     return result;
   }
@@ -210,7 +232,8 @@ export class ElectronAppServiceImpl extends ElectronAppService implements RPC.In
     ]);
 
     const tray = new Tray(this.getTrayIcon());
-    tray.addListener('double-click', () => this.showAllWindows());
+    this.trayClickHandler = () => this.showAllWindows();
+    tray.on('double-click', this.trayClickHandler);
     tray.setToolTip('Station');
     tray.setContextMenu(contextMenu);
     return tray;

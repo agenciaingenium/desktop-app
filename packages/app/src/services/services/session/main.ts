@@ -13,6 +13,8 @@ export class SessionServiceImpl extends SessionService implements RPC.Interface<
     this.initSession(options).then(session => {
       this.session = session;
       this.ready();
+    }).catch(err => {
+      console.error('[session] Failed to initialize session:', err);
     });
   }
 
@@ -42,6 +44,9 @@ export class SessionServiceImpl extends SessionService implements RPC.Interface<
 
   private async getSession(): Promise<Electron.Session> {
     await this.whenReady();
-    return this.session!;
+    if (!this.session) {
+      throw new Error('Session not initialized');
+    }
+    return this.session;
   }
 }

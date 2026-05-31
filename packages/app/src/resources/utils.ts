@@ -49,7 +49,12 @@ const executePromiseOnce = <T>(firstResolveCb: () => Promise<T>) => {
   let executedPromise: Promise<void> | undefined;
   return (whenFirstCallbackFn: (obj: T) => void): Promise<any> => {
     if (!executedPromise) {
-      executedPromise = firstResolveCb().then(whenFirstCallbackFn);
+      executedPromise = firstResolveCb()
+        .then(whenFirstCallbackFn)
+        .catch(err => {
+          console.error('[resources] executePromiseOnce failed:', err);
+          throw err;
+        });
     }
     return executedPromise;
   };

@@ -55,50 +55,74 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
   }
 
   async getId() {
+    if (!this.window) return 0;
     return this.window.id;
   }
 
   async getWebContentsId() {
+    if (!this.window) return 0;
     return this.window.webContents.id;
   }
 
   async focus() {
+    if (!this.window) return;
     this.window.focus();
   }
 
   async close() {
+    if (!this.window) return;
     this.window.close();
   }
 
   async show() {
+    if (!this.window) return;
     this.window.show();
   }
 
   async hide() {
+    if (!this.window) return;
     this.window.hide();
   }
 
   async load(url: string) {
-    this.window.loadURL(url);
+    if (!this.window) return;
+    try {
+      await this.window.loadURL(url);
+    } catch (err) {
+      console.error('[browser-window] loadURL failed:', err);
+    }
   }
 
   async reload() {
+    if (!this.window) return;
     this.window.webContents.reload();
   }
 
   async openDevTools() {
-    await this.window.webContents.openDevTools();
+    if (!this.window) return;
+    try {
+      await this.window.webContents.openDevTools();
+    } catch (err) {
+      console.error('[browser-window] openDevTools failed:', err);
+    }
   }
 
   async toggleDevTools() {
-    await this.window.webContents.toggleDevTools();
+    if (!this.window) return;
+    try {
+      await this.window.webContents.toggleDevTools();
+    } catch (err) {
+      console.error('[browser-window] toggleDevTools failed:', err);
+    }
   }
 
   async toggleFullscreen() {
+    if (!this.window) return;
     this.window.setFullScreen(!this.window.isFullScreen());
   }
 
   async toggleMaximize() {
+    if (!this.window) return;
     if (this.window.isMaximized()) {
       this.window.unmaximize();
     } else {
@@ -107,6 +131,8 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
   }
 
   async resetWindowPosition() {
+    if (!this.window) return;
+
     if (this.stateManager) {
       (this.stateManager as any).resetStateToDefault();
       this.stateManager.saveState(this.window);
@@ -121,10 +147,12 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
   }
 
   async getBounds() {
+    if (!this.window) return { x: 0, y: 0, width: 0, height: 0 };
     return this.window.getBounds();
   }
 
   async isFocused() {
+    if (!this.window) return false;
     return this.window.isFocused();
   }
 
@@ -134,6 +162,7 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
    * @param metadata
    */
   async setMetadata<T extends object>(metadata: T) {
+    if (!this.window) return;
     Object.assign(this.window, metadata);
   }
 
@@ -156,27 +185,27 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
   }
 
   private onAny(key: string, callback?: Function) {
-    if (!callback) return noop;
+    if (!callback || !this.window) return noop;
     return fromEvent(this.window, key).subscribe(() => callback());
   }
 
   private onAnyWebContents(key: string, callback?: Function) {
-    if (!callback) return noop;
+    if (!callback || !this.window) return noop;
     return fromEvent(this.window.webContents, key).subscribe(() => callback());
   }
 
   private onContextMenu(callback?: RPC.ObserverNode<BrowserWindowServiceObserver>['onContextMenu']) {
-    if (!callback) return noop;
+    if (!callback || !this.window) return noop;
     return fromEvent(this.window.webContents, 'context-menu', (_e, params) => params).subscribe(callback);
   }
 
   private onSwipe(callback?: RPC.ObserverNode<BrowserWindowServiceObserver>['onSwipe']) {
-    if (!callback) return noop;
+    if (!callback || !this.window) return noop;
     return fromEvent(this.window, 'swipe', (_e, direction) => direction).subscribe(callback);
   }
 
   private onReadyToShow(callback?: Function) {
-    if (!callback) return noop;
+    if (!callback || !this.window) return noop;
     const cb = (event: Electron.IpcMainEvent) => {
       if (event.sender === this.window.webContents) {
         callback();
@@ -189,7 +218,7 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
   }
 
   private onNewNotification(callback?: Function) {
-    if (!callback) return noop;
+    if (!callback || !this.window) return noop;
     const cb = (event: Electron.IpcMainEvent, notificationId: string, props: NotificationProps) => {
       if (event.sender === this.window.webContents) {
         callback(notificationId, props);
@@ -215,6 +244,10 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
       fullScreen: false,
     });
 
+    if (!this.stateManager) {
+      return {};
+    }
+
     return {
       x: this.stateManager.x,
       y: this.stateManager.y,
@@ -227,17 +260,19 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
   }
 
   private endInitPositionManager() {
-    if (!this.stateManager) return;
+    if (!this.stateManager || !this.window) return;
     this.stateManager.manage(this.window);
-    
-    // Ensure window is not in fullscreen mode on startup
-    // This fixes the bug where closing in fullscreen causes issues
+
     if (this.window.isFullScreen()) {
       this.window.setFullScreen(false);
     }
   }
 
   async setAlwaysOnTop(flag: boolean, level?: 'normal' | 'floating' | 'torn-off-menu' | 'modal-panel' | 'main-menu' | 'status' | 'pop-up-menu' | 'screen-saver', relativeLevel?: number) {
-    this.window.setAlwaysOnTop(flag, level, relativeLevel); 
+    try {
+      await this.window.setAlwaysOnTop(flag, level, relativeLevel);
+    } catch (err) {
+      console.error('[browser-window] setAlwaysOnTop failed:', err);
+    }
   }
 }

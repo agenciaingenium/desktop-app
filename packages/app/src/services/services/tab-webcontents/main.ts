@@ -50,78 +50,111 @@ export class TabWebContentsServiceImpl extends TabWebContentsService implements 
   }
 
   initWebviewsListener() {
-    app.on('web-contents-created', async (_e: any, contents: Electron.WebContents) => {
-      if ((contents as any).getType() === 'webview') {
-        this.webviews.next(contents);
+    app.on('web-contents-created', (_e: any, contents: Electron.WebContents) => {
+      try {
+        if ((contents as any).getType() === 'webview') {
+          this.webviews.next(contents);
+        }
+      } catch (err) {
+        console.error('[tab-webcontents] initWebviewsListener error:', err);
       }
     });
   }
 
   async clearHistory(webContentsId: number) {
-    (await getWebContentsFromIdOrThrow(webContentsId)).clearHistory();
+    try {
+      (await getWebContentsFromIdOrThrow(webContentsId)).clearHistory();
+    } catch (err) {
+      console.error('[tab-webcontents] clearHistory failed:', err);
+    }
   }
 
   async loadURL(webContentsId: number, url: string) {
-    (await getWebContentsFromIdOrThrow(webContentsId)).loadURL(url);
+    try {
+      await (await getWebContentsFromIdOrThrow(webContentsId)).loadURL(url);
+    } catch (err) {
+      console.error('[tab-webcontents] loadURL failed:', err);
+    }
   }
 
   async querySpellchecker(webContentsId: number, misspelledWord: string) {
-    const wc = await getWebContentsFromIdOrThrow(webContentsId);
+    try {
+      const wc = await getWebContentsFromIdOrThrow(webContentsId);
 
-    return await new BluebirdPromise<string[]>(resolve => {
-      ipcMain.once('spellchecker-get-correction-response', (_e: any, corrections: string[]) => resolve(corrections));
-      wc.send('spellchecker-get-correction', misspelledWord);
-    })
-      .timeout(200)
-      .catch(BluebirdPromise.TimeoutError, () => {
-        log.warn('querySpellcheckerInWebContents timeouts');
-        return [];
-      });
+      return await new BluebirdPromise<string[]>(resolve => {
+        ipcMain.once('spellchecker-get-correction-response', (_e: any, corrections: string[]) => resolve(corrections));
+        wc.send('spellchecker-get-correction', misspelledWord);
+      })
+        .timeout(200)
+        .catch(BluebirdPromise.TimeoutError, () => {
+          log.warn('querySpellcheckerInWebContents timeouts');
+          return [];
+        });
+    } catch (err) {
+      console.error('[tab-webcontents] querySpellchecker failed:', err);
+      return [];
+    }
   }
 
   async print(webContentsId: number) {
-    (await getWebContentsFromIdOrThrow(webContentsId)).print();
+    try {
+      (await getWebContentsFromIdOrThrow(webContentsId)).print();
+    } catch (err) {
+      console.error('[tab-webcontents] print failed:', err);
+    }
   }
 
   async setZoomLevel(webContentsId: number, zoomLevel: number) {
-    (await getWebContentsFromIdOrThrow(webContentsId)).setZoomLevel(zoomLevel);
+    try {
+      (await getWebContentsFromIdOrThrow(webContentsId)).setZoomLevel(zoomLevel);
+    } catch (err) {
+      console.error('[tab-webcontents] setZoomLevel failed:', err);
+    }
   }
 
-  async findInPage(webContentsId: number, searchString: string, options?: Electron.FindInPageOptions) {
-    const wc = await getWebContentsFromIdOrThrow(webContentsId);
+async findInPage(webContentsId: number, searchString: string, options?: Electron.FindInPageOptions) {
+    try {
+      const wc = await getWebContentsFromIdOrThrow(webContentsId);
 
-    return new Promise<Electron.Result>(resolve => {
-      if (wc.isDestroyed()) return resolve();
+      return new Promise<Electron.Result>(resolve => {
+        if (wc.isDestroyed()) return resolve();
 
-      wc.once('found-in-page', (_e: any, result: Electron.Result) => {
-        // We have a weird behaviour that we haven't successfully reproduced in fiddle yet.
-        // When the search reached its last result, and we try to find the next one (which doesn't exist),
-        // the main process freezes.
-        // The fix is to loop the search like in Chromium, so when we have reached the end,
-        // we clear the results and start a fresh search.
-        this.loop = result.matches === result.activeMatchOrdinal;
-        this.requestId = null;
-        resolve(result);
+        wc.once('found-in-page', (_e: any, result: Electron.Result) => {
+          this.loop = result.matches === result.activeMatchOrdinal;
+          this.requestId = null;
+          resolve(result);
+        });
+
+        let opts = options;
+        if (this.loop) {
+          this.loop = false;
+          opts = omit(['findNext'], options);
+        }
+        this.requestId = wc.findInPage(searchString, opts);
       });
-
-      let opts = options;
-      if (this.loop) {
-        this.loop = false;
-        opts = omit(['findNext'], options);
-      }
-      this.requestId = wc.findInPage(searchString, opts);
-    });
+    } catch (err) {
+      console.error('[tab-webcontents] findInPage failed:', err);
+      return { remaining: 0, matchRect: undefined, activeMatchOrdinal: 0, matches: 0 };
+    }
   }
 
   async stopFindInPage(webContentsId: number) {
-    (await getWebContentsFromIdOrThrow(webContentsId)).stopFindInPage('clearSelection');
+    try {
+      (await getWebContentsFromIdOrThrow(webContentsId)).stopFindInPage('clearSelection');
+    } catch (err) {
+      console.error('[tab-webcontents] stopFindInPage failed:', err);
+    }
   }
 
   async executeJavaScript(webContentsId: number, code: string, userGesture?: boolean) {
-    const wc = await getWebContentsFromIdOrThrow(webContentsId);
-
-    await awaitDomReady(wc);
-    return wc.executeJavaScript(code, userGesture);
+    try {
+      const wc = await getWebContentsFromIdOrThrow(webContentsId);
+      await awaitDomReady(wc);
+      return wc.executeJavaScript(code, userGesture);
+    } catch (err) {
+      console.error('[tab-webcontents] executeJavaScript failed:', err);
+      return undefined;
+    }
   }
 
   async askAutoLoginCredentials(webContentsId: number) {
@@ -135,9 +168,13 @@ export class TabWebContentsServiceImpl extends TabWebContentsService implements 
       return fromEvent(wc, 'ipc-message-sync', (event, channel, props) => ({ event, channel, props }))
         .pipe(filter(({ channel }) => channel === 'window-alert'))
         .subscribe(async ({ event, props }) => {
-          await provider.show(wc.id, props);
-          if (event && event.sendReply) {
-            event.sendReply([]);
+          try {
+            await provider.show(wc.id, props);
+            if (event && event.sendReply) {
+              event.sendReply([]);
+            }
+          } catch (err) {
+            console.error('[tab-webcontents] setAlertDialogProvider failed:', err);
           }
         });
     }));
@@ -168,19 +205,31 @@ export class TabWebContentsServiceImpl extends TabWebContentsService implements 
         return fromEvent(wc, 'ipc-message', (_e, channel) => channel)
           .pipe(filter(channel => channel === 'autologin-display-removeLinkBanner'))
           .subscribe(async () => {
-            await provider.showRemoveLinkBanner(wc.id);
+            try {
+              await provider.showRemoveLinkBanner(wc.id);
+            } catch (err) {
+              console.error('[tab-webcontents] showRemoveLinkBanner failed:', err);
+            }
           });
       }),
       shared.subscribe(wc => {
         return fromEvent(wc, 'did-navigate')
           .subscribe(async () => {
-            await provider.hideBanners(wc.id);
+            try {
+              await provider.hideBanners(wc.id);
+            } catch (err) {
+              console.error('[tab-webcontents] hideBanners(did-navigate) failed:', err);
+            }
           });
       }),
       shared.subscribe(wc => {
         return fromEvent(wc, 'did-navigate-in-page')
           .subscribe(async () => {
-            await provider.hideBanners(wc.id);
+            try {
+              await provider.hideBanners(wc.id);
+            } catch (err) {
+              console.error('[tab-webcontents] hideBanners(did-navigate-in-page) failed:', err);
+            }
           });
       }),
     ]);
@@ -190,25 +239,32 @@ export class TabWebContentsServiceImpl extends TabWebContentsService implements 
     return new ServiceSubscription(this.onNewWebviews().subscribe(wc => {
       return fromEvent(wc, 'login', (event, _request, authInfo, callback) => ({ event, authInfo, callback }))
         .subscribe(async ({ event, authInfo, callback }) => {
-          event.preventDefault();
-          const { username, password } = await provider.getAuthData(wc.id, authInfo);
-          callback(username, password);
+          try {
+            event.preventDefault();
+            const { username, password } = await provider.getAuthData(wc.id, authInfo);
+            callback(username, password);
+          } catch (err) {
+            console.error('[tab-webcontents] getAuthData failed:', err);
+          }
         });
     }));
   }
 
   async setWebContentsOverrideProvider(provider: RPC.Node<WebContentsOverrideProviderService>) {
     return new ServiceSubscription(this.onNewWebviews().subscribe(async wc => {
-      const data = await provider.getOverrideData(wc.id);
-      if (data.userAgent) {
-        let userAgentWithRealOS = data.userAgent;
-        const defaultUserAgent = session.defaultSession?.getUserAgent();
-        const baseOSUserAgent = defaultUserAgent?.match(/\(([^()]*)\)/m);
-        // Preventing any pb about the non respect of UserAgent format,prefer to have a valid one in all cases
-        if (baseOSUserAgent && baseOSUserAgent.length > 1) {
-          userAgentWithRealOS = data.userAgent.replace(/\(([^()]*)\)/m, baseOSUserAgent[0]);
+      try {
+        const data = await provider.getOverrideData(wc.id);
+        if (data.userAgent) {
+          let userAgentWithRealOS = data.userAgent;
+          const defaultUserAgent = session.defaultSession?.getUserAgent();
+          const baseOSUserAgent = defaultUserAgent?.match(/\(([^()]*)\)/m);
+          if (baseOSUserAgent && baseOSUserAgent.length > 1) {
+            userAgentWithRealOS = data.userAgent.replace(/\(([^()]*)\)/m, baseOSUserAgent[0]);
+          }
+          wc.setUserAgent(userAgentWithRealOS);
         }
-        wc.setUserAgent(userAgentWithRealOS);
+      } catch (err) {
+        console.error('[tab-webcontents] setWebContentsOverrideProvider failed:', err);
       }
     }));
   }
@@ -278,11 +334,15 @@ export class TabWebContentsServiceImpl extends TabWebContentsService implements 
           if (this.isNewWindowForUserRequest(details)) {
             return { action: 'allow' };
           }
-          provider.dispatchUrl(details.url, wc.id, DEFAULT_BROWSER_BACKGROUND);
+          provider.dispatchUrl(details.url, wc.id, DEFAULT_BROWSER_BACKGROUND).catch(err => {
+            console.error('[tab-webcontents] dispatchUrl failed:', err);
+          });
           return { action: 'deny' };
         }
         else if (details.disposition === 'background-tab') {
-          provider.dispatchUrl(details.url, wc.id, DEFAULT_BROWSER);
+          provider.dispatchUrl(details.url, wc.id, DEFAULT_BROWSER).catch(err => {
+            console.error('[tab-webcontents] dispatchUrl failed:', err);
+          });
           return { action: 'deny' };
         }
         else if (details.disposition === 'foreground-tab') {

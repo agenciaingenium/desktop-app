@@ -64,6 +64,8 @@ export class BrowserXAppWorker {
   public pubsub: PubSub;
   public router: URLRouter;
   public resourceRouter: ResourceRouterDispatcher;
+  private onlineHandler?: () => void;
+  private offlineHandler?: () => void;
 
   constructor() {
     try {
@@ -282,32 +284,40 @@ export class BrowserXAppWorker {
 
     services.tabWebContents.addGlobalObserver(observer({
       async onNewWebview(webContentsId: number) {
-        const contextMenuService = await services.contextMenu.create({ webcontentsId: webContentsId });
+        try {
+          const contextMenuService = await services.contextMenu.create({ webcontentsId: webContentsId });
 
-        return contextMenuService.addObserver(observer({
-          async onShow(props: Electron.ContextMenuParams) {
-            const newProps = !props.misspelledWord ? props : {
-              ...props,
-              misspellingCorrections: await services.tabWebContents
-                .querySpellchecker(webContentsId, props.misspelledWord),
-            };
-            const state = store.getState();
+          return contextMenuService.addObserver(observer({
+            async onShow(props: Electron.ContextMenuParams) {
+              try {
+                const newProps = !props.misspelledWord ? props : {
+                  ...props,
+                  misspellingCorrections: await services.tabWebContents
+                    .querySpellchecker(webContentsId, props.misspelledWord),
+                };
+                const state = store.getState();
 
-            contextMenuService.popup({
-              props: newProps,
-              context: {
-                inWebview: true,
-                backForwardState: {
-                  canGoBack: getForeFrontNavigationStateProperty(state, 'canGoBack'),
-                  canGoForward: getForeFrontNavigationStateProperty(state, 'canGoForward'),
-                },
-              },
-            });
-          },
-          onClickItem(params: IMenuServiceObserverOnClickItemParam) {
-            handleMenuItemClick(params);
-          },
-        }, 'ctx-show-click'));
+                contextMenuService.popup({
+                  props: newProps,
+                  context: {
+                    inWebview: true,
+                    backForwardState: {
+                      canGoBack: getForeFrontNavigationStateProperty(state, 'canGoBack'),
+                      canGoForward: getForeFrontNavigationStateProperty(state, 'canGoForward'),
+                    },
+                  },
+                });
+              } catch (err) {
+                console.error('[app-worker] contextMenu onShow failed:', err);
+              }
+            },
+            onClickItem(params: IMenuServiceObserverOnClickItemParam) {
+              handleMenuItemClick(params);
+            },
+          }, 'ctx-show-click'));
+        } catch (err) {
+          console.error('[app-worker] onNewWebview failed:', err);
+        }
       },
     }, 'wc-global')).catch(handleError());
   }
@@ -336,19 +346,23 @@ export class BrowserXAppWorker {
   }
 
   private async initAppLifeCycle() {
-    services.electronApp.setProvider(new ElectronAppServiceProviderServiceImpl(this.store))
-    // Don't wrap this in this.store.ready()
-    // because we want the window to be created as soon as possible
-    await this.mainWindowManager.create();
+    try {
+      services.electronApp.setProvider(new ElectronAppServiceProviderServiceImpl(this.store))
+      await this.mainWindowManager.create();
+    } catch (err) {
+      console.error('[app-worker] initAppLifeCycle mainWindow create failed:', err);
+    }
 
     const onActivate = async () => {
-      const isReady = await services.electronApp.isReady();
-      if (!isReady) {
-        return;
+      try {
+        const isReady = await services.electronApp.isReady();
+        if (!isReady) {
+          return;
+        }
+        await this.mainWindowManager.create();
+      } catch (err) {
+        console.error('[app-worker] onActivate failed:', err);
       }
-      // On macOS it's common to re-create a window in the app when the
-      // dock icon is clicked and there are no other windows open.
-      await this.mainWindowManager.create();
     };
     services.electronApp.addObserver(observer({ onActivate }, 'app-on-activate')).catch(handleError());
   }
@@ -377,10 +391,22 @@ export class BrowserXAppWorker {
       this.dispatch(setOnlineStatus(isOnline));
     };
 
-    window.addEventListener('online', () => updateOnlineStatus(true));
-    window.addEventListener('offline', () => updateOnlineStatus(false));
+    this.onlineHandler = () => updateOnlineStatus(true);
+    this.offlineHandler = () => updateOnlineStatus(false);
+
+    window.addEventListener('online', this.onlineHandler);
+    window.addEventListener('offline', this.offlineHandler);
 
     updateOnlineStatus(navigator.onLine);
+  }
+
+  private cleanupOnlineListener() {
+    if (this.onlineHandler) {
+      window.removeEventListener('online', this.onlineHandler);
+    }
+    if (this.offlineHandler) {
+      window.removeEventListener('offline', this.offlineHandler);
+    }
   }
 
   private initSDKv2() {

@@ -16,7 +16,7 @@ export default class CacheFetcher implements IFetcher {
   async fetch(uri: string) {
     // If fetching is already ongoing, wait for this result
     if (this.mutex.has(uri)) {
-      return this.mutex.get(uri);
+      return this.mutex.get(uri)!;
     }
 
     // Build the fetching promise

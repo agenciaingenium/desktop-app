@@ -142,6 +142,7 @@ export function periodicTick(ms: number, stopAfter?: number): Channel<any> {
     const iv = setInterval(() => {
       total += ms;
       if (stopAfter && stopAfter <= total) {
+        clearInterval(iv);
         emit(END);
       } else {
         emit({});
@@ -255,8 +256,15 @@ export function createServiceObserverChannel
           x.emitter.once('destroyed', () => {
             emitter(END);
           });
+        }).catch(err => {
+          console.error('[utils/sagas] service observer subscription failed:', err);
+          emitter(END);
         });
-        return () => sub.then(x => x.unsubscribe());
+        return () => {
+          sub.then(x => x.unsubscribe()).catch(err => {
+            console.error('[utils/sagas] unsubscribe failed:', err);
+          });
+        };
       }),
     );
   };
@@ -288,8 +296,15 @@ export function createWebContentsServiceObserverChannel
         x.emitter.once('destroyed', () => {
           emitter(END);
         });
+      }).catch(err => {
+        console.error('[utils/sagas] webcontents observer subscription failed:', err);
+        emitter(END);
       });
-      return () => sub.then(x => x.unsubscribe());
+      return () => {
+        sub.then(x => x.unsubscribe()).catch(err => {
+          console.error('[utils/sagas] unsubscribe failed:', err);
+        });
+      };
     }),
   );
 }

@@ -156,6 +156,9 @@ function* sagaSendToggleFullScreen(action) {
 
 function* sagaSendToggleMaximize() {
   const windowService = yield callService('browserWindow', 'getFocusedWindow');
+  if (!windowService) {
+    return;
+  }
   yield call([windowService, windowService.toggleMaximize]);
 }
 

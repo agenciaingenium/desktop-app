@@ -64,7 +64,12 @@ export function* addApplicationRequest(
     throw new Error('Add Application : given manifest URL is blank');
   }
 
-  const normalizedManifestURL = (new URL(manifestURL)).toString();
+  let normalizedManifestURL: string;
+  try {
+    normalizedManifestURL = (new URL(manifestURL)).toString();
+  } catch (err) {
+    throw new Error(`Invalid manifest URL: ${manifestURL}`);
+  }
 
   const { installation, timeout }: { installation: InstallApplicationReturn, timeout: any } = yield race({
     installation: call(installApplication, normalizedManifestURL, { installContext: context }),

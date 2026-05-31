@@ -25,7 +25,13 @@ const timer = () => {
   };
 };
 
-const cookiesForUrl = async (url: string) => session.defaultSession!.cookies.get({ url });
+const cookiesForUrl = async (url: string) => {
+  const defaultSession = session.defaultSession;
+  if (!defaultSession) {
+    return [];
+  }
+  return defaultSession.cookies.get({ url });
+};
 
 const shouldNotTryToRedirect = (url: string) => {
   for (const re of REDIRECT_BLACKLIST) {
@@ -43,7 +49,7 @@ const shouldNotTryToRedirect = (url: string) => {
  * @param nbExecutedRedirects
  */
 export const resolveRedirects = (url: string, t = timer(), nbExecutedRedirects = 1) =>
-  new Promise<{ url: string, resolution: number }>(async (resolve: any, reject: any) => {
+  new Promise<{ url: string, resolution: number }>((resolve: any, reject: any) => {
     const resolveNow = () => resolve({ url, resolution: t.stop() });
 
     if (nbExecutedRedirects === maxRedirections) return reject(errorMessageTooManyRedirects);
@@ -54,33 +60,34 @@ export const resolveRedirects = (url: string, t = timer(), nbExecutedRedirects =
       redirect: 'manual',
     });
 
-    request.removeHeader('Cookies');
+    cookiesForUrl(url)
+      .then(cookies => {
+        const cookieString = cookies
+          .map(({ name, value, path, expirationDate, domain, secure, httpOnly }: Cookie) => {
+            return new tough.Cookie({
+              key: name, value,
+              expires: moment.unix(Math.trunc(expirationDate!)).utc(false).toDate(),
+              path, domain, secure: Boolean(secure), httpOnly: Boolean(httpOnly),
+            }).toString();
+          })
+          .join('; ');
 
-    const cookies = (await cookiesForUrl(url))
-      .map(({ name, value, path, expirationDate, domain, secure, httpOnly }: Cookie) => {
-        return new tough.Cookie({
-          key: name, value,
-          expires: moment.unix(Math.trunc(expirationDate!)).utc(false).toDate(),
-          path, domain, secure: Boolean(secure), httpOnly: Boolean(httpOnly),
-        }).toString();
+        request.setHeader('Cookie', cookieString);
+
+        request.on('redirect', (_, __, redirectUrl) => {
+          if (redirectUrl !== url) {
+            request.abort();
+            resolve(resolveRedirects(redirectUrl, t, nbExecutedRedirects + 1));
+          }
+        });
+
+        request.on('error', error => reject(error));
+        request.on('response', resolveNow);
+
+        request.end();
       })
-      .join('; ');
-
-    request.setHeader('Cookie', cookies);
-
-    // We use the net.request Electron module for handle redirects with a flag for handle manually redirects.
-    // Instead of using the resolveAfterRedirects() method in the redirect event handler,
-    // we abort() the request to create another one that allow use to surcharge it
-    // with cookies from the app session for the redirected url
-    request.on('redirect', (_, __, redirectUrl) => {
-      if (redirectUrl !== url) {
-        request.abort();
-        resolve(resolveRedirects(redirectUrl, t, nbExecutedRedirects + 1));
-      }
-    });
-
-    request.on('error', error => reject(error));
-    request.on('response', resolveNow);
-
-    request.end();
+      .catch(err => {
+        console.error('[url-router-helper] resolveRedirects failed:', err);
+        reject(err);
+      });
   });

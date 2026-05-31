@@ -15,7 +15,11 @@ export class LazyDuplex extends Duplex {
   }
 
   _write(chunk: Buffer, _encoding: any, callback: Function) {
-    this.duplex!.write(chunk, _encoding, callback);
+    if (!this.duplex) {
+      callback(new Error('Duplex not connected'));
+      return;
+    }
+    this.duplex.write(chunk, _encoding, callback);
   }
 
   _read(_size: any) {

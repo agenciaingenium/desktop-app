@@ -10,7 +10,6 @@ import enhanceWebRequest from 'electron-better-web-request';
 import log from 'electron-log';
 
 const enhancedSessions = new WeakSet<Session>();
-const grantedMediaOrigins = new Set<string>();
 
 const orderListeners = (listeners: any) => {
   const orderableOrigins = [
@@ -148,8 +147,7 @@ const enhancePermissions = (session: Session) => {
       if (permission !== 'media') return false;
       if (isMacMediaAccessBlocked()) return false;
 
-      const origin = getOrigin(requestingOrigin) || getOrigin(details && details.requestingUrl);
-      return origin ? grantedMediaOrigins.has(origin) : true;
+      return true;
     });
   }
 
@@ -161,14 +159,8 @@ const enhancePermissions = (session: Session) => {
       }
 
       if (isMacMediaAccessBlocked()) {
-        log.warn('[session] Media permission denied by macOS privacy settings');
         callback(false);
         return;
-      }
-
-      const origin = getOrigin(details && details.requestingUrl) || getOrigin(webContents.getURL());
-      if (origin) {
-        grantedMediaOrigins.add(origin);
       }
 
       callback(true);

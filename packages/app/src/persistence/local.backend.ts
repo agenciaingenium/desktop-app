@@ -28,15 +28,20 @@ const {
 export const getVersion = () => App.findOne().then((result: any) => {
   if (!result) return null;
   return result.version;
+}).catch(err => {
+  console.error('[persistence] getVersion failed:', err);
+  throw err;
 });
 
 export const setVersion = (version: any) => App.findOne().then((result: any) => {
   if (!result) {
-    // Do nothing, it will be created by first `app` create
     return;
   }
   result.version = version; // eslint-disable-line
   return result.save();
+}).catch(err => {
+  console.error('[persistence] setVersion failed:', err);
+  throw err;
 });
 
 export class ProfileDataProxy extends MapProxyMixin({

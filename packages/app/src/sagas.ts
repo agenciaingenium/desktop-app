@@ -3,8 +3,12 @@ import { all, call, spawn } from 'redux-saga/effects';
 
 function createAsyncImport(...args: any[]) {
   return function* asyncImport(importPromise: Promise<any>) {
-    const w = yield call(() => importPromise.then(y => y.default || y));
-    yield (call as any)(w, ...args);
+    try {
+      const w = yield call(() => importPromise.then(y => y.default || y));
+      yield (call as any)(w, ...args);
+    } catch (err) {
+      console.error('[sagas] asyncImport failed:', err);
+    }
   };
 }
 

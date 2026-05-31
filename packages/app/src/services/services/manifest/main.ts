@@ -7,8 +7,16 @@ export class ManifestServiceImpl extends ManifestService implements RPC.Interfac
   protected manifestProvider: ManifestProvider;
 
   async getManifest(manifestURL: string) {
-    const bxApp = await this.manifestProvider.get(manifestURL).pipe(take(1)).toPromise();
-    return bxApp.manifest;
+    try {
+      const bxApp = await this.manifestProvider.get(manifestURL).pipe(take(1)).toPromise();
+      if (!bxApp) {
+        throw new Error(`Manifest not found for URL: ${manifestURL}`);
+      }
+      return bxApp.manifest;
+    } catch (err) {
+      console.error('[manifest] Failed to get manifest:', err);
+      throw err;
+    }
   }
 
   init(manifestProvider: ManifestProvider) {

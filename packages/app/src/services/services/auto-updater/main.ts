@@ -22,7 +22,11 @@ export class AutoUpdaterServiceImpl extends AutoUpdaterService implements RPC.In
   }
 
   async checkForUpdates() {
-    autoUpdater.checkForUpdates();
+    try {
+      await autoUpdater.checkForUpdates();
+    } catch (err) {
+      console.error('[auto-updater] checkForUpdates failed:', err);
+    }
   }
 
   async addObserver(observer: RPC.ObserverNode<AutoUpdaterServiceObserver>) {

@@ -119,7 +119,7 @@ export default class ApplicationResourceRouter implements ResourceRouter {
       manifestURL,
       url: appURL,
       title: tabTitle || manifest.name || '',
-      image: oc(manifest).icons[0].src() || '',
+      image: oc(manifest).icons?.[0]?.src() || '',
       themeColor: manifest.theme_color,
     };
   }

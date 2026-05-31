@@ -38,7 +38,8 @@ function isAttachmentAsMainframe(details: Electron.OnCompletedListenerDetails) {
 function hasEmptyHistory(webContentsId?: number) {
   if (!webContentsId) return true;
   try {
-    return !webContents.fromId(webContentsId).canGoBack;
+    const wc = webContents.fromId(webContentsId);
+    return !wc || !wc.canGoBack;
   } catch (e) { console.warn('[download] Error checking canGoBack:', e); }
   return true;
 }
@@ -119,15 +120,18 @@ export class DownloadServiceImpl extends DownloadService implements RPC.Interfac
     await app.whenReady();
     const { defaultSession } = electronSession;
     if (defaultSession && observer.onRequestCompleted) {
-      defaultSession.webRequest.onCompleted((details) => {
+      const listener = (details: Electron.OnCompletedDetails) => {
         if (isAttachmentAsMainframe(details)) {
           observer.onRequestCompleted!({
             ...details,
             hasEmptyHistory: hasEmptyHistory(details.webContentsId),
           });
         }
-      });
-      return () => defaultSession.webRequest.onCompleted(null as any);
+      };
+      defaultSession.webRequest.onCompleted(listener);
+      return () => {
+        defaultSession.webRequest.onCompleted.removeListener(listener);
+      };
     }
     return () => { };
   }

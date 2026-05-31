@@ -32,7 +32,7 @@ export class MenuServiceImpl extends MenuService implements RPC.Node<MenuService
       this.globalShortcutsObservable = this.registerGlobalShortcuts();
       app.applicationMenu = this.menuManager.menu;
       this.ready();
-    }).catch(handleError());
+    }).catch(handleError);
     app.on('before-quit', () => {
       globalShortcut.unregisterAll();
     });
@@ -134,8 +134,14 @@ export class ContextMenuServiceImpl extends ContextMenuService implements RPC.No
     const autofill = new AutofillContextMenu(emails);
     this.subscribeClickItem(autofill, this.contextMenuObservable);
 
+    const hostWindow = BrowserWindow.fromWebContents(wc.hostWebContents);
+    if (!hostWindow) {
+      console.warn('[menu] Could not get host window for autofill');
+      return;
+    }
+
     autofill.popup({
-      window: BrowserWindow.fromWebContents(wc.hostWebContents)!,
+      window: hostWindow,
       // The rect we receive is given without our own UI elements
       // Hence the added offset value which correspond to dock (50) & top rack (38)
       x: Math.floor(rect.left + 50),

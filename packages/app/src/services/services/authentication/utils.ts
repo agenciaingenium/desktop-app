@@ -9,6 +9,10 @@ export const jsonFetch = (requestedUrl: string, init?: RequestInit) =>
     .then((res: Response) => res.json())
     .then((asJson: any) => {
       return asJson;
+    })
+    .catch(err => {
+      console.error('[jsonFetch] fetch failed:', err);
+      throw err;
     });
 
 export const getBody = <T>(body: T) => {

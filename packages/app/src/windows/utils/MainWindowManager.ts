@@ -34,9 +34,13 @@ export default class MainWindowManager extends GenericWindowManager {
     });
 
     this.on('minimize', async () => {
-      const trayIconVisible = await services.electronApp.trayIconVisible()
-      if (trayIconVisible) {
-        services.browserWindow.hideAllWindows();
+      try {
+        const trayIconVisible = await services.electronApp.trayIconVisible();
+        if (trayIconVisible) {
+          services.browserWindow.hideAllWindows();
+        }
+      } catch (err) {
+        console.error('[MainWindowManager] minimize handler failed:', err);
       }
     });
 

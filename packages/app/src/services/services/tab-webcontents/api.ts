@@ -91,9 +91,12 @@ export const addOnNavigateObserver = (wc: Electron.WebContents, obs: RPC.Observe
 // Chrome practise is to prompt a dialog for confirmation
 // ref: https://electronjs.org/docs/api/web-contents#event-will-prevent-unload
 export const addOnPreventUnload = (wc: Electron.WebContents, _: RPC.ObserverNode<TabWebContentsLifeCycleObserver>) => {
-  wc.on('will-prevent-unload', (event: Electron.Event) => event.preventDefault());
+  const handler = (event: Electron.Event) => event.preventDefault();
+  wc.on('will-prevent-unload', handler);
 
-  return () => { };
+  return () => {
+    wc.removeListener('will-prevent-unload', handler);
+  };
 };
 
 export const addOnNewNotificationObserver = (wc: Electron.WebContents, obs: RPC.ObserverNode<TabWebContentsNotificationsObserver>) => {
@@ -205,6 +208,9 @@ export const handleDownloadHack = (wc: Electron.WebContents, url: string): boole
             // if popup is still the same after 2 seconds, we show it to let it finish
             window.show();
           }
+        })
+        .catch(err => {
+          console.warn('[tab-webcontents] handleDownloadHack Promise.race failed:', err);
         });
     });      
   }

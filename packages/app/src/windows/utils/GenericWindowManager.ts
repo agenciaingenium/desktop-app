@@ -60,47 +60,44 @@ export default class GenericWindowManager extends EventEmitter {
       await this.window.show();
       setTimeout(async () => {
         if (!this.window) return;
-        // Wait for window to be initialised, and for potential `blur()` to be triggered beforehand
-        await this.window.focus();
+        try {
+          await this.window.focus();
+        } catch (err) {
+          console.error('[GenericWindowManager] focus failed:', err);
+        }
       }, 1000);
     }
   }
 
   async focus() {
-    if (this.isCreated()) {
+    if (!this.window) return;
+    try {
       await this.window.focus();
+    } catch (err) {
+      console.error('[GenericWindowManager] focus failed:', err);
     }
   }
 
   async create(options: BrowserWindowServiceConstructorOptions, shownow: boolean = false) {
     if (this.isCreated()) return this.window;
 
-    this.window = await services.browserWindow.create({
-      ...options,
-      preventNavigation: true,
-      webPreferences: {
-        // nodeIntegration is overridden to false by BrowserWindowServiceImpl
-        // when contextIsolation is true (the preload bridge replaces Node access).
-        nodeIntegration: true,
-        webviewTag: true,
-        // The following 2 parameters combined will disable the `same-origin` policy.
-        // This allows any window (and the worker) to make http requests to externals services
-        // without being filtered.
-        // For instance, without this, when the app runs with localhost files in dev,
-        // and it tries to make a request to the Slack API, the request sees all of its cookies disappear.
-        // With those parameters, the cookies are automatically added whatever the origin.
-        //
-        // Adding the cookies on-the-fly thanks to `session.webRequest.onBeforeSendHeaders` doesn't do anything.
-        // @see https://gist.github.com/magne4000/15201a636978a1458095a996f2b26f25 for reproduction steps.
-        //
-        // A better solution would be to run those requests inside the context of their designated webviews
-        // (i.e. make slack calls inside the slack webview context).
-        webSecurity: false,
-        allowRunningInsecureContent: false,
-        contextIsolation: true,
-        sandbox: false,
-      },
-    });
+    try {
+      this.window = await services.browserWindow.create({
+        ...options,
+        preventNavigation: true,
+        webPreferences: {
+          nodeIntegration: true,
+          webviewTag: true,
+          webSecurity: false,
+          allowRunningInsecureContent: false,
+          contextIsolation: true,
+          sandbox: false,
+        },
+      });
+    } catch (err) {
+      console.error('[GenericWindowManager] create failed:', err);
+      throw err;
+    }
 
     this.emit('window-created');
     this.windowId = await this.window.getId();
@@ -127,7 +124,9 @@ export default class GenericWindowManager extends EventEmitter {
             self.emit('loaded');
           },
           onClosed() {
-            GenericWindowManager.dispatch(windowDeleted(self.windowId));
+            if (self.windowId !== undefined) {
+              GenericWindowManager.dispatch(windowDeleted(self.windowId));
+            }
             self.window = undefined;
             self.windowId = undefined;
             self.emit('closed');
@@ -174,7 +173,7 @@ export default class GenericWindowManager extends EventEmitter {
   }
 
   load(filepath?: string) {
-    if (!this.isCreated()) return;
+    if (!this.window) return;
     const fp = filepath || (<typeof GenericWindowManager>this.constructor).FILEPATH;
     if (!fp) throw new Error(`Invalid loadURL parameter: ${fp}`);
     return this.window.load(fp);
@@ -187,8 +186,12 @@ export default class GenericWindowManager extends EventEmitter {
 
     this.on('focus', () => {
       setTimeout(async () => {
-        if (this.window && (await this.window.isFocused())) {
-          GenericWindowManager.dispatch(changeAppFocusState(this.windowId));
+        try {
+          if (this.window && (await this.window.isFocused())) {
+            GenericWindowManager.dispatch(changeAppFocusState(this.windowId));
+          }
+        } catch (err) {
+          console.error('[GenericWindowManager] focus check failed:', err);
         }
       }, 1);
     });

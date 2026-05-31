@@ -199,6 +199,10 @@ function* sagaChangeSelectedApp({ applicationId, markAsActiveTab }: ChangeSelect
   }
 
   const application = yield select(getApplicationById, applicationId);
+  if (!application) {
+    logger.notify(new Error(`Application not found: ${applicationId}`));
+    return;
+  }
   const applicationActiveTabId = getApplicationActiveTab(application);
 
   yield put(changeSelectedAppMain(applicationId));

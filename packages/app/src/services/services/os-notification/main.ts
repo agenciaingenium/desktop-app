@@ -27,7 +27,9 @@ export class OSNotificationServiceImpl extends OSNotificationService implements 
     }
 
     const notification = new Notification(notificationOptions);
-    notification.show();
+    notification.show().catch(err => {
+      console.warn('[os-notification] show failed:', err);
+    });
 
     return new OSNotificationImpl(notification);
   }

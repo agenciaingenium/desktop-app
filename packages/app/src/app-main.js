@@ -9,8 +9,14 @@ import { handleError } from './services/api/helpers';
 import { start } from './webui/webUIHandler';
 import { enhanceSession } from './session';
 
+// Enhance the default session early so permission handlers are ready
+// before any webContents try to request media access
+app.on('ready', () => {
+  enhanceSession(electronSession.defaultSession);
+});
+
 export default class BrowserXAppMain extends EventEmitter {
-  
+
   init() {
     this.initAppLifeCycle();
     this.initProcessManagerAnalytics().catch(handleError());
@@ -19,8 +25,6 @@ export default class BrowserXAppMain extends EventEmitter {
 
   initAppLifeCycle() {
     app.on('ready', async () => {
-      enhanceSession(electronSession.defaultSession);
-
       // can register a onOpen function that should return a promise
       if (typeof this.onOpen === 'function') {
         await this.onOpen();

@@ -100,7 +100,9 @@ function* triggerCorrespondingAction(
 
   if (origin && origin.applicationId) {
     const application = yield select(getApplicationById, origin.applicationId);
-    getApplicationManifestURL(application);
+    if (application) {
+      getApplicationManifestURL(application);
+    }
   }
 
   switch (action) {
@@ -109,7 +111,9 @@ function* triggerCorrespondingAction(
       break;
     case URLRouterAction.DEFAULT_BROWSER:
       if (!options || !options.loadInBackground) {
-        openExternal(url);
+        openExternal(url).catch(err => {
+          log.error('[urlrouter] openExternal failed:', err);
+        });
       }
       else {
         services.browserWindow.getFocusedWindow()
@@ -123,13 +127,17 @@ function* triggerCorrespondingAction(
                   },
                     100) // vk: I can't explain why, but without this timeout, open in background doesn't work
                   )
-                );
+                )
+                .catch(err => log.error('[urlrouter] setAlwaysOnTop failed:', err));
             }
             else {
               log.info('Focused window is empty');
-              openExternal(url);
+              openExternal(url).catch(err => {
+                log.error('[urlrouter] openExternal failed:', err);
+              });
             }
-          });
+          })
+          .catch(err => log.error('[urlrouter] getFocusedWindow failed:', err));
       }
       break;
     case URLRouterAction.NAV_TO_TAB:

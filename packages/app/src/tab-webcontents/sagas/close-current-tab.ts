@@ -28,7 +28,10 @@ function* closeWindowIfNotMain(): SagaIterator {
     mainWindowManager,
   }: BrowserXAppWorker = yield getContext('bxApp');
 
-  const mainWindowId = yield call([mainWindowManager, mainWindowManager.window!.getId]);
+  if (!mainWindowManager.window) {
+    return false;
+  }
+  const mainWindowId = yield call([mainWindowManager, mainWindowManager.window.getId]);
 
   const focusedWindow = yield callService('browserWindow', 'getFocusedWindow');
   if (!focusedWindow) return false;

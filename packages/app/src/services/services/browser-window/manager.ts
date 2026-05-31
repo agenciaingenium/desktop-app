@@ -32,7 +32,9 @@ export class BrowserWindowManagerServiceImpl extends BrowserWindowManagerService
     app.on('browser-window-created', (_e, bw) => {
       bw.on('closed', closeAppIfAllWindowsClosed);
       bw.webContents.setWindowOpenHandler((details: HandlerDetails) => {
-        openExternal(details.url);
+        openExternal(details.url).catch(err => {
+          console.error('[browser-window/manager] openExternal failed:', err);
+        });
         return { action: 'deny' };
       });
     });
@@ -55,13 +57,22 @@ export class BrowserWindowManagerServiceImpl extends BrowserWindowManagerService
 
   async fromId(browserWindowId: number) {
     const bw = BrowserWindow.fromId(browserWindowId);
-    return this.getServiceFromBrowserWindow(bw!);
+    if (!bw) {
+      throw new Error(`BrowserWindow not found: ${browserWindowId}`);
+    }
+    return this.getServiceFromBrowserWindow(bw);
   }
 
   async fromWebContentsId(webContentsId: number) {
     const wc = webContents.fromId(webContentsId);
+    if (!wc) {
+      throw new Error(`WebContents not found: ${webContentsId}`);
+    }
     const bw = BrowserWindow.fromWebContents(wc);
-    return this.getServiceFromBrowserWindow(bw!);
+    if (!bw) {
+      throw new Error('BrowserWindow not found for WebContents');
+    }
+    return this.getServiceFromBrowserWindow(bw);
   }
 
   async setWorkerBrowserWindow(worker: BrowserWindow) {
