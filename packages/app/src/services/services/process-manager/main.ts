@@ -13,7 +13,7 @@ export class ProcessManagerServiceImpl extends ProcessManagerService implements 
 
   async open() {
     // @ts-ignore
-    const { openProcessManager } = await import('electron-process-manager');
+    const { openProcessManager } = (await import('electron-process-manager')) as any;
     await openProcessManager(defaultOptions);
   }
 
@@ -21,7 +21,8 @@ export class ProcessManagerServiceImpl extends ProcessManagerService implements 
     if (obs.onWillKillProcess) {
       const emit = obs.onWillKillProcess;
       // @ts-ignore no declaration file
-      const processManager = await import('electron-process-manager');
+      const processManagerMod = await import('electron-process-manager') as any;
+      const processManager = processManagerMod.default ?? processManagerMod;
       const listener = (pid: number) => {
         emit({ pid });
       };
