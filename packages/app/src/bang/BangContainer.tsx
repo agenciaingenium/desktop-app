@@ -8,7 +8,7 @@ import { SHORTCUTS } from '../keyboard-shortcuts';
 import BangSubdock from './BangSubdock';
 import { SearchPaneClosedVia, setVisibility, toggleVisibility } from './duck';
 import { isVisible as getIsBangVisible } from './selectors';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 
 export interface OwnProps {
   onQuit: () => void,

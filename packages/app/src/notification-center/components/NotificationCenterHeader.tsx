@@ -1,5 +1,5 @@
 import { ButtonIcon, IconSymbol, Size, Style } from '@getstation/theme';
-import * as moment from 'moment';
+import moment from 'moment';
 import * as React from 'react';
 import { osName } from '../../utils/process';
 import { INFINITE, SYNC_WITH_OS } from '../constants';

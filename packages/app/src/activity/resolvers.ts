@@ -1,5 +1,5 @@
 // @ts-ignore: no declaration file
-import * as isBlank from 'is-blank';
+import isBlank from 'is-blank';
 import { createSelector } from 'reselect';
 import { map } from 'rxjs/operators';
 

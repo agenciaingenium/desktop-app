@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { theme } from '@getstation/theme';
-import * as memoize from 'memoizee';
+import memoize from 'memoizee';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 // @ts-ignore: no declaration file

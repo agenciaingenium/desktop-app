@@ -1,7 +1,7 @@
 import { search } from '@getstation/sdk';
-import * as Fuse from 'fuse.js';
+import Fuse from 'fuse.js';
 // @ts-ignore: no declaration file
-import * as isBlank from 'is-blank';
+import isBlank from 'is-blank';
 
 type Item = search.SearchResultItem;
 

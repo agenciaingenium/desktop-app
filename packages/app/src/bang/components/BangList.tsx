@@ -1,9 +1,9 @@
 import { theme } from '@getstation/theme';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 // @ts-ignore: no declaration file
-import * as scrollIntoView from 'dom-scroll-into-view';
+import scrollIntoView from 'dom-scroll-into-view';
 // @ts-ignore: no declaration file
-import * as isBlank from 'is-blank';
+import isBlank from 'is-blank';
 import * as React from 'react';
 import { findDOMNode } from 'react-dom';
 import { EMPTY_SECTION, flattenResults, sectionsAlwaysExpanded } from '../api';

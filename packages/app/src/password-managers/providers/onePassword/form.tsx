@@ -1,6 +1,6 @@
 import { Button, Input, InputType, Style, theme } from '@getstation/theme';
 // @ts-ignore: no declaration file
-import * as isBlank from 'is-blank';
+import isBlank from 'is-blank';
 import * as React from 'react';
 import { AddPasswordManagerAction, ConfigurationStep } from '../../duck';
 import Providers from '../../providers';

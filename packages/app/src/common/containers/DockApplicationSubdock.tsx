@@ -1,5 +1,5 @@
 import { GradientType, withGradient } from '@getstation/theme';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 import * as React from 'react';
 import DockApplication from './DockApplication';
 

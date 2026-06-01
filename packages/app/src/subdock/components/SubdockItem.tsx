@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Maybe } from 'graphql/jsutils/Maybe';
 import { getHighlightGradient, Icon, IconSymbol, theme } from '@getstation/theme';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 // @ts-ignore: no declaration file
-import * as isBlank from 'is-blank';
+import isBlank from 'is-blank';
 
 import AppIcon from '../../dock/components/AppIcon';
 

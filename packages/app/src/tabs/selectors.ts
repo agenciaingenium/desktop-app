@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 // @ts-ignore: no declaration file
-import * as median from 'median';
+import median from 'median';
 // @ts-ignore: no declaration file
-import * as moment from 'moment';
+import moment from 'moment';
 import createCachedSelector from 're-reselect';
 import { createSelector } from 'reselect';
 import { getApplications } from '../applications/selectors';

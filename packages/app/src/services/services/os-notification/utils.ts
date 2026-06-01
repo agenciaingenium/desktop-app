@@ -1,5 +1,5 @@
 import { nativeImage } from 'electron';
-import * as memoize from 'memoizee';
+import memoize from 'memoizee';
 
 declare const __non_webpack_require__: NodeRequire | undefined;
 

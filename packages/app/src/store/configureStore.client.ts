@@ -1,7 +1,7 @@
 import { compact } from 'ramda-adjunct';
 import * as Immutable from 'immutable';
 // @ts-ignore: no declaration file
-import * as installDevTools from 'immutable-devtools';
+import installDevTools from 'immutable-devtools';
 import { applyMiddleware, compose, createStore, Store } from 'redux';
 // @ts-ignore: no declaration file
 import { observe } from 'redux-observers';

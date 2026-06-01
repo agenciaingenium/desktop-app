@@ -1,5 +1,5 @@
 import { BrowserWindow, ipcMain, screen } from 'electron';
-import * as windowStateKeeper from 'electron-window-state';
+import windowStateKeeper from 'electron-window-state';
 import { fromEvent } from 'rxjs';
 import * as path from 'path';
 import { NotificationProps } from '../../../notification-center/types';

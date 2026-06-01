@@ -2,7 +2,7 @@
  * Helpers used by the bx renderer only
  */
 
-import * as memoize from 'memoizee';
+import memoize from 'memoizee';
 import ms from 'ms';
 import { sortWith, descend } from 'ramda';
 import { resolve as resolveUrl } from 'url';

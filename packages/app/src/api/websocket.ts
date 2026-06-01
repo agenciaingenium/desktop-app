@@ -1,4 +1,4 @@
-import * as ReconnectingWebSocket from 'reconnecting-websocket';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 export interface ReconnectOptions {
   [key: string]: any;

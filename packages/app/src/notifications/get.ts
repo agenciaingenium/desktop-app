@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import * as Moment from 'moment';
+import Moment from 'moment';
 import { ImmutableNotification } from './types';
 
 export const getNotificationId = (notif: ImmutableNotification): string => notif.get('notificationId');

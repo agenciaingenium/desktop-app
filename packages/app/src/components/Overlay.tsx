@@ -1,5 +1,5 @@
 import { GradientType, withGradient, ButtonIcon, IconSymbol, Style } from '@getstation/theme';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 import * as React from 'react';
 // @ts-ignore: no declaration file
 import ClickOutside from 'react-click-outside';

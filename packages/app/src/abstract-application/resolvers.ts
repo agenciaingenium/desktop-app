@@ -1,5 +1,5 @@
 import { List } from 'immutable';
-import * as memoize from 'memoizee';
+import memoize from 'memoizee';
 import { map } from 'rxjs/operators';
 import { Resolvers } from '../graphql/resolvers-types.generated';
 import { subscribeStore } from '../utils/observable';

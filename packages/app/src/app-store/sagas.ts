@@ -1,5 +1,5 @@
 // @ts-ignore
-import * as isBlank from 'is-blank';
+import isBlank from 'is-blank';
 // @ts-ignore
 import * as _ from 'lodash';
 import { SagaIterator } from 'redux-saga';

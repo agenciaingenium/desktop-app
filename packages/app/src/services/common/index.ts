@@ -5,7 +5,7 @@ import { isPackaged } from '../../utils/env';
 import { servicesDuplexNamespace } from '../api/const';
 import { ServicePeerHandler } from '../lib/class';
 
-import * as eos from 'end-of-stream';
+import eos from 'end-of-stream';
 
 export const observeNewClients = () => {
   return new Observable(observer => {

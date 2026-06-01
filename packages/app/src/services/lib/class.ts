@@ -1,4 +1,4 @@
-import * as eos from 'end-of-stream';
+import eos from 'end-of-stream';
 import { EventEmitter } from 'events';
 import { BehaviorSubject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';

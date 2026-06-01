@@ -1,5 +1,5 @@
 // @ts-ignore no declaration file
-import * as AutoLaunch from 'auto-launch';
+import AutoLaunch from 'auto-launch';
 import log from 'electron-log';
 
 import { RPC } from '../../lib/types';

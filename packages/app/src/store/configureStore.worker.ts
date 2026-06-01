@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron';
 import log from 'electron-log';
-import * as EventEmitter from 'events';
+import EventEmitter from 'events';
 import { applyMiddleware, compose, createStore } from 'redux';
 // @ts-ignore: no declaration file
 import { observe } from 'redux-observers';

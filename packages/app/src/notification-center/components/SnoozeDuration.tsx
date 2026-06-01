@@ -1,7 +1,7 @@
 import * as React from 'react';
-import * as moment from 'moment';
+import moment from 'moment';
 // @ts-ignore no declaration file
-import * as millisec from 'millisec';
+import millisec from 'millisec';
 import ms = require('ms');
 import ReactInterval from '../../common/components/ReactInterval';
 

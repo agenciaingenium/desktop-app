@@ -1,5 +1,5 @@
 import { Cookie, net, session } from 'electron';
-import * as moment from 'moment';
+import moment from 'moment';
 import * as tough from 'tough-cookie';
 
 const maxRedirections = 19;

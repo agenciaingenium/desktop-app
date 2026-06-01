@@ -9,9 +9,9 @@ import {
 import { app } from 'electron';
 // @ts-ignore: no declaration file
 import { getLocation } from 'ip-geolocate';
-import * as memoize from 'memoizee';
+import memoize from 'memoizee';
 // @ts-ignore: no declaration file
-import * as mod from 'mod-op';
+import mod from 'mod-op';
 import { v4 as getMyPublicIPv4 } from 'public-ip';
 // @ts-ignore: no declaration file
 import * as SunCalc from 'suncalc';

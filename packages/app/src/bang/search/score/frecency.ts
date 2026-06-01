@@ -1,5 +1,5 @@
 // @ts-ignore: no declaration file
-import * as Frecency from '@getstation/frecency';
+import Frecency from '@getstation/frecency';
 import { ScoreAlgorithm, ScoreMap, withPercentages } from '../../../lib/score-engine';
 import { ScoreContext } from './types';
 import { getId } from './utils';

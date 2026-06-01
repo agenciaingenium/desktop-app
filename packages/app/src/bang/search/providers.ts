@@ -2,7 +2,7 @@ import * as path from 'path';
 import { take } from 'rxjs/operators';
 import { LocalStorage } from 'node-localstorage';
 // @ts-ignore no declaration file
-import * as moment from 'moment';
+import moment from 'moment';
 import { reverse } from 'ramda';
 import { SDK, activity } from '@getstation/sdk';
 

@@ -1,4 +1,4 @@
-import * as AsyncLock from 'async-lock';
+import AsyncLock from 'async-lock';
 import * as Immutable from 'immutable';
 import * as Sequelize from 'sequelize';
 

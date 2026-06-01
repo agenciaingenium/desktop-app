@@ -5,10 +5,10 @@
 import * as slack from 'slack';
 import { GradientType, withGradient } from '@getstation/theme';
 import ElectronWebview from '../common/components/ElectronWebview';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 import { Maybe } from 'graphql/jsutils/Maybe';
 // @ts-ignore
-import * as throttle from 'lodash.throttle';
+import throttle from 'lodash.throttle';
 import * as path from 'path';
 import { noop, compact } from 'ramda-adjunct';
 import * as React from 'react';

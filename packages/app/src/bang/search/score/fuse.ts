@@ -1,6 +1,6 @@
 // import {} from '../../lib/score-engine';
 
-import * as Fuse from 'fuse.js';
+import Fuse from 'fuse.js';
 import { getId } from './utils';
 import { ScoreAlgorithm, ScoreMap } from '../../../lib/score-engine';
 import { ScoreContext } from './types';

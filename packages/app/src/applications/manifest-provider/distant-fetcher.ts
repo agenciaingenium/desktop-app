@@ -1,5 +1,5 @@
 import * as fs from 'fs-extra';
-import * as moment from 'moment';
+import moment from 'moment';
 import {
   IFetcher,
   ManifestURL,

@@ -1,12 +1,12 @@
 import { over, lensProp } from 'ramda';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter, first, map, distinctUntilChanged } from 'rxjs/operators';
-import * as moment from 'moment';
+import moment from 'moment';
 import * as crypto from 'crypto';
 import { join } from 'path';
 import * as fs from 'fs-extra';
 // @ts-ignore: no declaration file
-import * as isBlank from 'is-blank';
+import isBlank from 'is-blank';
 import ms from 'ms';
 import {
   IManifestProvider,

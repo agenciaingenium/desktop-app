@@ -1,7 +1,7 @@
 // @ts-ignore: no declaration file
-import * as isBlank from 'is-blank';
+import isBlank from 'is-blank';
 // @ts-ignore: no declaration file
-import * as RadixRouter from 'radix-router';
+import RadixRouter from 'radix-router';
 import { uniq } from 'ramda';
 import { BehaviorSubject } from 'rxjs';
 import { URL as NodeURL } from 'url';

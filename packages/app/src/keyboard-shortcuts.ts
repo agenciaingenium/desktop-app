@@ -1,5 +1,5 @@
 import { EnumValues } from 'enum-values';
-import * as memoize from 'memoizee';
+import memoize from 'memoizee';
 import { isPackaged } from './utils/env';
 import { isDarwin } from './utils/process';
 

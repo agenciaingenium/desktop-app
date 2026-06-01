@@ -1,5 +1,5 @@
 // @ts-ignore: no declaration file
-import * as memoize from 'memoizee';
+import memoize from 'memoizee';
 import { createSelector } from 'reselect';
 import { getApplicationId } from '../applications/get';
 import { getApplicationsWithManifest } from '../applications/selectors';

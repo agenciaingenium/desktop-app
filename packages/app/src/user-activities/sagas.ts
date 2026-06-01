@@ -1,5 +1,5 @@
 import log from 'electron-log';
-import * as Moment from 'moment';
+import Moment from 'moment';
 import ms from 'ms';
 import { SagaIterator } from 'redux-saga';
 import { put, select, all } from 'redux-saga/effects';

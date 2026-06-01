@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 // @ts-ignore: no declaration file
-import * as isBlank from 'is-blank';
+import isBlank from 'is-blank';
 // @ts-ignore: no declaration file
-import * as memoize from 'memoizee';
+import memoize from 'memoizee';
 import { uniq } from 'ramda';
 import { createSelector } from 'reselect';
 import { getActiveApplicationId } from '../nav/selectors';

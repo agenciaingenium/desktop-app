@@ -2,7 +2,7 @@ import * as React from 'react';
 // @ts-ignore
 import { MutationFn } from '@apollo/client';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 
 import { MinimalSubdockApplication } from '../SubdockItem';
 import { ActiveTab } from '../../Container';
