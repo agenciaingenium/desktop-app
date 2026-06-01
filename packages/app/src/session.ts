@@ -128,6 +128,28 @@ const isMacMediaAccessBlocked = () => {
   );
 };
 
+export const requestMacOSMediaAccess = async () => {
+  if (process.platform !== 'darwin') return;
+
+  const micStatus = systemPreferences.getMediaAccessStatus('microphone');
+  if (micStatus === 'not-determined') {
+    try {
+      await systemPreferences.askForMediaAccess('microphone');
+    } catch (e) {
+      console.warn('[session] Failed to request microphone access', e);
+    }
+  }
+
+  const camStatus = systemPreferences.getMediaAccessStatus('camera');
+  if (camStatus === 'not-determined') {
+    try {
+      await systemPreferences.askForMediaAccess('camera');
+    } catch (e) {
+      console.warn('[session] Failed to request camera access', e);
+    }
+  }
+};
+
 const enhancePermissions = (session: Session) => {
   const targetSession = session as any;
 

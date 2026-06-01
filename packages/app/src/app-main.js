@@ -7,7 +7,13 @@ import services from './services/servicesManager';
 import { observer } from './services/lib/helpers';
 import { handleError } from './services/api/helpers';
 import { start } from './webui/webUIHandler';
-import { enhanceSession } from './session';
+import { enhanceSession, requestMacOSMediaAccess } from './session';
+
+// Pre-grant microphone/camera on macOS once so the OS-level prompt appears
+// at app start instead of being re-triggered by every webview getUserMedia call
+app.on('ready', () => {
+  requestMacOSMediaAccess().catch(handleError({ console: false, log: true }));
+});
 
 // Enhance the default session early so permission handlers are ready
 // before any webContents try to request media access
