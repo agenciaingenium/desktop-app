@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { ServicesData } from '../database/model';
 import { KeyValueProxyMixin } from '../persistence/mixins';
 

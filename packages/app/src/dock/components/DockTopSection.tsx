@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import TrafficLightsContainer from './TrafficLightsContainer';
 import DockNavigation from '../../dock-navigation/DockNavigationContainer';
 import SearchWrapper from '../../bang/BangContainer';

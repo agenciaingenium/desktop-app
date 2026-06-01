@@ -1,5 +1,5 @@
 import { Icon, IconSymbol } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 
 export interface Props {
   onClickSettings?: () => void,

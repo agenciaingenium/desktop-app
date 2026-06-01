@@ -3,8 +3,8 @@ import keycode = require('keycode');
 import camelCase = require('lodash.camelcase');
 // @ts-ignore: no declaration file
 import { shallowEquals } from 'redux-observers';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { logger } from '../../api/logger';
 import { Omit } from '../../types';
 import { dissoc } from 'ramda';

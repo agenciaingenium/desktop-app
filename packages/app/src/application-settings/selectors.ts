@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import createCachedSelector from 're-reselect';
 import { StationState } from '../types';
 import { ApplicationsSettingsImmutable } from './types';

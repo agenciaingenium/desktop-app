@@ -1,4 +1,4 @@
-import * as BluebirdPromise from 'bluebird';
+import BluebirdPromise from 'bluebird';
 import { app, ipcMain, session, HandlerDetails } from 'electron';
 
 import { omit } from 'ramda';

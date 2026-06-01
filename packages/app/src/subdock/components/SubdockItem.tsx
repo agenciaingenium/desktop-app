@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Maybe } from 'graphql/jsutils/Maybe';
 import { getHighlightGradient, Icon, IconSymbol, theme } from '@getstation/theme';
 import classNames from 'classnames';

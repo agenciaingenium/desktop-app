@@ -1,5 +1,5 @@
 import { ModalWrapper } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import DockApplication from '../common/containers/DockApplication';

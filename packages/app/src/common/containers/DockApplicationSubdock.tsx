@@ -1,6 +1,6 @@
 import { GradientType, withGradient } from '@getstation/theme';
 import classNames from 'classnames';
-import * as React from 'react';
+import React from 'react';
 import DockApplication from './DockApplication';
 
 interface OwnProps {

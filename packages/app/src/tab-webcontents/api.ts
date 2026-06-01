@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { isAlwaysLoaded } from '../application-settings/api';
 import { ApplicationsSettingsImmutable } from '../application-settings/types';
 import { getApplicationManifestURL } from '../applications/get';

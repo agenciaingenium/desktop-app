@@ -1,5 +1,5 @@
 import { Action } from 'redux';
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { fromJS } from '../utils/ts';
 import { DialogItem, DialogItemAction, DialogItemsImmutable, ExtendedDialogItem } from './types';
 

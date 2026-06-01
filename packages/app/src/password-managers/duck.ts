@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import Providers from './providers';
 import { Account, PasswordManager, Provider } from './types';
 

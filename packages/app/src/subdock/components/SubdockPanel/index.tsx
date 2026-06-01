@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import ReactDOM = require('react-dom');
 
 import { ActiveTab } from '../../Container';

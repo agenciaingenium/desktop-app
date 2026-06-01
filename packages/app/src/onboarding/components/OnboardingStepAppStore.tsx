@@ -1,5 +1,5 @@
 import { Button, SearchInput, Size, theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { MinimalApplication } from '../../applications/graphql/withApplications';
 import Application, { ApplicationActionType } from '../../applications/components/Application';
 

@@ -1,4 +1,4 @@
-import * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import { defineFavoritesSubdockOrder } from '../ordered-favorites/persistence/model';
 import { defineTabsSubdockOrder } from '../ordered-tabs/persistence/model';
 import definePasswordManagers from '../password-managers/persistence/model';

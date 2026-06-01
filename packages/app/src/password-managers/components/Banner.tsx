@@ -1,5 +1,5 @@
 import { Button, Icon, IconSymbol, Size, Style, theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { PasswordManager, Provider } from '../types';
 
 export interface Props {

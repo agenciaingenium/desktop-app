@@ -1,5 +1,5 @@
 import { theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 
 export default class AboutWindowFooter extends React.PureComponent<{}, {}> {
   render() {

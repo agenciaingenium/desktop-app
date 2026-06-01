@@ -1,6 +1,6 @@
-import * as BluebirdPromise from 'bluebird';
-import * as Immutable from 'immutable';
-import * as Sequelize from 'sequelize';
+import BluebirdPromise from 'bluebird';
+import Immutable from 'immutable';
+import Sequelize from 'sequelize';
 import { KeyValueProxy, ListProxy, MapProxy, SingletonProxy } from './mixins'; // We need this for cancellable Promises
 
 // @ts-ignore

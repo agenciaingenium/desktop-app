@@ -4,7 +4,7 @@ import { filter, first, map, distinctUntilChanged } from 'rxjs/operators';
 import moment from 'moment';
 import * as crypto from 'crypto';
 import { join } from 'path';
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 // @ts-ignore: no declaration file
 import isBlank from 'is-blank';
 import ms from 'ms';

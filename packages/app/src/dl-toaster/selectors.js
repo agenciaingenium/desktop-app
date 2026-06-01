@@ -1,5 +1,5 @@
 
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { createSelector } from 'reselect';
 import * as path from 'path';
 

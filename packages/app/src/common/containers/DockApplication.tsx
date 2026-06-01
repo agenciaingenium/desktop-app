@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 // @ts-ignore: no declaration file
 import ClickOutside from 'react-click-outside';
 // @ts-ignore: no declaration file

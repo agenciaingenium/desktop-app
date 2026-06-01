@@ -1,4 +1,4 @@
-import * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import OnePassword from '../providers/onePassword/model';
 
 const Link = (db: Sequelize.Sequelize) => db.define('passwordManagerLinks', {

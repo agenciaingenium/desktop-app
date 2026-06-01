@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { getTabWebcontentsById } from './selectors';
 import { Resolvers } from '../graphql/resolvers-types.generated';

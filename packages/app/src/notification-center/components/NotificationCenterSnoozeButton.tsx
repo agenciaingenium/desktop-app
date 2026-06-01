@@ -1,5 +1,5 @@
 import { Switcher, ButtonIcon, IconSymbol, Size, Style } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 // @ts-ignore: no declaration file
 import ClickOutside from 'react-click-outside';
 import { Manager, Popper, Reference } from 'react-popper';

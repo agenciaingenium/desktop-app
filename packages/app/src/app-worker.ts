@@ -75,15 +75,27 @@ export class BrowserXAppWorker {
 
   constructor() {
     try {
+      console.log('[app-worker] constructor: start');
       this.initStore();
+      console.log('[app-worker] initStore done');
       this.initManifestProvider();
+      console.log('[app-worker] initManifestProvider done');
       this.pubsub = new PubSub();
       this.initRouter();
+      console.log('[app-worker] initRouter done');
       this.initResourceRouter();
+      console.log('[app-worker] initResourceRouter done');
       this.initApolloLink();
+      console.log('[app-worker] initApolloLink done');
       this.initWindowManager();
+      console.log('[app-worker] initWindowManager done');
       this.initSDK();
-      this.initAppLifeCycle().catch(handleError());
+      console.log('[app-worker] initSDK done');
+      this.initAppLifeCycle().catch(err => {
+        console.error('[app-worker] initAppLifeCycle failed:', err);
+        handleError()(err as Error);
+      });
+      console.log('[app-worker] initAppLifeCycle kicked off');
       this.initOnlineListener();
       this.initMenu();
       this.initContextMenu();
@@ -95,7 +107,9 @@ export class BrowserXAppWorker {
       this.initWebContentsOverrideProvider().catch(handleError());
       this.initSDKv2();
       this.initAutoLaunch().catch(handleError());
+      console.log('[app-worker] constructor: end');
     } catch (e) {
+      console.error('[app-worker] constructor threw:', e);
       handleError()(e as Error);
       ipcRenderer.send('station:app-exit', 1);
     }
@@ -130,10 +144,11 @@ export class BrowserXAppWorker {
 
   initApolloClient() {
     // local apollo client
-    // addTypename: false — reactive-graphql doesn't support the __typename meta-field
+    // addTypename: false was removed in Apollo Client 3.14+; reactive-graphql workaround
+    // is handled via dataIdFromObject returning undefined for non-cacheable shapes.
     this.apolloClient = new ApolloClient({
       link: (services.apolloLink as ApolloLinkServiceImpl).link!,
-      cache: new InMemoryCache({ addTypename: false }),
+      cache: new InMemoryCache(),
       // see apollographql/apollo-client#4322
       queryDeduplication: false,
     });
@@ -354,8 +369,11 @@ export class BrowserXAppWorker {
 
   private async initAppLifeCycle() {
     try {
+      console.log('[app-worker] initAppLifeCycle: start');
       services.electronApp.setProvider(new ElectronAppServiceProviderServiceImpl(this.store))
+      console.log('[app-worker] initAppLifeCycle: setProvider done, calling mainWindowManager.create()');
       await this.mainWindowManager.create();
+      console.log('[app-worker] initAppLifeCycle: mainWindowManager.create() done');
     } catch (err) {
       console.error('[app-worker] initAppLifeCycle mainWindow create failed:', err);
     }

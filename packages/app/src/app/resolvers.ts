@@ -1,5 +1,5 @@
 import { prop } from 'ramda';
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
 import { subscribeStore } from '../utils/observable';

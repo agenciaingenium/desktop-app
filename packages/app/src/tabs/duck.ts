@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import isEmpty from 'is-empty';
 import { ImmutableList } from '../types';
 import { StationTabImmutable, StationTabsImmutable } from './types';

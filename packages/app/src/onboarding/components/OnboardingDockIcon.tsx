@@ -1,5 +1,5 @@
 import { Icon, IconSymbol, theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { MinimalApplication } from '../../applications/graphql/withApplications';
 import AppIcon from '../../dock/components/AppIcon';
 

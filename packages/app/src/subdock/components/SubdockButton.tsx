@@ -1,5 +1,5 @@
 import { Icon, IconSymbol, roundedBackground, Tooltip } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 
 export type Props = {
   className?: string,

@@ -21,6 +21,7 @@ export default class MainWindowManager extends GenericWindowManager {
       return this.window;
     }
 
+    console.log('[MainWindowManager] create: calling super.create');
     await super.create({
       show: true,
       ...(isDarwin
@@ -32,6 +33,7 @@ export default class MainWindowManager extends GenericWindowManager {
       fullscreenable: true,
       simpleFullscreen: false,
     });
+    console.log('[MainWindowManager] create: super.create done, window id:', this.windowId);
 
     this.on('minimize', async () => {
       try {
@@ -45,6 +47,7 @@ export default class MainWindowManager extends GenericWindowManager {
     });
 
     await super.load();
+    console.log('[MainWindowManager] create: super.load() done, returning window');
 
     return this.window!;
   }

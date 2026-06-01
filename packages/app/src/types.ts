@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import * as Redux from 'redux';
 import { Persistor } from 'redux-persist';
 import { SagaMiddleware } from 'redux-saga';

@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { createSelector } from 'reselect';
 import { getNotificationBadge } from '../notifications/get';
 import { getNotifications as getNotificationsObjects } from '../notifications/selectors';

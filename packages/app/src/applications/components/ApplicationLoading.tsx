@@ -1,5 +1,5 @@
 import { Maybe } from 'graphql/jsutils/Maybe';
-import * as React from 'react';
+import React from 'react';
 
 export interface Props {
   applicationName: Maybe<string>,

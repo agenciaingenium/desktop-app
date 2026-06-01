@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { FromJS } from '../types';
 
 export const fromJS: FromJS = Immutable.fromJS;

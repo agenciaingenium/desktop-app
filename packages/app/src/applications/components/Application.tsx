@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Icon, IconSymbol, theme } from '@getstation/theme';
 import { roundedBackground } from '@getstation/theme/dist/jss';
 import { MinimalApplication } from '../graphql/withApplications';

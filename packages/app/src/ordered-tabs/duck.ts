@@ -1,5 +1,5 @@
 import { filter } from 'ramda';
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import {
   StationAllOrderedTabsImmutable,
   StationOrderedTabsImmutable,

@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import createCachedSelector from 're-reselect';
 import { createSelector } from 'reselect';
 import { getApplicationId } from '../applications/get';

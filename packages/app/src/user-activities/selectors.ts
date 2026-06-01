@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 
 export const getUserActivities = (state: Immutable.List<number>) : any =>
   // @ts-ignore

@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 
 // Action type — must match what redux-ui used, since sagas listen for it
 export const UPDATE_UI_STATE = 'UPDATE_UI_STATE';

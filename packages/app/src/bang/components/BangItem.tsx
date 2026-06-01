@@ -4,7 +4,7 @@ import {
   IconSymbol,
   theme,
 } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 
 import AppIcon from '../../dock/components/AppIcon';
 import { SearchPaneItemSelectedItem } from '../duck';

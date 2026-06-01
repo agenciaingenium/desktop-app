@@ -1,4 +1,4 @@
-import * as BluebirdPromise from 'bluebird';
+import BluebirdPromise from 'bluebird';
 import { spawn } from 'child_process';
 import log from 'electron-log';
 import umzug from '../persistence/umzug';

@@ -1,5 +1,5 @@
 import { Collection } from 'immutable';
-import * as React from 'react';
+import React from 'react';
 import { fontMixin } from '../../utils/fontMixin';
 import ListItem, { ListItemType } from './ListItem';
 

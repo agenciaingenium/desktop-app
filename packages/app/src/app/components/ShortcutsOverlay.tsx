@@ -1,5 +1,5 @@
 import { either, propEq, reject } from 'ramda';
-import * as React from 'react';
+import React from 'react';
 import Overlay from '../../components/Overlay';
 import { CATEGORIES, getShortcutsByCategory, KeyboardShortcut } from '../../keyboard-shortcuts';
 import { Filter } from '../../utils/fp';

@@ -1,5 +1,5 @@
 import { GradientType, withGradient } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 import { oc } from 'ts-optchain';

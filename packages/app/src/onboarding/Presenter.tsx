@@ -1,6 +1,6 @@
 import { GradientType, SlideX, theme, withGradient } from '@getstation/theme';
 // @ts-ignore: no declaration file
-import * as React from 'react';
+import React from 'react';
 import { MinimalApplication } from '../applications/graphql/withApplications';
 import TrafficLights from '../dock/components/TrafficLights';
 import { OnboardingDockIcon } from './components/OnboardingDockIcon';

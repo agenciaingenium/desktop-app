@@ -14,7 +14,7 @@ import memoize from 'memoizee';
 import mod from 'mod-op';
 import { v4 as getMyPublicIPv4 } from 'public-ip';
 // @ts-ignore: no declaration file
-import * as SunCalc from 'suncalc';
+import SunCalc from 'suncalc';
 import { isPackaged } from '../utils/env';
 import log from 'electron-log';
 

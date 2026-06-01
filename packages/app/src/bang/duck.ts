@@ -1,5 +1,5 @@
 import { search } from '@getstation/sdk/';
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 
 import { SearchSection } from '../sdk/search/types';
 import { ActivityEntry } from '../activity/types';

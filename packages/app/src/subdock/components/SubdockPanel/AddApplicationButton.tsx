@@ -1,5 +1,5 @@
 import { Button, Style } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { oc } from 'ts-optchain';
 import { GetApplicationStateQuery } from '../../../applications/queries@local.gql.generated';
 

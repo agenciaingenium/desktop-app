@@ -1,5 +1,5 @@
 // @ts-ignore no typings
-import * as contentDisposition from 'content-disposition';
+import contentDisposition from 'content-disposition';
 import { app, BrowserWindow, dialog, Session, session as electronSession, webContents } from 'electron';
 import { head } from 'ramda';
 // @ts-ignore: no declaration file

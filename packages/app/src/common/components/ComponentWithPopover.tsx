@@ -1,6 +1,6 @@
 import { theme } from '@getstation/theme';
 import PopperJS from 'popper.js';
-import * as React from 'react';
+import React from 'react';
 // @ts-ignore: no declaration file
 import ClickOutside from 'react-click-outside';
 import { Manager, Popper, Reference } from 'react-popper';

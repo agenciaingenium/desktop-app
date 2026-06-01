@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { MapStateProxy } from '../../../persistence/backend';
 import { MapProxyMixin } from '../../../persistence/mixins';
 import { PasswordManagers } from '../../../database/model';

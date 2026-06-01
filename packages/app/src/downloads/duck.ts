@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 
 // Actions
 export const NEW_ITEM = 'browserX/downloads/NEW_ITEM';

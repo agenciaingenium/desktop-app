@@ -1,5 +1,5 @@
 import { Button, theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import DOMPurify = require('dompurify');
 
 const releaseNotesRaw = require('../../app/resources/release-notes.html');

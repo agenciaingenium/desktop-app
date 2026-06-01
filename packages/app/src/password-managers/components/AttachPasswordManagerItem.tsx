@@ -3,7 +3,7 @@ import { Chooser, Input, Modal, theme } from '@getstation/theme';
 import Fuse from 'fuse.js';
 // @ts-ignore: no declaration file
 import isBlank from 'is-blank';
-import * as React from 'react';
+import React from 'react';
 import { AccountsAction, AccountsStep } from '../duck';
 import { Account, PasswordManager } from '../types';
 

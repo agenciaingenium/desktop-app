@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import NativeAppDockIcon, { IconSymbol } from '../../dock/components/NativeAppDockIcon';
 import { osName } from '../../utils/process';
 

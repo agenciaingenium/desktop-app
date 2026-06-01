@@ -1,7 +1,7 @@
-import * as React from 'react';
+import React from 'react';
 import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { oc } from 'ts-optchain';
 
 import { useGetApplicationByIdQuery } from './queries@local.gql.generated';

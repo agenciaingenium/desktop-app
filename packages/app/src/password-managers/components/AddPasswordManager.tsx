@@ -1,5 +1,5 @@
 import { Button, Style } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { Provider } from '../types';
 
 export interface Props {

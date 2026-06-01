@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 // @ts-ignore: no declaration file
 import KeyHandler, { KEYDOWN, KEYUP } from 'react-key-handler';
 

@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { equals } from 'ramda';
 import { createSelector } from 'reselect';
 import createCachedSelector from 're-reselect';

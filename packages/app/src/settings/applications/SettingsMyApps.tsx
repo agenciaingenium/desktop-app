@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { theme } from '@getstation/theme';
 import memoize from 'memoizee';
 import { connect } from 'react-redux';

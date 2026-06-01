@@ -1,5 +1,5 @@
 import { Icon, IconSymbol, theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import classNames from 'classnames';
 import AppIcon from './AppIcon';
 import { ActivityEntry } from '../../activity/queries@local.gql.generated';

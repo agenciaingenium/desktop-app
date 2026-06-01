@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 // @ts-ignore: no declaration file
 import isBlank from 'is-blank';
 // @ts-ignore: no declaration file

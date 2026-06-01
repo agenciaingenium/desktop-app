@@ -1,4 +1,4 @@
-import * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 
 export const defineTabsSubdockOrder = (db: Sequelize.Sequelize) => {
   return db.define(

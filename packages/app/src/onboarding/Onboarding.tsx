@@ -1,9 +1,9 @@
 import { GradientType, InjectedProps as withGradientProps, withGradient } from '@getstation/theme';
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc';
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 // @ts-ignore: no declaration file
 import { validate as validateEmail } from 'isemail';
-import * as React from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 import { updateUI } from '../ui/redux-ui-compat';

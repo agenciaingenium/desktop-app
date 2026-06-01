@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Observable, Subscription } from 'rxjs';
 import { withSDK } from '../../context';
 import { BxSDK } from '../../index';

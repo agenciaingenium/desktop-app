@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 // @ts-ignore
 import { MutationFn } from '@apollo/client';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';

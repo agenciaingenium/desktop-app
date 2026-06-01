@@ -1,5 +1,5 @@
 import { Icon, IconSymbol, theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import * as log from 'electron-log';
 import { logger } from '../../api/logger';
 

@@ -228,7 +228,9 @@ const init = () => {
   }
 
   // let's go baby
+  console.log('[main.ts] init: starting bxAppMain.init()');
   bxAppMain.init();
+  console.log('[main.ts] init: bxAppMain.init() returned');
 };
 
 if (!isPackaged) {

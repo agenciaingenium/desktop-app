@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import Moment from 'moment';
 import { ImmutableNotification } from './types';
 

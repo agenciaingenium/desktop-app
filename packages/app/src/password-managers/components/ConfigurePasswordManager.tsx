@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Provider } from '../types';
 import { ProvidersForm } from '../providers';
 import { AddPasswordManagerAction, ConfigurationStep } from '../duck';

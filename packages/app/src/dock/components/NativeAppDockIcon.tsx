@@ -1,6 +1,6 @@
 import { Icon, IconSymbol, Tooltip } from '@getstation/theme';
 import classNames from 'classnames';
-import * as React from 'react';
+import React from 'react';
 import { nanoid } from 'nanoid';
 export import IconSymbol = IconSymbol;
 

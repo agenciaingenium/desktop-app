@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { tap, compose } from 'ramda';
 import { Maybe } from 'graphql/jsutils/Maybe';
 

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 // @ts-ignore: no declaration file
 import isBlank from 'is-blank';
-import * as React from 'react';
+import React from 'react';
 import { findDOMNode } from 'react-dom';
 import { EMPTY_SECTION, flattenResults, sectionsAlwaysExpanded } from '../api';
 import { SearchResultSerialized, SearchSectionSerialized } from '../duck';

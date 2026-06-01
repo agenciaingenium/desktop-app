@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import createCachedSelector from 're-reselect';
 import { getTabId } from '../tabs/get';
 import { getTabsForApplication } from '../tabs/selectors';

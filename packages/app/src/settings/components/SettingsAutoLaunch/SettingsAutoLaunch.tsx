@@ -1,5 +1,5 @@
 import { Switcher } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { useGetAutolaunchStatusQuery, useEnableAutoLaunchMutation } from './queries@local.gql.generated';
 
 const containerStyle: React.CSSProperties = {

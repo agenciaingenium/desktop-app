@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { createSelector } from 'reselect';
 import { getApplications } from '../applications/selectors';
 import { ApplicationsImmutable } from '../applications/types';

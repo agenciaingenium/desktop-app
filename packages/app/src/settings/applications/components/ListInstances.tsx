@@ -1,6 +1,6 @@
 import * as pluralize from 'pluralize';
 import { compact } from 'ramda-adjunct';
-import * as React from 'react';
+import React from 'react';
 import List from '../../../common/components/List';
 import {
   ListActionType,

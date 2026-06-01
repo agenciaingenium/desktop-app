@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { fromJS } from '../utils/ts';
 import { AuthProviders, StationUserIdentitiesImmutable } from './types';
 

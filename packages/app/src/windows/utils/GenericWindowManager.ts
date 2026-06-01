@@ -84,6 +84,7 @@ export default class GenericWindowManager extends EventEmitter {
     if (this.isCreated()) return this.window;
 
     try {
+      console.log('[GenericWindowManager] create: calling services.browserWindow.create');
       this.window = await services.browserWindow.create({
         ...options,
         preventNavigation: true,
@@ -96,6 +97,7 @@ export default class GenericWindowManager extends EventEmitter {
           sandbox: false,
         },
       });
+      console.log('[GenericWindowManager] create: services.browserWindow.create returned');
     } catch (err) {
       console.error('[GenericWindowManager] create failed:', err);
       throw err;

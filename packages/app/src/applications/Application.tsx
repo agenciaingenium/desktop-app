@@ -2,7 +2,7 @@
   We forked the Slack library for @getstation/slack since we need to use
   the browser version (the worker is a renderer process) and we are in a node context.
 */
-import * as slack from 'slack';
+import slack from 'slack';
 import { GradientType, withGradient } from '@getstation/theme';
 import ElectronWebview from '../common/components/ElectronWebview';
 import classNames from 'classnames';
@@ -11,7 +11,7 @@ import { Maybe } from 'graphql/jsutils/Maybe';
 import throttle from 'lodash.throttle';
 import * as path from 'path';
 import { noop, compact } from 'ramda-adjunct';
-import * as React from 'react';
+import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';

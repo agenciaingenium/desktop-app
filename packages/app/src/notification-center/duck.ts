@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { NotificationProps, StationNotificationImmutable } from './types';
 import { RequestForApplicationNotificationsStep } from '../notifications/duck';
 

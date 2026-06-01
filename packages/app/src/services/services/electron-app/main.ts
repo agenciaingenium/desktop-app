@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { BrowserWindow, Menu, Tray, app, nativeImage, session } from 'electron';
 import log from 'electron-log';
-import * as globalTunnel from 'global-tunnel-ng';
+import globalTunnel from 'global-tunnel-ng';
 import { fromEvent, Subject, Subscription } from 'rxjs';
 
 import { isPackaged } from '../../../utils/env';

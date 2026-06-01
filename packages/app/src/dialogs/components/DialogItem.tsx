@@ -1,5 +1,5 @@
 import { Button, Icon, theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { nanoid } from 'nanoid';
 import { oc } from 'ts-optchain';
 import { getApplicationIconURL, getApplicationManifestURL, getApplicationId } from '../../applications/get';

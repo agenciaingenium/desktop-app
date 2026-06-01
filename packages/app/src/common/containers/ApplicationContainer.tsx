@@ -1,5 +1,5 @@
 import { GradientType, withGradient } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 
 export interface Props {
   children?: React.ReactNode,

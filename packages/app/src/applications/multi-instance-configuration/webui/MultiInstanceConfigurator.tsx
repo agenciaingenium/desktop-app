@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { BxAppManifest } from '../../manifest-provider/bxAppManifest';
 import ChooseIdentityForm from './components/ChooseIdentityForm';
 import ChooseCommonForm from './components/ChooseCommonForm';

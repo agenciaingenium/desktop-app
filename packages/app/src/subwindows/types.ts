@@ -1,3 +1,3 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 
 export type StationSubWindowsImmutable = Immutable.Set<string>;

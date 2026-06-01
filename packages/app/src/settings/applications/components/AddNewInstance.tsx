@@ -1,5 +1,5 @@
 import { IconSymbol, Size, ButtonIcon, Style } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 
 type DefaultProps = {
   instanceTypeWording: string,

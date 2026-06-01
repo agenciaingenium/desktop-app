@@ -1,5 +1,5 @@
 import { Button, IconSymbol, Style, Switcher, theme, Tooltip, ButtonIcon, Size } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 
 export enum ListActionType {
   BUTTON, BUTTON_ICON, SWITCHER,

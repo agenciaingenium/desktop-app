@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { createSelector } from 'reselect';
 import { GDRIVE_MANIFEST_URL } from '../applications/manifest-provider/const';
 import { StationState } from '../types';

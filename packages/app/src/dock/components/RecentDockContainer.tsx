@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React from 'react';
 import {
   SearchPaneItemSelectedVia,
   cyclingStep, SearchPaneClosedVia,
 } from '../../bang/duck';
 import { Manager, Reference, Popper } from 'react-popper';
-import * as PopperJS from 'popper.js';
+import PopperJS from 'popper.js';
 
 import { ActivityEntry } from '../../activity/queries@local.gql.generated';
 

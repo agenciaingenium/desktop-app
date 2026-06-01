@@ -1,5 +1,5 @@
 import { GradientType, theme, withGradient } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { findDOMNode } from 'react-dom';
 // @ts-ignore: Mousetrap UMD global
 declare const Mousetrap: any;

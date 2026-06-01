@@ -1,4 +1,4 @@
-import * as Sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 
 export const defineFavoritesSubdockOrder = (db: Sequelize.Sequelize) => {
   return db.define(

@@ -1,5 +1,5 @@
 import { Icon, IconSymbol, theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { oc } from 'ts-optchain';
 import { useGetApplicationQuery } from '../queries@local.gql.generated';
 import AppIcon from '../../dock/components/AppIcon';

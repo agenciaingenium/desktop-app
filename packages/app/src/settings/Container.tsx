@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Tab from '../common/containers/Tab';
 import Tabs from '../common/containers/Tabs';
 import Overlay from '../components/Overlay';

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 // @ts-ignore
-import * as React from 'react';
+import React from 'react';
 import { AppDockIcon, AppearingAppDockIcon } from './AppDockIcon';
 
 const appDockIconMeta: Meta<typeof AppDockIcon> = {

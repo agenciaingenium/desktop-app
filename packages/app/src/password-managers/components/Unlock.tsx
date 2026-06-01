@@ -1,5 +1,5 @@
 import { Input, InputType, Modal } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { UnlockStep } from '../duck';
 import { PasswordManager } from '../types';
 

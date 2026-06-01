@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { StationTabImmutable } from './types';
 
 export const getTabId = (tab: StationTabImmutable) => tab.get('tabId');

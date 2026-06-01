@@ -1,5 +1,5 @@
 import { search } from '@getstation/sdk';
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { combineLatest, BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { AbstractProvider } from '../common';

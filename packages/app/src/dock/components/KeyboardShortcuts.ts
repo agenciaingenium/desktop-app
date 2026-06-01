@@ -1,8 +1,8 @@
-import * as BluebirdPromise from 'bluebird';
+import BluebirdPromise from 'bluebird';
 import { EventEmitter } from 'events';
 // @ts-ignore: no declaration file
 import Mousetrap from 'mousetrap';
-import * as React from 'react';
+import React from 'react';
 import { SHORTCUTS } from '../../keyboard-shortcuts';
 
 const originalHandleKey = (Mousetrap as any).prototype.handleKey;

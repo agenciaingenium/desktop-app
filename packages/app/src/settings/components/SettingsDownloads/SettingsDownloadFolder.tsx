@@ -1,5 +1,5 @@
 import { Switcher, Button, Size } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { isDarwin } from '../../../utils/process';
 import { useGetPromptDownloadStatusQuery, useEnablePromptDownloadMutation } from './queries@local.gql.generated';
 

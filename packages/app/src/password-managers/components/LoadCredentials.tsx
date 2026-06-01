@@ -1,5 +1,5 @@
 import { Modal } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 
 export interface Props {
   applicationName: string,

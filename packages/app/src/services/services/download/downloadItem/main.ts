@@ -5,7 +5,7 @@ import { Observer, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { nanoid } from 'nanoid';
 // @ts-ignore no definition types
-import * as unusedFilename from 'unused-filename';
+import unusedFilename from 'unused-filename';
 import { isDarwin } from '../../../../utils/process';
 import { ServiceSubscription } from '../../../lib/class';
 import { RPC, SubscriptionConstructorParam } from '../../../lib/types';

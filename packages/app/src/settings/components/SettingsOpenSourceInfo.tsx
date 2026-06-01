@@ -1,5 +1,5 @@
 import { Button, Size } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { openExternal } from '../../utils/shellRenderer';
 
 const STYLE = {

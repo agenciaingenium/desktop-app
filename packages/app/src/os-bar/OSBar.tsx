@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import * as React from 'react';
+import React from 'react';
 import DockNavigationButtons from '../dock-navigation/components/DockNavigationButtons';
 import TrafficLightsContainer from '../dock/components/TrafficLightsContainer';
 

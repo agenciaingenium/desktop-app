@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Application } from '../types';
 import { ITabSelectedInfo, ActiveTab } from '../Container';
 import SubdockHead from './SubdockHead';

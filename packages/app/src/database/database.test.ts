@@ -1,7 +1,7 @@
-import * as cls from 'continuation-local-storage';
+import cls from 'continuation-local-storage';
 import * as path from 'path';
-import * as Sequelize from 'sequelize';
-import * as tmp from 'tmp';
+import Sequelize from 'sequelize';
+import tmp from 'tmp';
 import operatorsAliases from './operatorsAliases';
 
 tmp.setGracefulCleanup();

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Props as TabProps } from './Tab';
 
 type TabElement = React.ReactElement<TabProps>;

@@ -1,5 +1,5 @@
 import { ChooserItem, ChooserItemStyle } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 
 export interface Props {
   passwordManagers: any[],

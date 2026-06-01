@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import * as models from '../database/model';
 import getPasswordManagerLinks from '../password-managers/persistence/passwordManagerLinks';
 import getPasswordManagers from '../password-managers/persistence/passwordManagers';

@@ -1,6 +1,6 @@
 import { IconSymbol } from '@getstation/theme';
-import * as Immutable from 'immutable';
-import * as React from 'react';
+import Immutable from 'immutable';
+import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import DockApplicationSubdock from '../common/containers/DockApplicationSubdock';

@@ -1,5 +1,5 @@
 import bxsdk from '@getstation/sdk';
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { Dispatch } from 'redux';
 // @ts-ignore: no declaration file
 import { observer } from 'redux-observers';

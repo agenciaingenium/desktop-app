@@ -1,6 +1,6 @@
 import { Cookie, net, session } from 'electron';
 import moment from 'moment';
-import * as tough from 'tough-cookie';
+import tough from 'tough-cookie';
 
 const maxRedirections = 19;
 const errorMessageTooManyRedirects = 'too much redirecting';

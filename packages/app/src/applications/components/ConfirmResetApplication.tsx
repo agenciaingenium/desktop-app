@@ -1,5 +1,5 @@
 import { Modal } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUI } from '../../ui/redux-ui-compat';
 import { oc } from 'ts-optchain';

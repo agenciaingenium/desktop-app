@@ -1,5 +1,5 @@
 import { theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { SHORTCUTS } from '../../../keyboard-shortcuts';
 import SDKPortal from '../../../sdk/react/components/SDKPortal';
 import FindBoostedAppsButton, { OwnProps as FindBoostedAppsButtonOwnProps } from './FindBoostedAppsButton';

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import ElectronWebview, { ElectronWebviewProps } from '../common/components/ElectronWebview';
 
 export interface Props extends ElectronWebviewProps {

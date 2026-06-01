@@ -1,5 +1,5 @@
 import { theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { CSSTransition } from 'react-transition-group';
 import { bindActionCreators, Dispatch } from 'redux';

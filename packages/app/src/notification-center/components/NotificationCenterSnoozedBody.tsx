@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { osName } from '../../utils/process';
 
 const illuSVG = require('./resources/illustration--focus.svg');

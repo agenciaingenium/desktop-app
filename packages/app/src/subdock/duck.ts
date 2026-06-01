@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 
 export const SET_SUBDOCK_APPLICATION_ID = 'browserX/subdock/SET_SUBDOCK_APPLICATION_ID';
 export type SET_SUBDOCK_APPLICATION_ID = 'browserX/subdock/SET_SUBDOCK_APPLICATION_ID';

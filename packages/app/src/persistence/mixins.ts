@@ -1,6 +1,6 @@
 import AsyncLock from 'async-lock';
-import * as Immutable from 'immutable';
-import * as Sequelize from 'sequelize';
+import Immutable from 'immutable';
+import Sequelize from 'sequelize';
 
 // In order to have better TS support in IDE
 // replace Classes that have a lot of static with dedicated classes or functions

@@ -1,5 +1,5 @@
 import { COLORS, Coordinates } from '@getstation/theme';
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 
 // Constants
 export type CHANGE_THEME_COLORS = 'browserX/theme/CHANGE_THEME_COLORS';

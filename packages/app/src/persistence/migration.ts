@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import umzug from './umzug';
 import db from '../database/database';
 

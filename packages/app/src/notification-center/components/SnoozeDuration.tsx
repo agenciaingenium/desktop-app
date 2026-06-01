@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import moment from 'moment';
 // @ts-ignore no declaration file
 import millisec from 'millisec';

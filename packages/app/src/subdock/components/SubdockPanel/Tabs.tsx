@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import mergeRefs from 'react-merge-refs';
 import classNames from 'classnames';

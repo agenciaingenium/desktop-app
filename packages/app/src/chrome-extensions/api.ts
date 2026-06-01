@@ -1,4 +1,4 @@
-import * as BluebirdPromise from 'bluebird';
+import BluebirdPromise from 'bluebird';
 import { uniq } from 'ramda';
 import { getManifestOrTimeout } from '../applications/api';
 import { BrowserXAppWorker } from '../app-worker';

@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { EventEmitter } from 'events';
 import storage from '../persistence';
 

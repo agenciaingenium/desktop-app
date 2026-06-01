@@ -1,5 +1,5 @@
 import { Modal, theme } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import { oc } from 'ts-optchain';
 import { useGetApplicationByIdQuery } from '../queries@local.gql.generated';
 

@@ -1,7 +1,7 @@
 import { Modal } from '@getstation/theme';
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import * as pluralize from 'pluralize';
-import * as React from 'react';
+import React from 'react';
 import List from '../../../common/components/List';
 import { ListItemType } from '../../../common/components/ListItem';
 import { Instances, Instance } from '../types';

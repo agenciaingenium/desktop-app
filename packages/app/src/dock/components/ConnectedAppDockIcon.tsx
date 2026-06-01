@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { oc } from 'ts-optchain';
 import { useGetApplicationQuery } from '../queries@local.gql.generated';
 import { AppearingAppDockIcon, OwnProps } from './AppDockIcon';

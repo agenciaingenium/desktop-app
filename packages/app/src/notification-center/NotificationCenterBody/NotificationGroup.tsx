@@ -1,6 +1,6 @@
 import { Icon, IconSymbol } from '@getstation/theme';
-import * as Immutable from 'immutable';
-import * as React from 'react';
+import Immutable from 'immutable';
+import React from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { oc } from 'ts-optchain';
 import AppIcon from '../../dock/components/AppIcon';

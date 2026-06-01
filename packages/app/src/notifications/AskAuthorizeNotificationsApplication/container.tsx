@@ -1,5 +1,5 @@
-import * as Immutable from 'immutable';
-import * as React from 'react';
+import Immutable from 'immutable';
+import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose, Dispatch } from 'redux';
 

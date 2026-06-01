@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import DraggableSubdockItem from '../DraggableSubdockItem';
 import { MinimalSubdockApplication, WrappedActions } from '../SubdockItem';

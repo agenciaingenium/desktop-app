@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 export default class ConsoleErrorBoundary extends React.PureComponent<{children?: React.ReactNode}> {
   componentDidCatch(error: Error) {

@@ -1,8 +1,8 @@
 import { Button, Style } from '@getstation/theme';
 // @ts-ignore: no declaration file
-import * as networkErrors from 'chromium-net-errors';
+import networkErrors from 'chromium-net-errors';
 import { Maybe } from 'graphql/jsutils/Maybe';
-import * as React from 'react';
+import React from 'react';
 
 export interface Props {
   crashed: boolean,

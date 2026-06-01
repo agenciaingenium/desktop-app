@@ -1,6 +1,6 @@
 import { Button, Size } from '@getstation/theme';
 import ms = require('ms');
-import * as React from 'react';
+import React from 'react';
 import {
   useGetAutoUpdateStatusQuery, useCheckForUpdatesMutationMutation, useQuitAndInstallMutationMutation,
 } from './queries@local.gql.generated';

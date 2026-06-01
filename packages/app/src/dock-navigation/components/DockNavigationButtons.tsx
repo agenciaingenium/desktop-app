@@ -1,7 +1,7 @@
 import { IconSymbol, Tooltip } from '@getstation/theme';
 // @ts-ignore: no declaration file
 import bind from 'memoize-bind';
-import * as React from 'react';
+import React from 'react';
 import NativeAppDockIcon, { Size } from '../../dock/components/NativeAppDockIcon';
 import { SHORTCUTS } from '../../keyboard-shortcuts';
 

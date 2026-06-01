@@ -1,5 +1,5 @@
 import { IconSymbol, Size, theme, ButtonIcon, Style } from '@getstation/theme';
-import * as React from 'react';
+import React from 'react';
 import {
   StatusState,
   checkForUpdate,

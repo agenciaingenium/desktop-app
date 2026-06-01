@@ -1,4 +1,4 @@
-import * as Immutable from 'immutable';
+import Immutable from 'immutable';
 import { nanoid } from 'nanoid';
 import {
   RequestForApplicationNotifications,
