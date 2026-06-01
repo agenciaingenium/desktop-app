@@ -16,6 +16,7 @@ export const startSessionsListening = () => {
   if (listening) throw new Error('Cannot call startSessionsListening() several times');
   // @ts-ignore no typing for 'session-created'
   app.on('session-created', (sess: Session) => {
+    console.log('[sessions] session-created event fired');
     // usage of `setImmediate` here because `session.defaultSession` cannot be accessed synchronously in the app.on('session-created') callback
     setImmediate(() => sessions.next(sess));
   });

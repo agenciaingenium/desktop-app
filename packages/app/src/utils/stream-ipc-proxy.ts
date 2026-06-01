@@ -175,7 +175,11 @@ export class ElectronIpcRendererDuplex extends Duplex {
           console.warn('ElectronIpcRendererDuplex: Failed to get current WC ID via sendSync', e);
         }
 
-      this.channel = getFullChannel(channel, currentWebContentsId);
+      // When wcId === 0, we're talking to the main process.
+      // The main's firstConnectionHandler listens on the bare namespace,
+      // so we must send on the bare namespace too (not getFullChannel which
+      // appends a per-WebContents suffix the main doesn't know about).
+      this.channel = this.wcId === 0 ? channel : getFullChannel(channel, currentWebContentsId);
 
       if (this.wcId === 0) {
             // renderer to main - Use standard send
