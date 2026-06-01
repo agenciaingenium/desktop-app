@@ -242,7 +242,7 @@ export class ElectronIpcRendererDuplex extends Duplex {
 }
 
 export const firstConnectionHandler = (callback: (socket: Duplex) => void, channel?: string) => {
-  const seensIds = new Set<number>();
+  const seensDuplexes = new Map<number, Duplex>();
 
   const ipc: any = isRenderer ? getIpcRenderer() : ipcMain;
   ipc.on(channel || 'data', (e: any, data: any, ..._rest: any[]) => {
@@ -255,11 +255,15 @@ export const firstConnectionHandler = (callback: (socket: Duplex) => void, chann
           senderId = data.__senderId;
         }
 
-        // Always check seensIds to prevent infinite connection loops.
-      if (seensIds.has(senderId)) {
+        // If we already created a duplex for this sender, push the data into it
+        // instead of creating a new one. This is required because the renderer
+        // side sends the initial "connection" message and then subsequent
+        // service calls on the same channel — we must deliver all of them.
+      const existing = seensDuplexes.get(senderId);
+      if (existing) {
+          if (data !== undefined) existing.push(data);
           return;
         }
-      seensIds.add(senderId);
 
       let duplex: Duplex;
       if (isRenderer) {
@@ -268,6 +272,7 @@ export const firstConnectionHandler = (callback: (socket: Duplex) => void, chann
             // @ts-ignore: e.sender is WebContents
           duplex = new ElectronIpcMainDuplex(e.sender, channel || 'data');
         }
+      seensDuplexes.set(senderId, duplex);
         // Only push initial data for default channel (legacy behavior)
       if (!channel) {
           duplex.push(data);
