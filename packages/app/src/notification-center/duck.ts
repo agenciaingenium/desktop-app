@@ -138,6 +138,7 @@ export const showNotification = (notificationId: string): ShowNotificationAction
 
 // Reducer
 
+// @ts-ignore
 const defaultMap = Immutable.Map({
   notifications: Immutable.List(),
 }) as StationNotificationImmutable;

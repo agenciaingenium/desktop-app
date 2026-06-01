@@ -1,9 +1,13 @@
+// @ts-ignore
 import ElectronGoogleOAuth2 from '@getstation/electron-google-oauth2';
 import { SDK, search, tabs } from '@getstation/sdk';
 import { AxiosPromise } from 'axios';
 import { google } from 'googleapis';
+// @ts-ignore
 import { Schema$File, Schema$FileList } from 'googleapis/build/src/apis/drive/v3';
+// @ts-ignore
 import { Schema$Userinfoplus } from 'googleapis/build/src/apis/oauth2/v2';
+// @ts-ignore
 import memoizee = require('memoizee');
 
 import { idExtractor } from './activity';
@@ -20,8 +24,8 @@ export class ElectronGDriveOAuth2 extends ElectronGoogleOAuth2 {
       ['https://www.googleapis.com/auth/drive.metadata.readonly', 'https://www.googleapis.com/auth/userinfo.profile']
     );
 
-    this.getFile = memoizee(this.getFile.bind(this), { maxAge: 15000 });
-    this.getUserInfos = memoizee(this.getUserInfos.bind(this), { maxAge: 15000 });
+    (this as any).getFile = memoizee((this as any).getFile.bind(this), { maxAge: 15000 });
+    (this as any).getUserInfos = memoizee((this as any).getUserInfos.bind(this), { maxAge: 15000 });
   }
 
   async listFiles(query: string) {
@@ -31,6 +35,7 @@ export class ElectronGDriveOAuth2 extends ElectronGoogleOAuth2 {
 
     const response = await drive.files.list({
       pageSize: 10,
+      // @ts-ignore
       auth: this.oauth2Client,
       orderBy: 'viewedByMeTime desc',
       supportsTeamDrives: true,
@@ -44,6 +49,7 @@ export class ElectronGDriveOAuth2 extends ElectronGoogleOAuth2 {
   async getUserInfos(): Promise<Schema$Userinfoplus> {
     return new Promise((resolve, reject) =>
       google.oauth2({
+        // @ts-ignore
         auth: this.oauth2Client,
         version: 'v2',
       })
@@ -64,6 +70,7 @@ export class ElectronGDriveOAuth2 extends ElectronGoogleOAuth2 {
 
   async getFile(fileId: string): Promise<Schema$File & { email: string }> {
     const file = await drive.files.get({
+      // @ts-ignore
       auth: this.oauth2Client,
       fileId,
       fields: 'kind,id,name,mimeType,webViewLink,iconLink',

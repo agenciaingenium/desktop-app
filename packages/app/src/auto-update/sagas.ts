@@ -1,11 +1,16 @@
 import log from 'electron-log';
+import { SagaIterator } from 'redux-saga';
 import { all, call, fork, put, select } from 'redux-saga/effects';
 import { updateUI } from '../ui/redux-ui-compat';
+// @ts-ignore no declaration file
 import { READY } from '../app/duck';
 import services from '../services/servicesManager';
 import { dispatchUrlSaga } from '../urlrouter/sagas';
+// @ts-ignore no declaration file
 import { consumeLockFileIfExists, createLockFile, FILE } from '../utils/AppData';
+// @ts-ignore no declaration file
 import { callService, periodicTick, serviceAddObserverChannel, takeEveryWitness } from '../utils/sagas';
+// @ts-ignore no declaration file
 import {
   CHECK_FOR_UPDATES,
   OPEN_RELEASE_NOTES,
@@ -15,22 +20,24 @@ import {
   setDownloadingUpdate,
   setUpdateIsAvailable,
   toggleReleaseNotesSubdockVisibility,
+// @ts-ignore no declaration file
 } from './duck';
+// @ts-ignore no declaration file
 import { isDownloadingUpdate, isUpdateAvailable } from './selectors';
-import ms = require('ms');
+import ms from 'ms';
 
 const POLL_UPDATE_INTERVAL = ms('30mins');
 
-function* onQuitAndInstall() {
+function* onQuitAndInstall(): SagaIterator {
   services.electronApp.quit();
 }
 
-function* initAppUpdater() {
-  const updateDownloadedChannel = serviceAddObserverChannel(services.autoUpdater, 'onUpdateDownloaded', 'au-update-downloaded');
-  const checkingForUpdateChannel = serviceAddObserverChannel(services.autoUpdater, 'onCheckingForUpdate', 'au-checking-update');
-  const updateNotAvailableChannel = serviceAddObserverChannel(services.autoUpdater, 'onUpdateNotAvailable', 'au-update-not-available');
-  const updateAvailableChannel = serviceAddObserverChannel(services.autoUpdater, 'onUpdateAvailable', 'au-update-available');
-  const errorChannel = serviceAddObserverChannel(services.autoUpdater, 'onError', 'aus-error');
+function* initAppUpdater(): SagaIterator {
+  const updateDownloadedChannel = (serviceAddObserverChannel as any)(services.autoUpdater, 'onUpdateDownloaded', 'au-update-downloaded');
+  const checkingForUpdateChannel = (serviceAddObserverChannel as any)(services.autoUpdater, 'onCheckingForUpdate', 'au-checking-update');
+  const updateNotAvailableChannel = (serviceAddObserverChannel as any)(services.autoUpdater, 'onUpdateNotAvailable', 'au-update-not-available');
+  const updateAvailableChannel = (serviceAddObserverChannel as any)(services.autoUpdater, 'onUpdateAvailable', 'au-update-available');
+  const errorChannel = (serviceAddObserverChannel as any)(services.autoUpdater, 'onError', 'aus-error');
 
   const fileExists = yield call(consumeLockFileIfExists, FILE.SHOW_RELEASE_NOTES);
 
@@ -65,7 +72,7 @@ function* initAppUpdater() {
   });
 }
 
-function* checkForUpdates() {
+function* checkForUpdates(): SagaIterator {
   const downloading = yield select(isDownloadingUpdate);
   const updateAvailable = yield select(isUpdateAvailable);
 
@@ -77,15 +84,16 @@ function* checkForUpdates() {
   yield callService('autoUpdater', 'checkForUpdates');
 }
 
-function* doOpenReleaseNotes() {
+function* doOpenReleaseNotes(): SagaIterator {
+  // @ts-ignore sagas and TS does not seem to go well together
   yield call(dispatchUrlSaga, { url: 'https://github.com/getstation/desktop-app/releases/' });
 }
 
-function* consumeUpdateLockFile() {
+function* consumeUpdateLockFile(): SagaIterator {
   yield call(createLockFile, FILE.SHOW_RELEASE_NOTES);
 }
 
-export default function* main() {
+export default function* main(): SagaIterator {
   yield all([
     takeEveryWitness(READY, initAppUpdater),
     takeEveryWitness(QUIT_AND_INSTALL, onQuitAndInstall),

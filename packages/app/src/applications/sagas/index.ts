@@ -3,6 +3,7 @@ import { all, call, fork, getContext, put, select } from 'redux-saga/effects';
 import { updateUI } from '../../ui/redux-ui-compat';
 import { nanoid } from 'nanoid';
 import { BrowserXAppWorker } from '../../app-worker';
+// @ts-ignore no declaration file
 import { changeAppFocusState } from '../../app/duck';
 import { changeSelectedAppMain } from '../../nav/duck';
 import { getActiveApplicationId } from '../../nav/selectors';
@@ -14,8 +15,10 @@ import { addTab } from '../../tabs/duck';
 import { getTabApplicationId, getTabId } from '../../tabs/get';
 import { getTabById, getTabIdsByApplicationId, getTabsForApplication } from '../../tabs/selectors';
 import { callService, takeEveryWitness } from '../../utils/sagas';
+// @ts-ignore no declaration file
 import { getWindowIdFromTabId } from '../../windows/selectors';
 import { getManifestOrTimeout } from '../api';
+import { logger } from '../../api/logger';
 import {
   CHANGE_SELECTED_APP,
   changeSelectedApp,
@@ -59,13 +62,13 @@ import { installApplication, watchLifecyleActions, InstallApplicationReturn } fr
 import { goToStartUrlAfterSetConfigData, updateApplicationIconAfterSetConfigData } from './configData';
 import { ApplicationImmutable } from '../types';
 
-function* interceptZoomActions({ applicationId }: ZoomActions) {
+function* interceptZoomActions({ applicationId }: ZoomActions): SagaIterator {
   const application = yield select(getApplicationById, applicationId);
 
   if (!application) return undefined;
-  const tabIds = yield select(getTabIdsByApplicationId, applicationId);
-  const webcontentsIds = yield select(getWebcontentsIdsByTabIds, tabIds);
-  const zoomLevel = getApplicationZoomLevel(application);
+  const tabIds = (yield select(getTabIdsByApplicationId, applicationId)) as string[];
+  const webcontentsIds = (yield select(getWebcontentsIdsByTabIds, tabIds)) as number[];
+  const zoomLevel = Number(getApplicationZoomLevel(application));
 
   for (const webcontentsId of webcontentsIds) {
     try {
@@ -76,7 +79,7 @@ function* interceptZoomActions({ applicationId }: ZoomActions) {
   }
 }
 
-function* setHomeTabAsActiveForApplication({ applicationId }: SetHomeTabAsActiveAction) {
+function* setHomeTabAsActiveForApplication({ applicationId }: SetHomeTabAsActiveAction): SagaIterator {
   const application = yield select(getApplicationById, applicationId);
   if (!application) return;
 
@@ -92,7 +95,7 @@ function* setHomeTabAsActiveForApplication({ applicationId }: SetHomeTabAsActive
   }
 }
 
-function* sagaCreateNewTab({ applicationId, url, home, detach: shouldDetach, navigateToApplication }: CreateNewTabAction) {
+function* sagaCreateNewTab({ applicationId, url, home, detach: shouldDetach, navigateToApplication }: CreateNewTabAction): SagaIterator {
   const id = nanoid();
   const tabId = `${applicationId}/${id}`;
   if (shouldDetach) {
@@ -111,7 +114,7 @@ function* sagaCreateNewTab({ applicationId, url, home, detach: shouldDetach, nav
   }
 }
 
-function* sagaCreateNewEmptyTab({ applicationId, home }: CreateNewEmptyTabAction) {
+function* sagaCreateNewEmptyTab({ applicationId, home }: CreateNewEmptyTabAction): SagaIterator {
   const bxApp: BrowserXAppWorker = yield getContext('bxApp');
   const application = yield select(getApplicationById, applicationId);
   if (!application) return;
@@ -125,7 +128,7 @@ function* sagaCreateNewEmptyTab({ applicationId, home }: CreateNewEmptyTabAction
   yield put(createNewTab(applicationId, newPageUrl, { home, navigateToApplication: true }));
 }
 
-export function* focusActiveTab({ applicationId, tabId }: SetActiveTabAction) {
+export function* focusActiveTab({ applicationId, tabId }: SetActiveTabAction): SagaIterator {
   const activeApplicationId = yield select(getActiveApplicationId);
 
   if (applicationId === activeApplicationId) {
@@ -140,7 +143,7 @@ export function* focusActiveTab({ applicationId, tabId }: SetActiveTabAction) {
  * successively.
  * Only the `installContext` is kept between the previous and the new application.
  */
-export function* onResetApplication({ applicationId }: ResetApplicationAction) {
+export function* onResetApplication({ applicationId }: ResetApplicationAction): SagaIterator {
   yield put(updateUI('confirmResetApplicationModal', 'isVisible', false));
 
   const application: ApplicationImmutable = yield select(getApplicationById, applicationId);

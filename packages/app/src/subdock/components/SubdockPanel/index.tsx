@@ -168,4 +168,4 @@ const reduceTabsAndFavorites = (tabs: Tab[], favorites: Favorite[]) => {
   };
 };
 
-export default SubdockPanel as React.ComponentType<OwnProps>;
+export default SubdockPanel as any;

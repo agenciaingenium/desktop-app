@@ -11,6 +11,7 @@ import { getApplicationsWithManifest, getHomeTab } from '../applications/selecto
 import { ApplicationImmutable } from '../applications/types';
 import { addItem } from '../dialogs/duck';
 import { getTabId, getTabURL } from '../tabs/get';
+import { StationTabImmutable } from '../tabs/types';
 import { getTabById } from '../tabs/selectors';
 import { DEFAULT_BROWSER } from '../urlrouter/constants';
 import { takeEveryWitness } from '../utils/sagas';
@@ -58,8 +59,9 @@ function* onInstallableApplication({ manifestURL, doNotInstall }: MarkApplicatio
 
     yield all(applications.map((app: ApplicationImmutable) => call(function* () {
       const tabId = getApplicationActiveTab(app);
-      const tab = yield select(getTabById, tabId);
-      urlsToReopenInTheDefaultBrowser.push(getTabURL(tab));
+      const tab = yield select(getTabById, tabId) as unknown as StationTabImmutable | undefined;
+      const tabUrl = tab ? getTabURL(tab as StationTabImmutable) : undefined;
+      urlsToReopenInTheDefaultBrowser.push(tabUrl);
       yield put(uninstallApplication(app.get('applicationId')));
     })).valueSeq().toArray());
 

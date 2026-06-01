@@ -4,8 +4,10 @@ import { observer } from 'redux-observers';
 import { logger } from '../api/logger';
 import { StationState } from '../types';
 
+// @ts-ignore
 const observeDockDuplicates = observer(
-  (state: StationState) => state.get('dock'),
+  // @ts-ignore
+  (state: StationState) => state.get('dock') as any,
   (_dispatch: Dispatch, state: StationState, previousState: StationState | undefined) => {
     if (state === previousState) return;
     if (state.toSet().size === state.size) return;

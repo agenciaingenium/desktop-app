@@ -23,7 +23,7 @@ export function observe<S, R, Fn extends WorkerFn<R>>(
   worker: Fn,
   ...args: Tail<Parameters<Fn>>
 ) {
-  return fork(function* () {
+  return fork(function* (): any {
     let previous = null;
 
     while (true) {

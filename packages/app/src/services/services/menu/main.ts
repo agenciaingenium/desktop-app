@@ -23,7 +23,7 @@ import AutofillContextMenu from '../../../context-menus/autofill-menu';
 export class MenuServiceImpl extends MenuService implements RPC.Node<MenuService> {
 
   protected menuManager: BrowserXMenuManager;
-  protected globalShortcutsObservable: Observable<unknown>;
+  protected globalShortcutsObservable!: Observable<unknown>;
   
   constructor(uuid?: string) {
     super(uuid, { ready: false });
@@ -42,7 +42,7 @@ export class MenuServiceImpl extends MenuService implements RPC.Node<MenuService
     const subscriptions: Subscription[] = [];
 
     if (observer.onClickItem) {
-      subscriptions.push(fromEvent(this.menuManager, 'click-item')
+      subscriptions.push((fromEvent(this.menuManager as any, 'click-item' as any) as any)
         .subscribe((params: IMenuServiceObserverOnClickItemParam) => {
           observer.onClickItem!(params);
         }));
@@ -125,7 +125,7 @@ export class ContextMenuServiceImpl extends ContextMenuService implements RPC.No
     });
     this.subscribeClickItem(contextMenu, this.contextMenuObservable);
 
-    contextMenu.popup(BrowserWindow.fromWebContents(wc.hostWebContents));
+    contextMenu.popup(BrowserWindow.fromWebContents(wc.hostWebContents as any) as any);
   }
 
   async popupAutofill({ emails, rect }: { emails: [string], rect: any }) {
@@ -134,14 +134,14 @@ export class ContextMenuServiceImpl extends ContextMenuService implements RPC.No
     const autofill = new AutofillContextMenu(emails);
     this.subscribeClickItem(autofill, this.contextMenuObservable);
 
-    const hostWindow = BrowserWindow.fromWebContents(wc.hostWebContents);
+    const hostWindow = BrowserWindow.fromWebContents(wc.hostWebContents as any) as any;
     if (!hostWindow) {
       console.warn('[menu] Could not get host window for autofill');
       return;
     }
 
     autofill.popup({
-      window: hostWindow,
+      window: hostWindow as any,
       // The rect we receive is given without our own UI elements
       // Hence the added offset value which correspond to dock (50) & top rack (38)
       x: Math.floor(rect.left + 50),

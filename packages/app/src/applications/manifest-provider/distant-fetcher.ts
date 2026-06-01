@@ -60,7 +60,7 @@ export default class DistantFetcher implements IFetcher {
 
         const app = {
           manifest,
-          lastChecked: moment(),
+          lastChecked: (moment as any)(),
           source: Source.DISTANT,
         };
 

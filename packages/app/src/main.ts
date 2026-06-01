@@ -80,6 +80,7 @@ const loadWorker = () => {
       // Include the original sender's webContentsId so the target can reply back
       targetWebContents.send(channel, { __senderId: event.sender.id }, ...args);
     } else {
+      // eslint-disable-next-line no-console
       console.log(`[DEBUG] Target webContents ${targetId} not found!`);
     }
   });

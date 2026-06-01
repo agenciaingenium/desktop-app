@@ -6,14 +6,19 @@ import { InMemoryCache, NormalizedCacheObject, ApolloClient } from '@apollo/clie
 import { PubSub } from 'graphql-subscriptions';
 import { updateUI } from './ui/redux-ui-compat';
 // @ts-ignore no declaration file
+// @ts-ignore no declaration file
+// @ts-ignore no declaration file
 import { openProcessManager, setFullScreenState, setOnlineStatus, toggleKbdShortcuts } from './app/duck';
+// @ts-ignore no declaration file
 import { getFocus } from './app/selectors';
+// @ts-ignore no declaration file
 import {
   detachCurrentlyFocusedApplicationTab,
   dispatchURLNavigationActiveApp,
   resetZoomActiveApp,
   zoomInActiveApp,
   zoomOutActiveApp,
+// @ts-ignore no declaration file
 } from './applications/ApplicationsActions';
 import { dispatchUrl } from './applications/duck';
 import ManifestProvider from './applications/manifest-provider/manifest-provider';
@@ -28,6 +33,7 @@ import { AlertDialogProviderServiceImpl } from './dialogs/alertDialogProvider';
 import * as inTabSearch from './in-tab-search/duck';
 import * as notificationCenter from './notification-center/duck';
 import { NotificationProps } from './notification-center/types';
+import { NewNotificationOptions } from './notification-center/duck';
 import { TabWebContentsAutoLoginDetailsProviderServiceImpl } from './password-managers/autoLoginProvider';
 import ResourceRouterDispatcher from './resources/ResourceRouterDispatcher';
 import bxSDK from './sdk';
@@ -57,13 +63,13 @@ import { BrowserWindowManagerProviderServiceImpl } from './services/services/bro
 import { ElectronAppServiceProviderServiceImpl } from './services/services/electron-app/worker';
 
 export class BrowserXAppWorker {
-  public store: StationStoreWorker;
-  public mainWindowManager: MainWindowManager;
-  public apolloClient: ApolloClient<NormalizedCacheObject>;
-  public manifestProvider: ManifestProvider;
-  public pubsub: PubSub;
-  public router: URLRouter;
-  public resourceRouter: ResourceRouterDispatcher;
+  public store!: StationStoreWorker;
+  public mainWindowManager!: MainWindowManager;
+  public apolloClient!: ApolloClient<NormalizedCacheObject>;
+  public manifestProvider!: ManifestProvider;
+  public pubsub!: PubSub;
+  public router!: URLRouter;
+  public resourceRouter!: ResourceRouterDispatcher;
   private onlineHandler?: () => void;
   private offlineHandler?: () => void;
 
@@ -90,7 +96,7 @@ export class BrowserXAppWorker {
       this.initSDKv2();
       this.initAutoLaunch().catch(handleError());
     } catch (e) {
-      handleError()(e);
+      handleError()(e as Error);
       ipcRenderer.send('station:app-exit', 1);
     }
   }
@@ -287,7 +293,8 @@ export class BrowserXAppWorker {
         try {
           const contextMenuService = await services.contextMenu.create({ webcontentsId: webContentsId });
 
-          return contextMenuService.addObserver(observer({
+          // @ts-ignore
+          contextMenuService.addObserver(observer({
             async onShow(props: Electron.ContextMenuParams) {
               try {
                 const newProps = !props.misspelledWord ? props : {
@@ -337,7 +344,7 @@ export class BrowserXAppWorker {
     this.mainWindowManager.on('swipe-left', () => this.dispatch(executeWebviewMethodForCurrentTab('go-back')));
     this.mainWindowManager.on('swipe-right', () => this.dispatch(executeWebviewMethodForCurrentTab('go-forward')));
     this.mainWindowManager.on('new-notification', (notificationId: string, props: NotificationProps, options: NotificationOptions) => {
-      this.dispatch(notificationCenter.newNotification(undefined, undefined, notificationId, props, options))
+      this.dispatch(notificationCenter.newNotification(undefined, undefined, notificationId, props, options as NewNotificationOptions))
     });
   }
 
@@ -400,15 +407,6 @@ export class BrowserXAppWorker {
     updateOnlineStatus(navigator.onLine);
   }
 
-  private cleanupOnlineListener() {
-    if (this.onlineHandler) {
-      window.removeEventListener('online', this.onlineHandler);
-    }
-    if (this.offlineHandler) {
-      window.removeEventListener('offline', this.offlineHandler);
-    }
-  }
-
   private initSDKv2() {
     return (services.sdkv2 as SDKv2ServiceImpl).setStore(this.store);
   }
@@ -428,6 +426,7 @@ export class BrowserXAppWorker {
 
 if (!isPackaged) {
   process.on('unhandledRejection', error => {
+    // eslint-disable-next-line no-console
     console.trace(error);
   });
 }

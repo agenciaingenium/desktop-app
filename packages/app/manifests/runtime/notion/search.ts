@@ -25,7 +25,7 @@ import {
 type CancelQuery = () => void;
 
 class Search {
-  public static instance;
+  public static instance: Search | null = null;
 
   private static readonly errors: Subject<Error> = new Subject();
 
@@ -73,7 +73,7 @@ class Search {
             this.sdk.search.results.next({ results: [] });
           }
         }),
-        filter(query => Boolean(query.value)), // ignore empty query
+        filter((query: any) => Boolean(query.value)),
         distinctUntilChanged(),
         debounceTime(150)
       )
@@ -113,7 +113,7 @@ class Search {
                 workspace.domain,
                 {
                   results: [...new Set([...searchPages.results, ...searchCollections.results])],
-                  recordMap: deepExtend(searchPages.recordMap, searchCollections.recordMap),
+                  recordMap: (deepExtend as any)(searchPages.recordMap, searchCollections.recordMap),
                 }
               )
             );
@@ -123,11 +123,11 @@ class Search {
             .map(tab => idExtractor(tab.url) || '')
             .filter(x => Boolean(x));
 
-          const isTabHasResourceId = compose(contained(tabsAsResourceIds), prop('resourceId'));
+          const isTabHasResourceId = compose(contained(tabsAsResourceIds as string[]), prop('resourceId') as any) as any;
           const rejectResultIfAvailableAsTab = reject<search.SearchResultItem>(isTabHasResourceId);
 
           this.sdk.search.results.next({
-            results: rejectResultIfAvailableAsTab(results),
+            results: rejectResultIfAvailableAsTab(results as search.SearchResultItem[]),
           });
         },
         e => Search.errors.next(e)
@@ -161,7 +161,7 @@ class Search {
 
         return undefined;
       })
-      .filter(r => Boolean(r));
+      .filter((r: any) => Boolean(r));
   }
 }
 

@@ -10,7 +10,7 @@ import { BrowserXAppWorker } from '../app-worker';
  * @param manifestURLs
  */
 export async function getImportedCXIdsForManifests(appWorker: BrowserXAppWorker, manifestURLs: string[]): Promise<string[]> {
-  const manifests = await BluebirdPromise.map(manifestURLs, manifestURL => {
+  const manifests = await (BluebirdPromise as any).map(manifestURLs, (manifestURL: string) => {
     return getManifestOrTimeout(appWorker, manifestURL);
   });
 

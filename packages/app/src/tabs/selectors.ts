@@ -35,6 +35,7 @@ export const getTabsMappedByExactURL = createSelector(
  */
 export const getTabsMappedByLooseURL = createSelector(
   getTabsMappedByExactURL,
+  // @ts-ignore
   tabs => tabs.mapKeys(removeHashFromURL)
 );
 
@@ -121,7 +122,9 @@ export const getDuplicateTabsByURL = createSelector(
 
     let result: RecursiveImmutableMap<Record<string, StationTab[]>> = Immutable.Map<string, any>() as any;
 
+    // @ts-ignore
     tabsByURL.mapKeys((url: string) => {
+      // @ts-ignore
       const tabsWithSameURL = filteredTabs.filter(tab => getTabURL(tab) === url);
       result = result.set(url, tabsWithSameURL.toList());
     });
@@ -138,29 +141,35 @@ export const getDuplicateTabsByURLFilteredByApplicationId = createCachedSelector
 
 export const getDuplicatedTabsCountByURL = createCachedSelector(
   getDuplicateTabsByURLFilteredByApplicationId,
+  // @ts-ignore
   tabsGroupedByURL => tabsGroupedByURL
     .flatten(true)
     .toList()
-    .countBy(tab => tab.get('url'))
+    // @ts-ignore
+    .countBy((tab: any) => tab.get('url'))
     .reduce((accumulator: number, value: number) => accumulator + value - 1, 0)
-)((_state: StationState, applicationId) => applicationId);
+)((_state: StationState, applicationId: string) => applicationId);
 
 export const getDuplicatedTabsCountByTitle = createCachedSelector(
   getDuplicateTabsByURLFilteredByApplicationId,
+  // @ts-ignore
   tabsGroupedByURL => tabsGroupedByURL
     .flatten(true)
     .toList()
-    .countBy(tab => tab.get('title'))
+    // @ts-ignore
+    .countBy((tab: any) => tab.get('title'))
     .reduce((accumulator: number, value: number) => accumulator + value - 1, 0)
-)((_state: StationState, applicationId) => applicationId);
+)((_state: StationState, applicationId: string) => applicationId);
 
 export const getTabInactivityTimesInDays = createCachedSelector(
   getTabsSortedByLastActivityAt, (_state: StationState, applicationId: string) => applicationId,
+  // @ts-ignore
   (tabsSorted: RecursiveImmutableList<StationTab[]>, applicationId) =>
-    tabsSorted
-      .filter(tab => getTabApplicationId(tab) === applicationId)
-      .map(tab => getLastActivityAt(tab))
-      .map(lastActivityAt => moment().diff(moment(lastActivityAt), 'days'))
+    (tabsSorted as any)
+      .filter((tab: any) => getTabApplicationId(tab) === applicationId)
+      .map((tab: any) => getLastActivityAt(tab))
+      // @ts-ignore
+      .map((lastActivityAt: any) => moment().diff(moment(lastActivityAt), 'days'))
       .toJS()
 )((_state: StationState, applicationId) => applicationId);
 

@@ -7,6 +7,7 @@ import { CSSTransition } from 'react-transition-group';
 import { StationState } from '../../types';
 import { isLoadingScreenVisible } from '../selectors';
 
+// @ts-ignore no declaration file
 const announcementRaw = require('../../app/resources/announcement.html');
 const announcementHTML = DOMPurify.sanitize(announcementRaw);
 
@@ -94,9 +95,10 @@ class LoadingScreenImpl extends React.PureComponent<StateProps & GradientProps, 
 }
 
 export default compose(
-  connect<StateProps, {}, {}>(
-    (state: StationState) => ({
-      visible: isLoadingScreenVisible(state) as boolean,
-    })),
+  connect(
+    (state: StationState): StateProps => ({
+      visible: isLoadingScreenVisible(state),
+    }),
+  ),
   withGradient(GradientType.normal)
 )(LoadingScreenImpl);

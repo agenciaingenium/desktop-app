@@ -1,10 +1,13 @@
-import * as memoize from 'memoizee';
+// @ts-ignore no declaration file
+const memoize: any = require('memoizee');
 import { BxAppManifest } from './manifest-provider/bxAppManifest';
 import { MultiInstanceConfigPreset } from './manifest-provider/types';
 
 // handlebars takes some time to load, so we lazy load it
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const getHandlebarsCompile = memoize(() => {
-  const Handlebars = require('handlebars');
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const Handlebars: any = require('handlebars');
   return memoize(Handlebars.compile);
 });
 
@@ -53,7 +56,7 @@ const formatURL = (urlType: URLType, manifest: BxAppManifest, configData: Config
 };
 
 export const interpretedIconUrl = (manifest: BxAppManifest) => {
-  return normalizeIconUrl(manifest.icon) || undefined;
+  return normalizeIconUrl(manifest.icons?.[0]?.src) || undefined;
 };
 
 export const normalizeIconUrl = (iconUrl?: string | null): string | null => {

@@ -8,6 +8,7 @@ import {
   getFirstApplicationWithAttachedActiveTab,
   getHomeTab,
 } from '../applications/selectors';
+// @ts-ignore no declaration file
 import { getFrontActiveTabId } from '../applications/utils';
 import { changeSelectedAppMain } from '../nav/duck';
 import { getPreviousActiveApplicationId } from '../nav/selectors';

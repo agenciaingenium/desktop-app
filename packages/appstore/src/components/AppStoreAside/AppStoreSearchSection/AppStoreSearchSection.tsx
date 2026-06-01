@@ -13,6 +13,7 @@ import { MutateSetSearchStringProps } from '@src/graphql/types/mutateSetSearchSt
 import AppStoreSearchInput from './AppStoreSearchInput/AppStoreSearchInput';
 import styles, { IClasses } from './styles';
 
+// @ts-ignore no declaration file
 const asideSvgSpitePath: string = require('../aside-svg-spite.svg');
 
 export interface AppStoreSearchSectionProps {

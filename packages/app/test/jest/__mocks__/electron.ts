@@ -30,3 +30,13 @@ export const webContents = {
 export const systemPreferences = {
   getMediaAccessStatus: jest.fn(() => 'granted'),
 };
+
+export const session = {
+  fromPartition: jest.fn(() => ({
+    clearCache: jest.fn(),
+    cookies: {
+      get: jest.fn(),
+      set: jest.fn(),
+    },
+  })),
+};

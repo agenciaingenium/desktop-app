@@ -79,10 +79,9 @@ const webviewMethods: WebviewMethods = {
   'go-back': (webview) => webview.isReady() && webview.goBack(),
   'go-forward': (webview) => webview.isReady() && webview.goForward(),
   'toggle-dev-tools': (webview) => webview.isReady() && toggleDevTools(webview),
-  'copy-url-to-clipboard': (webview) => webview.isReady() && window.station.clipboard.write({
-    bookmark: webview.getTitle(),
-    text: webview.getURL(),
-  }),
+  'copy-url-to-clipboard': (webview) => webview.isReady() && window.station.clipboard.writeText(
+    webview.getURL()
+  ),
   'paste-and-match-style': (webview) => webview.isReady() && webview.pasteAndMatchStyle(),
 };
 
@@ -163,9 +162,9 @@ class ApplicationImpl extends React.PureComponent {
     promptBasicAuth: false,
   };
 
-  public props: Props;
+  public props!: Props;
   public state: ApplicationImplState;
-  private webView: ElectronWebview;
+  private webView!: ElectronWebview;
   private busSubscription: Subscription | null = null;
 
   constructor(props: Props) {
@@ -404,7 +403,7 @@ class ApplicationImpl extends React.PureComponent {
     const tabUrl = tab.get('url', '');
     const {
       applicationId, applicationName, applicationIcon,
-      appstoreApplicationId, themeColor, manifestURL,
+      appstoreApplicationId, manifestURL,
       askResetApplication, onChooseAccount,
       crashed, errorCode, errorDescription,
       canGoBack, themeGradient, email,
@@ -422,8 +421,10 @@ class ApplicationImpl extends React.PureComponent {
     return (
       <div>
         <div
-          className={classNames('l-webview__loader', { 'l-webview__loader-active': getTabLoadingState(tab) })}
-          style={{ backgroundColor: themeColor! }}
+          // @ts-ignore
+          className={classNames('l-webview__loader', { 'l-webview__loader-active':
+            // @ts-ignore
+            getTabLoadingState(tab) })}
         />
 
         <ApplicationContainer
@@ -456,14 +457,18 @@ class ApplicationImpl extends React.PureComponent {
           authInfoRealm={basicAuthInfo && basicAuthInfo.get('realm')}
         />
 
+        {/* @ts-ignore */}
         <LazyWebview
           initialSrc={tabUrl}
           hidden={this.props.hidden}
           className="l-webview__content"
           preload={preloadUrl}
-          allowpopups={true}
+          allowpopups={true as any}
           loading={this.props.loading}
+          // @ts-ignore
           webviewRef={this.setWebviewRef}
+          // @ts-ignore
+          // @ts-ignore
           partition={useDefaultSession ? '' : `persist:${applicationId}`}
           onPageTitleUpdated={this.handleTitleUpdated}
           onPageFaviconUpdated={this.handleFaviconUpdated}
@@ -472,7 +477,7 @@ class ApplicationImpl extends React.PureComponent {
           onDidFailLoad={this.handleDidFailLoad}
           onDomReady={this.handleDomReady}
           onCrashed={this.handleWebcontentsCrashed}
-          webpreferences={`allowRunningInsecureContent=false,nativeWindowOpen=${useNativeWindowOpen},contextIsolation=true,nodeIntegration=false`}
+          webpreferences={`allowRunningInsecureContent=false,nativeWindowOpen=${useNativeWindowOpen},contextIsolation=true,nodeIntegration=false` as any}
         />
 
       </div>
@@ -490,7 +495,7 @@ const ApplicationWithGql: React.FC<OuterProps> = (outerProps) => {
     },
   });
 
-  const gqlProps: Partial<OwnProps> = React.useMemo(() => {
+  const gqlProps = React.useMemo((): Partial<OwnProps> => {
     if (!data) return { loading: true };
     const { application: app, stationStatus } = oc(data);
     const manifestData = app.manifestData;
@@ -510,9 +515,10 @@ const ApplicationWithGql: React.FC<OuterProps> = (outerProps) => {
 
       loading: gqlLoading,
       legacyServiceId: manifestData.bx_legacy_service_id(),
-    };
+    } as Partial<OwnProps>;
   }, [data, gqlLoading, application]);
 
+  // @ts-ignore
   return <ConnectedApplicationImpl {...outerProps} {...gqlProps} />;
 };
 
@@ -523,7 +529,8 @@ type OuterProps = {
   loading: boolean,
 };
 
-const ConnectedApplicationImpl = connect<StateProps, DispatchProps, OwnProps>(
+// @ts-ignore
+const ConnectedApplicationImpl = connect(
   (state: StationState, ownProps: OwnProps): StateProps => {
     const { application, tab } = ownProps;
     const tabId = getTabId(tab);
@@ -582,6 +589,7 @@ const ConnectedApplicationImpl = connect<StateProps, DispatchProps, OwnProps>(
       askResetApplication: () => dispatchProps.updateResetAppModal(appFocus),
     };
   },
+  // @ts-ignore
 )(ApplicationImpl);
 
 const Application = compose(

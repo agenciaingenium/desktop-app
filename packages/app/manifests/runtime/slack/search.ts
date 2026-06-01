@@ -126,6 +126,7 @@ class SlackSearch {
       onChanged.removeListener.bind(onChanged)
     )
       .pipe(
+        // @ts-ignore
         map((changes: StorageChanges) =>
           changes.tokens && changes.tokens.newValue),
         distinctUntilChanged((a: Record<string, string>, b: Record<string, string>) => equals(a, b))

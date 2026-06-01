@@ -35,7 +35,7 @@ import {
 import { getActiveApplicationId } from '../nav/selectors';
 
 const PasswordManagerView: React.FC = () => {
-  const activeApplicationId = useSelector((state: Immutable.Map<string, any>) => getActiveApplicationId(state)!);
+  const activeApplicationId = useSelector((state: Immutable.Map<string, any>) => getActiveApplicationId(state as any)!);
   const shouldUnlock = useSelector((state: Immutable.Map<string, any>) => getUnlockProcess(state).step !== UnlockStep.NotAsked);
   const shouldAttachPasswordManagerItem = useSelector((state: Immutable.Map<string, any>) =>
     [AccountsStep.Loaded, AccountsStep.Load].includes(getAccounts(state).step)

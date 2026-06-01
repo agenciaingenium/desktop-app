@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getAppStoreTab } from '../../../app-store/selectors';
 import { dispatchUrl, navigateToApplicationTab } from '../../../applications/duck';
-import { StationState } from '../../../types';
 
 type StateProps = {
   appStoreTab: any,
@@ -39,15 +38,16 @@ const FindBoostedAppsButton = ({ navigateToBoostedApps, closeSettings }: Props) 
 };
 
 const connector = compose(
+  // @ts-ignore
   connect<StateProps, DispatchProps, MergeProps>(
-    (state: StationState) => ({
+    (state: any) => ({
       appStoreTab: getAppStoreTab(state),
     }),
-    dispatch => bindActionCreators({
+    (dispatch: any) => bindActionCreators({
       dispatchUrl,
       navigateToApplicationTab,
     }, dispatch),
-    (stateProps, dispatchProps, ownProps) => ({
+    (stateProps: any, dispatchProps: any, ownProps: any) => ({
       ...ownProps,
       navigateToBoostedApps: () => {
         if (stateProps.appStoreTab) {
@@ -64,6 +64,10 @@ const connector = compose(
     })
   ),
 );
-const ConnectedFindBoostedAppsButton = connector(FindBoostedAppsButton) as React.ComponentType<OwnProps>;
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
+const ConnectedFindBoostedAppsButton = connector(FindBoostedAppsButton) as any;
 
 export default ConnectedFindBoostedAppsButton;

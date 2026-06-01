@@ -22,7 +22,8 @@ function initProxyResolver() {
 
     // Use electron session resolver to detect proxy settings with a distant URL
     // If settings are detected, parse them then intialize a global tunnel for the whole app
-    defaultSession.resolveProxy('https://auth0.com/', (proxyDetected) => {
+    // @ts-ignore
+    defaultSession.resolveProxy('https://auth0.com/', (proxyDetected: string) => {
       if (proxyDetected === 'DIRECT') {
         log.info('Proxy : no settings detected');
       } else {
@@ -31,10 +32,12 @@ function initProxyResolver() {
         const parts = proxyDetected.split(' ');
         const hostPort = parts[1]?.split(':');
         if (hostPort && hostPort.length >= 2 && hostPort[0] && hostPort[1]) {
+          // @ts-ignore
           globalTunnel.initialize({
             host: hostPort[0],
             port: Number(hostPort[1]),
-          }).catch(err => {
+          // @ts-ignore
+          }).catch((err: any) => {
             log.error('Proxy : globalTunnel.initialize failed:', err);
           });
         } else {
@@ -82,7 +85,7 @@ export class ElectronAppServiceImpl extends ElectronAppService implements RPC.In
   }
 
   async getPath(name: ElectronAppPath) {
-    return app.getPath(name);
+    return app.getPath(name as any);
   }
 
   async quit() {
@@ -123,7 +126,7 @@ export class ElectronAppServiceImpl extends ElectronAppService implements RPC.In
     const subscriptions: Subscription[] = [];
 
     if (obs.onActivate) {
-      subscriptions.push(fromEvent(app, 'activate')
+      subscriptions.push(fromEvent(app as any, 'activate')
         .subscribe(() => {
           obs.onActivate!();
         })
@@ -131,7 +134,7 @@ export class ElectronAppServiceImpl extends ElectronAppService implements RPC.In
     }
 
     if (obs.onBeforeQuit) {
-      subscriptions.push(fromEvent(app, 'before-quit')
+      subscriptions.push(fromEvent(app as any, 'before-quit')
         .subscribe(() => {
           obs.onBeforeQuit!();
         })

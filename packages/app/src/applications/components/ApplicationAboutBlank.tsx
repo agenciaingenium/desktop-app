@@ -36,7 +36,7 @@ export default class ApplicationAboutBlank extends React.PureComponent<Props, {}
           <div>Something went wrong with {applicationName}, you navigated on a blank page</div>
           <Button
             btnStyle={Style.SECONDARY}
-            className={{ width: '100%', marginTop: 20 }}
+            className={{ width: '100%', marginTop: 20 } as any}
             onClick={canGoBack ? this.handleClickGoBack : this.handleClickResetApplication}
           >
             {canGoBack ? 'Go Back' : 'Reset application'}

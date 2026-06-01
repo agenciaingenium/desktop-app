@@ -15,7 +15,7 @@ export const withSDK = () =>
 
       render() {
         return (
-          <WrappedComponent {...this.props} sdk={bxSDK} />
+          <WrappedComponent {...this.props as any} sdk={bxSDK as any} />
         );
       }
     };

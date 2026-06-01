@@ -41,7 +41,7 @@ function* urlFromRedirections(dispatch: DispatchURLAction): SagaIterator {
       task: callService('urlRouterHelper', 'resolveRedirects', { url }),
       timeout: delay(followRedirectsTimeout),
     });
-  } catch (e) {
+  } catch (e: any) {
     if (e !== errorMessageTooManyRedirects) logger.notify(e);
   } finally {
     if ((yield select(getCursorIcon)) === 'wait') {
@@ -86,6 +86,7 @@ export function* dispatchUrlSaga(
   queue.delete(url);
 
   const finalDispatch = action === URLRouterAction.DEFAULT_BROWSER ? { ...dispatch, url: originalUrl } : dispatch;
+  // @ts-ignore
   yield call(triggerCorrespondingAction, action, destination, finalDispatch);
 
   return { url: finalDispatch.url, origin, options, action, destination };
@@ -95,10 +96,11 @@ function* triggerCorrespondingAction(
   action: URLRouterAction,
   destination: any,
   { url, origin, options }: DispatchURLAction
-) {
+): any {
   if (process.env.NODE_ENV === 'test') return;
 
   if (origin && origin.applicationId) {
+    // @ts-ignore
     const application = yield select(getApplicationById, origin.applicationId);
     if (application) {
       getApplicationManifestURL(application);
@@ -156,8 +158,10 @@ function* triggerCorrespondingAction(
       yield put(createNewTab(destination.applicationId, url, { detach: true, navigateToApplication: true }));
       break;
     case URLRouterAction.INSTALL_AND_OPEN: {
+      // @ts-ignore
       yield put(installApplication(destination.manifestURL, {
         optOutFlow: true,
+        // @ts-ignore
         installContext: { url, origin, options },
         navigate: true,
         andCreateTabWithURL: url,

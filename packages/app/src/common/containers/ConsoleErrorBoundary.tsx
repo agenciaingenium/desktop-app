@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export default class ConsoleErrorBoundary extends React.PureComponent {
+export default class ConsoleErrorBoundary extends React.PureComponent<{children?: React.ReactNode}> {
   componentDidCatch(error: Error) {
     console.error(error);
     throw error;

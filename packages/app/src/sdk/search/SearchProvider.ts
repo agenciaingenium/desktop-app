@@ -40,6 +40,7 @@ function getSearchResults(loadingCategories: Set<string>,
     sectionsMap.set(category, {
       sectionName: category,
       loading: loadingCategories.has(category),
+      // @ts-ignore
       results: resultsGroupedByCat.get(category, Immutable.List()).toArray(),
     });
   }
@@ -50,12 +51,13 @@ function getSearchResults(loadingCategories: Set<string>,
 export default class SearchProvider extends AbstractProvider<search.SearchConsumer> {
 
   public query: BehaviorSubject<search.SearchQuery>;
-  public results: Subject<SearchSection[]>;
-  protected resultsSubscription: Subscription;
+  public results!: Subject<SearchSection[]>;
+  protected resultsSubscription!: Subscription;
 
   constructor() {
     super();
     this.query = new BehaviorSubject({ value: '' });
+    // @ts-ignore: BehaviorSubject constructor expects array type
     this.results = new BehaviorSubject([]);
   }
 

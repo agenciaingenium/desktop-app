@@ -15,7 +15,7 @@ interface State {
 
 export class SDKPortalDest extends React.PureComponent<Props, State> {
 
-  private subscription: Subscription;
+  private subscription!: Subscription;
   private observable: Observable<React.ComponentClass[]>;
 
   constructor(props: Props) {

@@ -1,15 +1,15 @@
 import * as Immutable from 'immutable';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { getTabWebcontentsById } from './selectors';
-import { IResolvers } from '../graphql/resolvers-types.generated';
+import { Resolvers } from '../graphql/resolvers-types.generated';
 import { subscribeStore } from '../utils/observable';
 
-const resolvers: IResolvers = {
+const resolvers: Resolvers = {
   Query: {
-    getTabWebContent: (_obj, args, context) => {
+    getTabWebContent: (_obj: any, args: any, context: { store: any }): any => {
       return subscribeStore(
-        context.store,
-        state => getTabWebcontentsById(state, args.tabId)
+        context.store as any,
+        state => getTabWebcontentsById(state as any, args.tabId)
       ).pipe(distinctUntilChanged(Immutable.is));
     },
   },

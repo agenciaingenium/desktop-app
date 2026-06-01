@@ -40,7 +40,7 @@ const fetchApi = memoizee(
   }
 );
 
-const collectionFilter = ({ value }) =>
+const collectionFilter = ({ value }: { value: any }) =>
   value.type && (value.type === 'collection_view_page' || value.type === 'collection_view');
 
 export const getResource =
@@ -53,18 +53,18 @@ export const getResource =
       const collectionViewPages = results.results.filter(collectionFilter);
 
       if (collectionViewPages.length > 0) {
-        const mergedResults = results.results.filter(r => !collectionFilter(r));
+        const mergedResults = results.results.filter((r: any) => !collectionFilter(r));
 
         for (const collectionViewPage of collectionViewPages) {
-          const collectionFetcher = fetchCollection(collectionViewPage.value.collection_id);
-          const collection = await fetchApi(collectionFetcher.endpoint, JSON.stringify(collectionFetcher.body), sdk);
+          const collectionFetcher = fetchCollection((collectionViewPage as any).value.collection_id);
+          const collection: any = await fetchApi(collectionFetcher.endpoint, JSON.stringify(collectionFetcher.body), sdk);
           collection.results[0].value.id = collectionViewPage.value.id;
 
-          mergedResults.push(transformer(collection));
+          mergedResults.push(transformer(collection) as any);
         }
 
-        if (mergedResults.length > 1) return mergedResults;
-        return mergedResults[0];
+        if (mergedResults.length > 1) return mergedResults as any;
+        return mergedResults[0] as any;
       }
     }
 

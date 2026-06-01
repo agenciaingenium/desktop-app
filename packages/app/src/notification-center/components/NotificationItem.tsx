@@ -43,6 +43,7 @@ class NotificationItem extends React.PureComponent<Props, { hovered: boolean }> 
 
     return (
       <div
+        // @ts-ignore
         className={classNames(
           'l-notification-item',
           { 'l-notification-item-compact': !isNotificationFull(notification) })
@@ -75,7 +76,9 @@ class NotificationItem extends React.PureComponent<Props, { hovered: boolean }> 
               backgroundColor: hovered ? 'rgba(255, 255, 255, 0.3)' : undefined,
             }}
             symbolId={IconSymbol.CHECKMARK}
+            // @ts-ignore
             onClick={this.handleClickMarkAsRead as any}
+            // @ts-ignore
             size="24px"
             color={'rgba(255, 255, 255, 0.6)'}
           />

@@ -25,7 +25,7 @@ export const getProviderJS = createSelector(
   getProviderId,
   providerId => {
     const provider = Object.assign({}, Providers[providerId]);
-    delete provider.runtime;
+    delete (provider as any).runtime;
     return provider;
   }
 );
@@ -54,7 +54,7 @@ export const getConfigurationProcess = (state: Immutable.Map<string, any>) => {
   const configuration = state.getIn(['passwordManagers', 'configuration']);
 
   if (configuration) {
-    return configuration.toJS();
+    return (configuration as any).toJS();
   }
   return { step: ConfigurationStep.NotStarted };
 };
@@ -63,7 +63,7 @@ export const getAccounts = (state: Immutable.Map<string, any>) => {
   const accounts = state.getIn(['passwordManagers', 'accounts']);
 
   if (accounts) {
-    return accounts.toJS();
+    return (accounts as any).toJS();
   }
   return { step: AccountsStep.NotAsked };
 };
@@ -72,7 +72,7 @@ export const getUnlockProcess = (state: Immutable.Map<string, any>) => {
   const unlock = state.getIn(['passwordManagers', 'unlock']);
 
   if (unlock) {
-    return unlock.toJS();
+    return (unlock as any).toJS();
   }
   return { step: UnlockStep.NotAsked };
 };
@@ -87,7 +87,7 @@ export const getLink = createSelector(
 );
 
 export const getLinkForActiveApplication = createSelector(
-  getActiveApplicationId,
+  getActiveApplicationId as any,
   getLinks,
   (applicationId, links) => links.get(applicationId)
 );

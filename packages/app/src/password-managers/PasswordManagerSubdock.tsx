@@ -77,6 +77,7 @@ class PasswordManagerSubdockImpl extends React.PureComponent<Props & Overridable
 }
 
 const PasswordManagerSubdock = connect<any, any, OverridableProps>(
+  // @ts-ignore
   (state: Immutable.Map<string, any>) => ({
     configurationProcess: getConfigurationProcess(state),
     canConfigure: getConfigurationProcess(state).step !== ConfigurationStep.NotStarted,
@@ -86,12 +87,12 @@ const PasswordManagerSubdock = connect<any, any, OverridableProps>(
   }),
   (dispatch: Dispatch<any>) => bindActionCreators({
     onLogout: (passwordManager: PasswordManager) => removePasswordManager({ passwordManager }),
-    onAdd: provider => addPasswordManager({
+    onAdd: (provider: Provider) => addPasswordManager({
       step: ConfigurationStep.Credentials,
       provider,
     }),
-    onConnect: (provider, credentials) => addPasswordManager({ step: ConfigurationStep.Test, provider, payload: credentials }),
-    onCancel: provider => addPasswordManager({
+    onConnect: (provider: Provider, credentials: any) => addPasswordManager({ step: ConfigurationStep.Test, provider, payload: credentials }),
+    onCancel: (provider: Provider) => addPasswordManager({
       step: ConfigurationStep.Cancel,
       provider,
     }),

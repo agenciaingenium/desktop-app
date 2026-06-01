@@ -1,5 +1,5 @@
 import * as fs from 'fs-extra';
-import * as memoize from 'memoizee';
+import memoize from 'memoizee';
 import { join } from 'path';
 import { BxAppManifest } from '../src/applications/manifest-provider/bxAppManifest';
 import { PrivateApplicationRequest } from '../src/plugins/bxapi';
@@ -21,7 +21,7 @@ const privateManifestsPath = join(getUserDataPath(), 'private-manifests.json');
 const getPrivateData = memoize((): BxAppManifestWithId[] => {
   if (!fs.existsSync(privateManifestsPath)) return [];
   try {
-    return fs.readJsonSync(privateManifestsPath).data;
+    return fs.readJsonSync(privateManifestsPath).data as BxAppManifestWithId[];
   } catch (e) {
     console.warn(e);
   }
@@ -30,7 +30,7 @@ const getPrivateData = memoize((): BxAppManifestWithId[] => {
 
 function readOnInit() {
   highestId = getPrivateData().reduce(
-    (acc, app) => Math.max(acc, app.id),
+    (acc: number, app: BxAppManifestWithId) => Math.max(acc, app.id),
     highestId
   );
 }
@@ -60,7 +60,7 @@ export function saveNewApplication(payload: PrivateApplicationRequest) {
 
 export function deleteManifest(id: number) {
   const data = getPrivateData();
-  fs.outputJSONSync(privateManifestsPath, { data: data.filter(app => app.id !== id) });
+  fs.outputJSONSync(privateManifestsPath, { data: data.filter((app: BxAppManifestWithId) => app.id !== id) });
   // clear memoization cache
   getPrivateData.clear();
 }
@@ -78,7 +78,7 @@ export function getPrivateManifests(): Manifest[] {
 }
 
 export function getPrivateApplicationById(id: number): Manifest | undefined {
-  const app = getPrivateData().find(a => a.id === id);
+  const app = getPrivateData().find((a: BxAppManifestWithId) => a.id === id);
   if (app) {
     return cleanIcon(app);
   }

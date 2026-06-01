@@ -18,8 +18,10 @@ import { setSearchValue } from '../bang/duck';
 
 import { tabAsActivityEntry } from './helpers';
 
+// @ts-ignore
 const resolvers: Resolvers = {
   Query: {
+    // @ts-ignore
     activity: (_, args, context) => {
       const { query } = args;
       const { store, manifestProvider } = context;
@@ -27,8 +29,8 @@ const resolvers: Resolvers = {
       // Search
       if (query) {
         store.dispatch(setSearchValue(query));
-        return subscribeStore(store, getResultsJS)
-          .pipe(map(flattenResults));
+        return subscribeStore(store, getResultsJS as any)
+          .pipe(map(flattenResults as any)) as any;
       }
 
       // History

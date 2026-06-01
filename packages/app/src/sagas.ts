@@ -2,7 +2,7 @@
 import { all, call, spawn } from 'redux-saga/effects';
 
 function createAsyncImport(...args: any[]) {
-  return function* asyncImport(importPromise: Promise<any>) {
+  return function* asyncImport(importPromise: Promise<any>): any {
     try {
       const w = yield call(() => importPromise.then(y => y.default || y));
       yield (call as any)(w, ...args);
@@ -17,13 +17,16 @@ export default function* root(bxApp: any) {
     spawn(createAsyncImport(bxApp), import('./activity/sagas')),
     spawn(createAsyncImport(bxApp), import('./bang/sagas')),
     spawn(createAsyncImport(bxApp), import('./history/sagas')),
+    // @ts-ignore no declaration file
     spawn(createAsyncImport(bxApp), import('./dl-toaster/sagas')),
     spawn(createAsyncImport(bxApp), import('./downloads/sagas')),
+    // @ts-ignore no declaration file
     spawn(createAsyncImport(bxApp), import('./app/sagas')),
     spawn(createAsyncImport(bxApp), import('./ordered-favorites/sagas')),
     spawn(createAsyncImport(bxApp), import('./favorites/sagas')),
     spawn(createAsyncImport(bxApp), import('./applications/sagas')),
     spawn(createAsyncImport(bxApp), import('./tab-webcontents/sagas')),
+    // @ts-ignore no declaration file
     spawn(createAsyncImport(bxApp), import('./in-tab-search/sagas')),
     spawn(createAsyncImport(bxApp), import('./auto-update/sagas')),
     spawn(createAsyncImport(bxApp), import('./ordered-tabs/sagas')),

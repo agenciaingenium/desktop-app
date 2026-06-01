@@ -43,7 +43,7 @@ export default class NativeAppDockIcon extends React.PureComponent<Props, State>
 
   maskId: string;
   imageId: string;
-  img: SVGImageElement | null;
+  img!: SVGImageElement | null;
 
   constructor(props: Props) {
     super(props);
@@ -154,7 +154,7 @@ export default class NativeAppDockIcon extends React.PureComponent<Props, State>
         width={props.width}
         height={props.height}
         viewBox={props.viewBox}
-        className={classNames(this.props.className)}
+        className={(classNames as any)(this.props.className)}
         onClick={onClick}
         onMouseEnter={() => {
           this.setState({ hovered: true });

@@ -49,6 +49,7 @@ const FavoriteItem = (props: OwnProps) => {
 const useSanitization = (item: Favorite, isActive: boolean) => {
   return React.useMemo(
     () => {
+      // @ts-ignore
       const { relatedTab } = item;
       return {
         title: item.title || '',
@@ -76,6 +77,7 @@ const useActionsWrapper = (
 ): WrappedActions => {
   return React.useMemo(
     () => {
+      // @ts-ignore
       const { favoriteId, relatedTab } = item;
       if (!favoriteId) throw new Error('Missing Favorite ID to wrap actions');
 

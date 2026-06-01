@@ -1,4 +1,4 @@
-import arrayUniq = require('array-uniq');
+import arrayUniq from 'array-uniq';
 import createCachedSelector from 're-reselect';
 import { StationState } from '../types';
 import { getEmail, getIdentityId, getImageURL } from './get';

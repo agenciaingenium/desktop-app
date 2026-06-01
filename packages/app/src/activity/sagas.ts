@@ -1,4 +1,4 @@
-import ms = require('ms');
+import ms from 'ms';
 import { SagaIterator } from 'redux-saga';
 import { delay } from 'redux-saga/effects';
 import { all, call, fork, select, take } from 'redux-saga/effects';

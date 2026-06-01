@@ -76,6 +76,7 @@ declare global {
 
 export default async function configureStore(actionsEmitter?: ActionsEmitter): Promise<Store> {
   const workerWebContentsId = window.station.getGlobal('worker').webContentsId;
+  // eslint-disable-next-line no-console
   console.log(`[DEBUG] configureStore.client: Creating duplex to worker wcId=${workerWebContentsId}, namespace=${namespace}`);
   const duplex = new ElectronIpcRendererDuplex(workerWebContentsId, namespace);
 
@@ -96,6 +97,7 @@ export default async function configureStore(actionsEmitter?: ActionsEmitter): P
   } catch (error) {
     console.error('Failed to get initial state:', error);
     // Retry once after a short delay
+    // eslint-disable-next-line no-console
     console.log('Retrying initial state fetch...');
     await new Promise(resolve => setTimeout(resolve, 1000));
     initialState = await getInitialStateClient();

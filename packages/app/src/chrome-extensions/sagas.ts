@@ -44,7 +44,7 @@ function* watchInstalledManifests() {
           try {
             yield call(loadSync, cxId);
           } catch (e) {
-            handleError()(e);
+            handleError()(e as Error);
           }
         }
       }
@@ -86,7 +86,7 @@ function* onExtensionUpdated(extension: Extension): SagaIterator {
   yield put(extensionUpdateIsAvailable(extension));
 }
 
-export function* onFocusTab({ tabId }: SetActiveTabAction) {
+export function* onFocusTab({ tabId }: SetActiveTabAction): SagaIterator {
   const webContentsId = yield select(getWebcontentsIdForTabId, tabId);
   yield callService('ecx', 'dispatchEvent', {
     channel: 'tabs.onActivated',
@@ -99,6 +99,6 @@ export default function* main() {
     fork(watchInstalledManifests),
     takeEveryWitness(CHECK_FOR_UPDATE, checkForUpdate),
     takeEveryWitness(SET_ACTIVE_TAB, onFocusTab),
-    takeEveryWitness(serviceAddObserverChannel(services.ecx, 'onExtensionUpdated', 'ecx-updated'), onExtensionUpdated),
+    takeEveryWitness((serviceAddObserverChannel as any)(services.ecx, 'onExtensionUpdated', 'ecx-updated'), onExtensionUpdated),
   ]);
 }

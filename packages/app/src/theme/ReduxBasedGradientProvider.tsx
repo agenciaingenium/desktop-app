@@ -1,5 +1,4 @@
 import { GradientProvider } from '@getstation/theme';
-import * as Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { getThemeColors } from './selectors';
 
@@ -11,6 +10,6 @@ export interface OwnProps {
   children: React.Component;
 }
 
-export default connect<StateToProps, {}, OwnProps>((state: Immutable.Map<string, any>) => ({
+export default connect<StateToProps, {}, OwnProps>((state: any) => ({
   themeColors: getThemeColors(state),
-}))(GradientProvider);
+}))(GradientProvider as any);

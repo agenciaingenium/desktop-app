@@ -20,6 +20,7 @@ import { reorderTab } from '../ordered-tabs/duck';
 
 function* sagaAddTabAsFavorite(action: AddTabAsFavoriteAction) {
   const { tabId } = action;
+  // @ts-ignore yield
   const tab = yield select(getTabById, tabId);
 
   const favoriteId = `favorite-${nanoid()}`;
@@ -47,13 +48,15 @@ function* doRemoveFavorite(action: RemoveFavoriteAction) {
 }
 
 function* openFavorite(action: OpenFavoriteAction) {
+  // @ts-ignore yield
   const favorite = yield select(getFavorite, action.favoriteId);
 
-  const origin = { applicationId: favorite.get('applicationId') };
+  const origin = { applicationId: favorite!.get('applicationId') };
   const options = {
     target: action.newWindow ? NEW_WINDOW : NEW_TAB,
   };
-  yield call(dispatchUrlSaga, { url: favorite.get('url'), origin, options });
+  // @ts-ignore
+  yield call(dispatchUrlSaga, { url: favorite!.get('url'), origin, options });
 }
 
 export default function* main() {

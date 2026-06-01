@@ -28,18 +28,18 @@ export type Providers = SearchProvider |
   ResourcesProvider;
 
 export abstract class BxSDK implements Provider {
-  public search: BxSubSDK<SearchProvider, search.SearchConsumer>;
-  public storage: BxSubSDK<StorageProvider, storage.StorageConsumer>;
-  public tabs: BxSubSDK<TabsProvider, tabs.TabsConsumer>;
-  public session: BxSubSDK<SessionProvider, session.SessionConsumer>;
-  public react: BxSubSDK<ReactProvider, react.ReactConsumer>;
-  public ipc: BxSubSDK<IpcProvider, ipc.IpcConsumer>;
-  public activity: BxSubSDK<ActivityProvider, activity.ActivityConsumer>;
-  public history: BxSubSDK<HistoryProvider, history.HistoryConsumer>;
-  public config: BxSubSDK<ConfigProvider, config.ConfigConsumer>;
-  public resources: BxSubSDK<ResourcesProvider, resources.ResourcesConsumer>;
+  public search!: BxSubSDK<SearchProvider, search.SearchConsumer>;
+  public storage!: BxSubSDK<StorageProvider, storage.StorageConsumer>;
+  public tabs!: BxSubSDK<TabsProvider, tabs.TabsConsumer>;
+  public session!: BxSubSDK<SessionProvider, session.SessionConsumer>;
+  public react!: BxSubSDK<ReactProvider, react.ReactConsumer>;
+  public ipc!: BxSubSDK<IpcProvider, ipc.IpcConsumer>;
+  public activity!: BxSubSDK<ActivityProvider, activity.ActivityConsumer>;
+  public history!: BxSubSDK<HistoryProvider, history.HistoryConsumer>;
+  public config!: BxSubSDK<ConfigProvider, config.ConfigConsumer>;
+  public resources!: BxSubSDK<ResourcesProvider, resources.ResourcesConsumer>;
 
-  protected _store: StationStore;
+  protected _store!: StationStore;
 
   register(consumer: Consumers) {
     const sub = this[consumer.namespace as keyof BxSDK] as BxSubSDK<any, any> | undefined;
@@ -63,7 +63,7 @@ export abstract class BxSDK implements Provider {
 }
 
 export class BxSDKWorker extends BxSDK {
-  protected _store: StationStore;
+  protected _store!: StationStore;
 
   constructor() {
     super();

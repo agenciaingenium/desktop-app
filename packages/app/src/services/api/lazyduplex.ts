@@ -19,6 +19,7 @@ export class LazyDuplex extends Duplex {
       callback(new Error('Duplex not connected'));
       return;
     }
+    // @ts-ignore: callback type mismatch
     this.duplex.write(chunk, _encoding, callback);
   }
 

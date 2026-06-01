@@ -3,6 +3,7 @@ import { createSelector } from 'reselect';
 import { StationState } from '../types';
 
 export const isDone = (state: StationState): boolean =>
+  // @ts-ignore
   Boolean(state.getIn(['onboarding', 'done'], false));
 
 export const isApplicationStoreTooltipDisabled = (state: StationState): boolean =>
@@ -16,6 +17,7 @@ export const getLastInvitationColleagueDate = (state: Immutable.Map<string, any>
 
 export const isVisible = createSelector(
   isDone,
+  // @ts-ignore
   (state: StationState) => state.getIn(['app', 'showLogin'], false) as boolean,
   (onboardingDone, showLogin) => !onboardingDone || showLogin
 );

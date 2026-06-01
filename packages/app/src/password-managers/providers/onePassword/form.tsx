@@ -73,10 +73,11 @@ export default class OnePasswordForm extends React.PureComponent<Props & Overrid
     return Object
       .entries(credentialsWithDomainOnly)
       .map(([k, v]: any[]) => [k, v.trim()])
-      .reduce((result, [k, v]) => {
+      // @ts-ignore
+      .reduce((result, [k, v]: [string, any]) => {
         result[k] = v;
         return result;
-      }, {});
+      }, {} as any);
   }
 
   componentDidUpdate(prevProps: Readonly<Props>) {

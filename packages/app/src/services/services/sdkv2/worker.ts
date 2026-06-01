@@ -108,8 +108,8 @@ const generateParams = (allowedParameters: string[], payload?: any): string[] =>
 
 export class SDKv2ServiceImpl extends SDKv2Service implements RPC.Interface<SDKv2Service> {
 
-  protected store: StationStoreWorker;
-  protected observableStore: Observable<StationState>;
+  protected store!: StationStoreWorker;
+  protected observableStore!: Observable<StationState>;
 
   constructor(uuid?: string) {
     super(uuid);
@@ -120,7 +120,7 @@ export class SDKv2ServiceImpl extends SDKv2Service implements RPC.Interface<SDKv
 
   setStore(store: StationStoreWorker) {
     this.store = store;
-    this.observableStore = subscribeStore(store).pipe(share()) as Observable<StationState>;
+    this.observableStore = subscribeStore(store).pipe(share() as any) as Observable<StationState>;
   }
 
   async callAction(channel: SDKv2Actions | SDKv2Selectors, payload: any) {
@@ -128,10 +128,7 @@ export class SDKv2ServiceImpl extends SDKv2Service implements RPC.Interface<SDKv
 
     if (bxAPIAction) {
       if (bxAPIAction.sagaMethod) {
-        let body;
-        const sagaMethod = await bxAPIAction.sagaMethod();
-        const params = generateParams(bxAPIAction.allowedParameters, payload);
-        body = await (this.store.runSaga as Function)(sagaMethod, ...params).toPromise();
+        const body = await (this.store.runSaga as Function)(sagaMethod, ...params).toPromise();
 
         if (body) {
           return {
@@ -192,14 +189,16 @@ const initPreloadListener = (sdkv2: SDKv2ServiceImpl) => {
         subscription && subscription.unsubscribe();
       });
     } catch (e) {
-      handleError()(e);
+      handleError()(e as Error);
     }
   });
 
   ipcRenderer.on('bx-api-perform', (_event: Electron.Event, { senderId }: { senderId: number }, channel: SDKv2Selectors, payload?: any) => {
+    // eslint-disable-next-line no-console
     console.log(`[DEBUG] worker.ts: received bx-api-perform from senderId=${senderId}, channel=${channel}`);
     sdkv2.callAction(channel, payload)
       .then(result => {
+        // eslint-disable-next-line no-console
         console.log(`[DEBUG] worker.ts: sending response for channel=${channel} to senderId=${senderId}`);
         // Use proxy through main process instead of deprecated sendTo
         ipcRenderer.send('bx-api-response', senderId, `bx-api-perform-response-${channel}`, result);

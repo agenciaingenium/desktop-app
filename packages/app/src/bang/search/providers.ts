@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { take } from 'rxjs/operators';
 import { LocalStorage } from 'node-localstorage';
+// @ts-ignore no declaration file
 import * as moment from 'moment';
 import { reverse } from 'ramda';
 import { SDK, activity } from '@getstation/sdk';
@@ -33,7 +34,7 @@ export const feedGlobalFrecencyStorage = async (searchEngine: SearchEngine, sdk:
   const allEntries$ = sdk.activity.query({
     // we only want activities that are 15 days old
     // this prevent bx to overload at start
-    limitByDate: moment().subtract(15, 'days').valueOf(),
+    limitByDate: ((moment as any)() as any).subtract(15, 'days').valueOf(),
     limit: 5000, // additional overload protection at bx start
     global: true, // all activities, unregarding consumer id
     ascending: false, // we want the most recent activities
@@ -41,8 +42,8 @@ export const feedGlobalFrecencyStorage = async (searchEngine: SearchEngine, sdk:
 
   // the global frecency algortihm need to be fed with `ascending` entries but the query we made is `descending`,
   // so that's why we `reverse(entries)`
-  const descendingEntries = await allEntries$.pipe(take(1)).toPromise();
-  const ascendingEntries = reverse(descendingEntries);
+  const descendingEntries = await (allEntries$ as any).pipe(take(1)).toPromise();
+  const ascendingEntries = reverse(descendingEntries as any) as any;
 
   for (const entry of ascendingEntries) {
     saveGlobalSelection(searchEngine, entry);

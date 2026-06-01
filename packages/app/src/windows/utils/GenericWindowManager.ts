@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import { Action, Store } from 'redux';
 
+// @ts-ignore no declaration file
 import { changeAppFocusState } from '../../app/duck';
 import { NotificationProps } from '../../notification-center/types';
 import { handleError } from '../../services/api/helpers';
@@ -9,6 +10,7 @@ import { RPC } from '../../services/lib/types';
 import { BrowserWindowService, BrowserWindowServiceConstructorOptions } from '../../services/services/browser-window/interface';
 import services from '../../services/servicesManager';
 import { isPackaged } from '../../utils/env';
+// @ts-ignore no declaration file
 import { windowCreated, windowDeleted } from '../duck';
 
 let allowDispatch = true;

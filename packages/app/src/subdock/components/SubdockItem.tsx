@@ -139,6 +139,7 @@ const SubdockItem = (props: OwnProps) => {
 
   return (
     <li
+      // @ts-ignore
       className={classNames('subdock-item', { isActive })}
       style={itemStyle}
     >
@@ -241,4 +242,5 @@ const useEventWrapper = (actions: WrappedActions) => {
 
 // EXPORT
 
+// @ts-ignore
 export default SubdockItem as React.ComponentType<OwnProps>;

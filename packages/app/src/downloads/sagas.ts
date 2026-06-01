@@ -1,6 +1,7 @@
 import { shell } from 'electron';
 import { SagaIterator } from 'redux-saga';
 import { all, call, put, select } from 'redux-saga/effects';
+// @ts-ignore no declaration file
 import { SET_DOWNLOAD_FOLDER, setDefaultDownloadFolder, setDownloadFolder } from '../app/duck';
 import { getDownloadFolder } from '../app/selectors';
 import { observer } from '../services/lib/helpers';
@@ -106,7 +107,7 @@ function* handleDownloadSaga(downloadItemService: RPC.Node<DownloadItemService>)
   const downloadId: string = yield call([downloadItemService, downloadItemService.getDownloadId]);
   const webContentsId: number = yield call([downloadItemService, downloadItemService.getWebContentsId]);
 
-  const itemStateChannel = serviceAddObserverChannel(downloadItemService, 'onUpdated', 'download-updated');
+  const itemStateChannel = (serviceAddObserverChannel as any)(downloadItemService, 'onUpdated', 'download-updated');
 
   yield put(newItem(downloadId, savePath, webContentsId));
 
@@ -137,7 +138,7 @@ function* handleRevealPathInFinderSaga({ path }: revealPathInFinderAction): Saga
 }
 
 export default function* main(): SagaIterator {
-  const onWillDownloadChannel = serviceAddObserverChannel(services.download, 'onWillDownload', 'will-download');
+  const onWillDownloadChannel = (serviceAddObserverChannel as any)(services.download, 'onWillDownload', 'will-download');
 
   yield all([
     takeEveryWitness(NEW_ITEM, addDownloadItemSaga),

@@ -4,7 +4,9 @@ import { Tooltip } from '@getstation/theme';
 import { colors } from '@src/theme';
 
 import { Application } from '../Application.type';
+// @ts-ignore no declaration file
 const dots = require('../../../static/dock-sample-three-dots.svg');
+// @ts-ignore no declaration file
 const empty = require('../../../static/dock-sample-empty.svg');
 
 const useStyles = createUseStyles({
@@ -152,9 +154,7 @@ export const ApplicationsList = ({
 
   React.useEffect(() => {
     if (prevApplications && applications && (applications.length > prevApplications.length)) {
-      console.log(prevApplications, applications, ulRef);
       ulRef.current && ulRef.current.scrollTo(0, ulRef.current.scrollHeight);
-
     }
   }, [applications]);
 

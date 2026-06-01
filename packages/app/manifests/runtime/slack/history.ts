@@ -34,11 +34,10 @@ const getHistoryItem = async (
     ...entry,
     date: new Date(item.createdAt),
     url: item.extraData.tabUrl,
-  };
+  } as history.HistoryEntry;
 };
 
 export const startHistoryRecording = async (sdk: SDK): Promise<Observable<Error>> => {
-  // @ts-ignore
   activitySubscription = sdk.activity
     .query({
       limit: 10,
@@ -47,15 +46,15 @@ export const startHistoryRecording = async (sdk: SDK): Promise<Observable<Error>
     })
     .subscribe(async (activityEntries: activity.ActivityEntry[]) => {
       const historyEntries = await Promise.all(
-        pipe(
+        // @ts-ignore
+        ([
           compact,
-          // TODO: should be done in sdk activity provider (via the query)
           uniqBy(prop('resourceId')),
-          map(getHistoryItem)
-        )(activityEntries)
+          map((a: activity.ActivityEntry) => getHistoryItem(a))
+        ].reduce(pipe)(activityEntries as any[]) as any)
       );
 
-      sdk.history.entries.next(compact(historyEntries));
+      sdk.history.entries.next(compact(historyEntries) as any);
     });
 
   return EMPTY;

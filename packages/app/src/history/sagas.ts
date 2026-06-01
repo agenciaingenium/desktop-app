@@ -35,13 +35,16 @@ function* sdkHistoryProvider(): SagaIterator {
 
   yield takeEveryWitness(
     providerHistoryChannel,
+    // @ts-ignore nested generator
     function* (entries: history.HistoryEntry[]) {
+      // @ts-ignore yield
       const historySectionSerialized = yield call(
         serializeResults,
         [historyItemsAsLastUsedSection(entries)],
         callbacksHistory
       );
 
+      // @ts-ignore yield
       const organizedHistorySectionSerialized = yield call(organizeHistoryResults, historySectionSerialized);
 
       yield put(setHistoryItems(organizedHistorySectionSerialized[0].results));
@@ -90,11 +93,14 @@ function* sdkHistoryAppConsumer({ store }: BrowserXAppWorker): SagaIterator {
 
   yield takeEveryWitness(
     activityWithTabsChannel,
+    // @ts-ignore nested generator
     function* (activityWithTabs: [activity.ActivityEntry[], StationTabsImmutable]) {
       const [activities, tabs] = activityWithTabs;
 
+      // @ts-ignore yield
       const entries = yield all(activities
         .map(
+          // @ts-ignore nested generator
           function* ({ resourceId, createdAt, manifestURL }: activity.ActivityEntry) {
             const activeConsumer = manifestURL && isActiveConsumer('history', manifestURL, bxSDK);
             if (activeConsumer) return undefined;
@@ -102,10 +108,13 @@ function* sdkHistoryAppConsumer({ store }: BrowserXAppWorker): SagaIterator {
             const tab = tabs.find(t => getTabId(t) === resourceId);
             if (!tab) return undefined;
 
+            // @ts-ignore yield
             const application = yield select(getApplicationByTabId, getTabId(tab));
             if (!application) return undefined;
 
+            // @ts-ignore yield
             const { manifestProvider }: BrowserXAppWorker = yield getContext('bxApp');
+            // @ts-ignore yield
             const { manifest } = yield manifestProvider.getFirstValue(getApplicationManifestURL(application));
 
             return {

@@ -28,6 +28,7 @@ export default class SessionProvider extends AbstractProvider<session.SessionCon
 
   getProviderInterface(): session.SessionProviderInterface {
     return {
+      // @ts-ignore
       getUserAgent: this.getUserAgent.bind(this),
       getCookies: this.getCookies.bind(this),
     };

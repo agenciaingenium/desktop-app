@@ -222,10 +222,10 @@ interface ElectronWebview {
 }
 
 class ElectronWebview extends React.Component<ElectronWebviewProps, {}> {
-  public view: Electron.WebviewTag;
-  protected ref: HTMLElement;
-  protected ready: boolean;
-  private loaded: boolean;
+  public view!: Electron.WebviewTag;
+  protected ref!: HTMLElement;
+  protected ready!: boolean;
+  private loaded!: boolean;
 
   constructor(props: ElectronWebviewProps) {
     super(props);
@@ -233,14 +233,16 @@ class ElectronWebview extends React.Component<ElectronWebviewProps, {}> {
   }
 
   componentDidMount() {
-    const container = ReactDOM.findDOMNode(this.ref);
+    const container = ReactDOM.findDOMNode(this.ref) as HTMLElement;
 
     const webview = document.createElement('webview') as Electron.WebviewTag;
 
-    Object.keys(this.props).forEach((propName) => {
-      // Waiting for a fix https://github.com/electron/electron/issues/9618
-      if (this.props[propName] !== undefined && typeof this.props[propName] !== 'function') {
-        setWebviewAttribute(webview, propName, this.props[propName]);
+    (Object.keys(this.props) as Array<keyof ElectronWebviewProps>).forEach((propName) => {
+      if (propName !== 'preload' && propName !== 'initialSrc') {
+        const value = this.props[propName];
+        if (value !== undefined && typeof value !== 'function') {
+          setWebviewAttribute(webview, propName as string, value as string);
+        }
       }
     });
     if (this.props.className) {
@@ -267,12 +269,13 @@ class ElectronWebview extends React.Component<ElectronWebviewProps, {}> {
     this.view.addEventListener('did-attach', (...attachArgs: any[]) => {
       this.ready = true;
       events.forEach((event) => {
-        const propName = camelCase(`on-${event}`);
-        if (this.props[propName]) {
-          this.view.addEventListener(event, this.props[propName], false);
+        const propName = camelCase(`on-${event}`) as keyof ElectronWebviewProps;
+        const handler = this.props[propName] as EventListener | undefined;
+        if (handler) {
+          this.view.addEventListener(event, handler, false);
         }
       });
-      if (this.props.onDidAttach) this.props.onDidAttach(...attachArgs);
+      if (this.props.onDidAttach) (this.props.onDidAttach as any)(...attachArgs);
     });
 
     this.view.addEventListener('dom-ready', () => {
@@ -283,13 +286,13 @@ class ElectronWebview extends React.Component<ElectronWebviewProps, {}> {
     });
 
     methods.forEach((method) => {
-      if (this[method]) return;
-      this[method] = (...args: any[]) => {
+      if ((this as any)[method]) return;
+      (this as any)[method] = (...args: any[]) => {
         if (!this.ready) return;
         try {
-          return this.view[method](...args);
+          return (this.view as any)[method](...args);
         } catch (e) {
-          logger.notify(e);
+          logger.notify(e as Error);
         }
       };
     });
@@ -347,11 +350,15 @@ class ElectronWebview extends React.Component<ElectronWebviewProps, {}> {
 
   componentDidUpdate(prevProps: ElectronWebviewProps) {
     Object.keys(changableProps).forEach((propName) => {
-      const propValue = this.props[propName];
-      if (propValue !== prevProps[propName]) {
-        this[changableProps[propName]](propValue);
+      const propValue = (this.props as any)[propName];
+      if (propValue !== (prevProps as any)[propName]) {
+        const methodName = changableProps[propName as keyof typeof changableProps];
+        (this.view as any)[methodName](propValue);
       }
     });
+    if (prevProps.hidden !== this.props.hidden) {
+      this.updateClassName(this.props);
+    }
   }
 
   updateClassName = (props = this.props) => {
@@ -360,12 +367,6 @@ class ElectronWebview extends React.Component<ElectronWebviewProps, {}> {
       return this.view.setAttribute('class', className);
     }
   };
-
-  componentDidUpdate(prevProps: ElectronWebviewProps) {
-    if (prevProps.hidden !== this.props.hidden) {
-      this.updateClassName(this.props);
-    }
-  }
 
   focus() {
     if (!this.view) return;

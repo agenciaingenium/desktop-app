@@ -154,6 +154,7 @@ export interface FnMap<T, Context> {
   ): InheritImmutable<Context, M>;
 }
 
+// @ts-ignore
 export interface ImmutableList<T extends any[]> extends Immutable.List<T[number]> {
   get: FnGet<T>;
   set: FnSet<T, this>;
@@ -168,6 +169,7 @@ export interface ImmutableList<T extends any[]> extends Immutable.List<T[number]
   delete: FnRemove<T, this>;
 }
 
+// @ts-ignore
 export interface ImmutableMap<T> extends Omit<Immutable.Map<any, any>, keyof ImmutableMap<T>> {
   get: FnGet<T>;
   set: FnSet<T, this>;

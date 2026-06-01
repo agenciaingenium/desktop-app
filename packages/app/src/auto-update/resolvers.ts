@@ -1,7 +1,9 @@
 import { map } from 'rxjs/operators';
 import { subscribeStore } from '../utils/observable';
 import { Resolvers } from '../graphql/resolvers-types.generated';
+// @ts-ignore no declaration file
 import { isDownloadingUpdate, isCheckingUpdate, isUpdateAvailable, getReleaseName } from './selectors';
+// @ts-ignore no declaration file
 import { checkForUpdates, quitAndInstall } from './duck';
 
 export type AutoUpdateStatusParent = {};
@@ -26,7 +28,7 @@ const resolvers: Resolvers = {
     releaseName: (_obj, _args, context) => {
       return subscribeStore(context.store, getReleaseName as () => string)
         // Waiting for https://github.com/mesosphere/reactive-graphql/pull/19
-        .pipe(map(r => r === undefined ? null : r));
+        .pipe(map(r => r === undefined ? null : r)) as any;
     },
   },
   Mutation: {

@@ -28,7 +28,8 @@ const fuseOptions: Fuse.FuseOptions<Item> = {
 export const fuseScoreAlgorithm: ScoreAlgorithm<Item, ScoreContext> = (items: Item[], { query }: ScoreContext): ScoreMap => {
   if (!query) return {}; // empty scoremap means: all score equals to 0
 
-  const fuse = new Fuse(items, fuseOptions);
+  // @ts-ignore
+  const fuse = new Fuse(items, fuseOptions) as any;
   const scoredItems = fuse.search(query) as unknown as FuseScored<Item>[];
 
   return scoredItems.reduce((scoreMap, { item, score }) => {

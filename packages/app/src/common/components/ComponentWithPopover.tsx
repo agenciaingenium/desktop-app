@@ -13,7 +13,7 @@ export interface IComponentWithPopoverChildrenProps {
 }
 
 export interface OwnProps {
-  children: React.SFC<IComponentWithPopoverChildrenProps> | React.ReactNode,
+  children: React.FC<IComponentWithPopoverChildrenProps> | React.ReactNode,
   modifiers?: PopperJS.Modifiers,
   placement?: PopperJS.Placement,
   overlay?: boolean,
@@ -52,10 +52,12 @@ export default class ComponentWithPopover extends React.PureComponent<Props, Sta
   getChild(indice: number) {
     const { children } = this.props;
     const { showPopper } = this.state;
-    const child = children![indice];
+    // @ts-ignore: React.Children.toArray typing issue
+    const childArray = React.Children.toArray(children);
+    const child = childArray[indice];
 
     if (typeof child === 'function') {
-      return child({
+      return (child as Function)({
         toggle: this.handleToggle,
         isVisible: showPopper,
       });

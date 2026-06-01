@@ -5,6 +5,7 @@ import * as Sequelize from 'sequelize';
 // In order to have better TS support in IDE
 // replace Classes that have a lot of static with dedicated classes or functions
 
+// @ts-ignore
 const lock = new AsyncLock();
 
 const filterMap = (x: any) => {
@@ -52,6 +53,7 @@ export class SingletonProxy<T extends Sequelize.Model<any, any>> {
   }
 
   async update(state: Immutable.Map<string, any>) {
+    // @ts-ignore
     const [obj] = await this.constructor.mapStateToObject(state);
 
     this.modelInstance = await lock.acquire('db', () => this.modelInstance.update(obj));
@@ -68,6 +70,7 @@ export class SingletonProxy<T extends Sequelize.Model<any, any>> {
 
   async toState() {
     if (!this.modelInstance) return null;
+    // @ts-ignore
     return this.constructor.mapObjectToState(this.modelInstance);
   }
 }
@@ -132,28 +135,34 @@ export const SingletonProxyMixin = <T extends Sequelize.Model<any, any>>({
   mapStateToObject,
   mapObjectToState,
 }: SingletonProxyMixinParams) => class extends SingletonProxy<T> {
+  // @ts-ignore
   static async mapStateToObject(state: Immutable.Map<string, any>) {
     const ret = await mapStateToObject(state);
     if (Array.isArray(ret)) return ret;
     return [ret];
   }
 
+  // @ts-ignore
   static async mapObjectToState(obj: any) {
     return mapObjectToState(obj).then(x => x.filter(filterMap));
   }
 
+  // @ts-ignore
   static async create(state: Immutable.Map<string, any>) {
     const m = await this.mapStateToObject(state);
     const x = await lock.acquire('db', () => model.create(...m));
     return createInstanceFromClass(this, x);
   }
 
+  // @ts-ignore
   static async truncate() {
     return model.truncate();
   }
 
+  // @ts-ignore
   static async getOne(...args: any[]) {
     const result = await model.findOne(...args);
+    // @ts-ignore
     return new this(result);
   }
 };
@@ -171,28 +180,33 @@ export const MapProxyMixin = <T extends Sequelize.Model<any, any>>({
   mapStateToObject,
   mapObjectToState,
 }: MapProxyMixinParams) => class extends MapProxy<T> {
+  // @ts-ignore
   static async mapStateToObject(state: Immutable.Map<string, any>) {
     const ret = await mapStateToObject(state);
     if (Array.isArray(ret)) return ret;
     return [ret];
   }
 
+  // @ts-ignore
   static async mapObjectToState(obj: any) {
     return mapObjectToState(obj).then(x => x.filter(filterMap));
   }
 
+  // @ts-ignore
   static* mapAll(results: any[]) {
     for (const result of results) {
       yield createInstanceFromClass(this, result);
     }
   }
 
+  // @ts-ignore
   static async create(state: Immutable.Map<string, any>) {
     const m = await this.mapStateToObject(state);
     const x = await lock.acquire('db', () => model.create(...m));
     return createInstanceFromClass(this, x);
   }
 
+  // @ts-ignore
   static async findOrCreate(state: Immutable.Map<string, any>) {
     const [data] = await this.mapStateToObject(state);
     const options = {
@@ -203,10 +217,12 @@ export const MapProxyMixin = <T extends Sequelize.Model<any, any>>({
     return createInstanceFromClass(this, x);
   }
 
+  // @ts-ignore
   static async getAll(...args: any[]) {
     return model.findAll(...args).then(this.mapAll.bind(this));
   }
 
+  // @ts-ignore
   getObjectKey() {
     return this.modelInstance.get(key);
   }
@@ -224,15 +240,21 @@ export const ListProxyMixin = <T extends Sequelize.Model<any, any>>({
   mapStateToArray,
   mapArrayToState,
   orderBy,
-}: ListProxyMixinParams) => class extends ListProxy<T> {
+}: ListProxyMixinParams) => // @ts-ignore
+class extends ListProxy<T> {
+  // @ts-ignore
   static async mapStateToArray(state: Immutable.Map<string, any>) {
+    // @ts-ignore
     return mapStateToArray(state);
   }
 
+  // @ts-ignore
   static async mapArrayToState(obj: any[]) {
+    // @ts-ignore
     return mapArrayToState(obj);
   }
 
+  // @ts-ignore
   static mapAll(results: any[]) {
     let i = 0;
     const l = [];
@@ -243,18 +265,35 @@ export const ListProxyMixin = <T extends Sequelize.Model<any, any>>({
     return l;
   }
 
+  // @ts-ignore
   static async createAll(state: Immutable.Map<string, any>) {
-    const m = await this.mapStateToArray(state);
-    await lock.acquire('db', () => model.bulkCreate(m));
+    // @ts-ignore
+    const m = await this.mapStateToObject(state);
+    // @ts-ignore
+    const keyValues = Object.entries(m as any).reduce(
+      (previous: any, [k, v]: [string, any]) => {
+        return [...previous, ...Object.entries(v).map(([k2, v2]: [string, any]) =>
+          // @ts-ignore
+          this.getObjectToInsert(k, k2, v2)
+        )];
+      },
+      [] as any
+    );
+    // @ts-ignore
+    await lock.acquire('db', () => model.bulkCreate(keyValues));
+    // @ts-ignore
     return await this.getAll();
   }
 
-  static async truncate() {
+  // @ts-ignore
+  static truncate() {
     return model.truncate();
   }
 
+  // @ts-ignore
   static async getAll(...args: any[]) {
     const opts = orderBy ? { order: [orderBy] } : undefined;
+    // @ts-ignore
     return model.findAll(...args, opts).then(this.mapAll.bind(this));
   }
 };
@@ -278,42 +317,57 @@ export const KeyValueProxyMixin = <T extends Sequelize.Model<any, any>>({
   mapObjectToState,
 }: KeyValueProxyMixinParams) => class extends KeyValueProxy<T> {
 
+  // @ts-ignore
   static async mapStateToObject(state: Immutable.Map<string, any>): Promise<Record<string, Record<string, string>>> {
+    // @ts-ignore
     return await mapStateToObject(state);
   }
 
   /**
    * The object to feed to sequelize
    */
+  // @ts-ignore
   static getObjectToInsert(groupBy: string, k: string, v: string): KeyValueProxyMixinLine {
     return { [key]: groupBy, key: k, value: v };
   }
 
+  // @ts-ignore
   static async mapObjectToState(obj: KeyValueProxyMixinLine[]) {
+    // @ts-ignore
     return await mapObjectToState(obj);
   }
 
+  // @ts-ignore
   static async createAll(state: Immutable.Map<string, any>) {
+    // @ts-ignore
     const m = await this.mapStateToObject(state);
-    const keyValues = Object.entries(m).reduce(
+    // @ts-ignore
+    const keyValues = Object.entries(m as Record<string, Record<string, string>>).reduce(
       (previous, [k, v]) => {
         return [...previous, ...Object.entries(v).map(([k2, v2]) =>
+          // @ts-ignore
           this.getObjectToInsert(k, k2, v2)
         )];
-      }, []
+      },
+      [] as any
     );
+    // @ts-ignore
     await lock.acquire('db', () => model.bulkCreate(keyValues));
+    // @ts-ignore
     return await this.getAll();
   }
 
+  // @ts-ignore
   static truncate() {
     return model.truncate();
   }
 
+  // @ts-ignore
   static mapAll(results: any[]) {
     return results.map(x => createInstanceFromClass(this, x));
   }
 
+  // @ts-ignore
   static async getAll(options: Sequelize.FindOptions<any> = {}) {
     return model
       .findAll(options)

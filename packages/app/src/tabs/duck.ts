@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import isEmpty = require('is-empty');
+import isEmpty from 'is-empty';
 import { ImmutableList } from '../types';
 import { StationTabImmutable, StationTabsImmutable } from './types';
 
@@ -155,7 +155,7 @@ export default function tabs(state: StationTabsImmutable = Immutable.Map() as an
         url,
         isApplicationHome,
       } = action;
-      return state.set(tabId, <StationTabImmutable>Immutable.Map({
+      return state.set(tabId, <StationTabImmutable><any>Immutable.Map({
         tabId,
         applicationId,
         url,

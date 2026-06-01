@@ -53,6 +53,7 @@ class NotificationCenterSnoozeButton extends React.PureComponent<Props, State> {
   isSnoozed() {
     const { currentSnoozeDurationInMs } = this.props;
     if (!currentSnoozeDurationInMs) return false;
+    // @ts-ignore
     return currentSnoozeDurationInMs > 0 || currentSnoozeDurationInMs === SYNC_WITH_OS || currentSnoozeDurationInMs === INFINITE;
   }
 

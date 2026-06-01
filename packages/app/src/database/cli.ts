@@ -7,7 +7,7 @@ import { getDatabasePath } from './database.prod';
 
 const describe = () => db.getQueryInterface()
   .showAllTables()
-  .then(tableNames => BluebirdPromise.each(tableNames, tableName =>
+  .then((tableNames: string[]) => (BluebirdPromise as any).each(tableNames, (tableName: string) =>
     db.getQueryInterface()
       .describeTable(tableName)
       .then(attributes => {

@@ -22,7 +22,7 @@ export default class ConfigurePasswordManager extends React.PureComponent<Props 
       onCancel,
     } = this.props;
 
-    const ProviderForm = ProvidersForm[provider.id];
+    const ProviderForm = (ProvidersForm as any)[provider.id];
     const error = configurationProcess.step === ConfigurationStep.Error ? configurationProcess.payload : null;
 
     return (

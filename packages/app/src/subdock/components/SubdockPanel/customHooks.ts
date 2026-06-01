@@ -23,7 +23,8 @@ export const useScrollToActiveTabOnMount = (
   // on mount
   useEffect(() => {
     // Compute position needed to see the selected element
-    const pos = tabs.findIndex((elem: Tab | Favorite) => activeIdentifier === elem[identifierType]);
+    // @ts-ignore
+    const pos = tabs.findIndex((elem: Tab | Favorite) => activeIdentifier === elem[identifierType as keyof typeof elem]);
     const scrollPos = (pos < 3) ? 0 : (pos - 2) * SUBDOCK_ITEM_HEIGHT;
     if (scrollPos >= 0 && ref.current) {
       // Apply computed position to scroll view

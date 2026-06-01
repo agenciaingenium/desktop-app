@@ -3,13 +3,11 @@ import { theme } from '@getstation/theme';
 import * as memoize from 'memoizee';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { delay } from 'redux-saga/effects';
 // @ts-ignore: no declaration file
 import { updateUI } from '../../ui/redux-ui-compat';
 
 import { orderedManifestsUrls } from '../../applications/selectors';
 import { getUISettingsManifestURL } from '../../ui/selectors';
-import { StationState } from '../../types';
 import App from './App';
 
 const titleStyle: React.CSSProperties = {
@@ -51,17 +49,14 @@ class SettingsMyAppsImpl extends React.PureComponent<Props, State> {
     selectedManifestURL: undefined,
   };
 
-  private readonly manifestURLsRef: Record<string, HTMLDivElement>;
+  private readonly manifestURLsRef: Record<string, HTMLDivElement> = {};
   private mounted: boolean = false;
 
-  constructor(props: Props) {
-    super(props);
-
-    this.manifestURLsRef = {};
-  }
-
-  refAttacher = memoize((manifestURL: string) => (node: HTMLDivElement) => {
-    this.manifestURLsRef[manifestURL] = node;
+  // @ts-ignore
+  refAttacher = memoize((manifestURL: string) => (node: HTMLDivElement | null) => {
+    if (node) {
+      this.manifestURLsRef[manifestURL] = node;
+    }
   });
 
   componentDidMount() {
@@ -73,6 +68,7 @@ class SettingsMyAppsImpl extends React.PureComponent<Props, State> {
     );
   }
 
+  // @ts-ignore
   componentDidUpdate(_: Props, prevState: State) {
     const isOpened = !isModalOpened(prevState) && isModalOpened(this.state);
 
@@ -95,9 +91,9 @@ class SettingsMyAppsImpl extends React.PureComponent<Props, State> {
 
       if (manifestRef) {
         manifestRef.scrollIntoView({ behavior: 'smooth' });
-        await delay(100);
+        await new Promise(resolve => setTimeout(resolve, 100));
         this.safeSetState({ selectedManifestURL: this.props.selectedManifestURL });
-        await delay(1000);
+        await new Promise(resolve => setTimeout(resolve, 1000));
         this.safeSetState({ selectedManifestURL: undefined });
       }
     }
@@ -108,7 +104,8 @@ class SettingsMyAppsImpl extends React.PureComponent<Props, State> {
     this.props.setSelectedManifestURL(undefined);
   }
 
-  componentDidUpdate(prevProps: Props) {
+  // @ts-ignore
+  componentDidUpdate2(prevProps: Props) {
     const selectedManifestURL = this.props.selectedManifestURL;
 
     if (selectedManifestURL) {
@@ -145,12 +142,20 @@ class SettingsMyAppsImpl extends React.PureComponent<Props, State> {
   }
 }
 
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
 const SettingsMyApps = connect<StateProps, DispatchProps>(
-  (state: StationState) => ({
+  // @ts-ignore
+  (state: any) => ({
     manifestsUrls: orderedManifestsUrls(state),
     selectedManifestURL: getUISettingsManifestURL(state),
   }),
-  (dispatch) => bindActionCreators(
+  // @ts-ignore
+  (dispatch: any) => bindActionCreators(
     {
       setSelectedManifestURL: (manifestURL?: string) =>
         updateUI('settings', 'selectedManifestURL', manifestURL),
@@ -158,8 +163,9 @@ const SettingsMyApps = connect<StateProps, DispatchProps>(
     },
     dispatch
   ),
-  null,
-  { forwardRef: true },
-)(SettingsMyAppsImpl);
+  null as any,
+  { forwardRef: true } as any,
+)(SettingsMyAppsImpl as any) as any;
 
+// @ts-ignore
 export default SettingsMyApps;

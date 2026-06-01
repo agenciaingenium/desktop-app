@@ -103,7 +103,7 @@ export function* uninstallApplication(applicationId: string): SagaIterator {
   // todo move that behind a single action
   const applicationFavs = (yield select(getFavoritesForApplication, applicationId)).values();
   for (const fav of applicationFavs) {
-    const favoriteId = getTabFavoriteId(fav);
+    const favoriteId = getTabFavoriteId(fav) as string | undefined;
     if (favoriteId) yield put(deleteFavorite(favoriteId));
   }
 }

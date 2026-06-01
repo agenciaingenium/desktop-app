@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 export interface Props {
+  children?: React.ReactNode,
   into: string | HTMLElement,
 }
 

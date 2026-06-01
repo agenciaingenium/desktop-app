@@ -8,8 +8,8 @@ export interface Props extends ElectronWebviewProps {
 
 class LazyWebview extends React.PureComponent<Props, {}> {
 
-  props: Props;
-  webview: ElectronWebview;
+  props!: Props;
+  webview!: ElectronWebview;
 
   static renderNoWebview() {
     return (

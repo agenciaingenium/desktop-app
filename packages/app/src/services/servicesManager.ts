@@ -9,9 +9,10 @@ import { GlobalServices, ServicesInitializerImpl, ServicesInitializerNode } from
 function mapObject<T>(initializer: ServicesInitializerImpl<T>): T;
 function mapObject<T>(initializer: ServicesInitializerNode<T>, handler: any): T;
 function mapObject(...args: any[]): any {
-  const services: GlobalServices = {} as any;
+  const services: GlobalServices = {} as GlobalServices;
   const [initializer, handler] = args;
   for (const key of Object.keys(initializer)) {
+    // @ts-ignore
     services[key] = handler ? initializer[key](handler) : initializer[key]();
   }
   return services;
@@ -21,6 +22,7 @@ class ServicesManager {
   protected handlers: Set<ServicePeerHandler>;
 
   constructor() {
+    // eslint-disable-next-line no-console
     console.log('[DEBUG] ServicesManager: Constructor called');
     this.handlers = new Set();
   }
@@ -43,6 +45,7 @@ class ServicesManager {
   }
 
   protected initWorker(): GlobalServices {
+    // eslint-disable-next-line no-console
     console.log('[DEBUG] ServicesManager: initWorker called');
     const { getMainPeerHandler, mainServices, workerServices } = require('./worker');
 
@@ -54,19 +57,20 @@ class ServicesManager {
 
     // impl
     const workerServicesConnected = mapObject(workerServices);
-    observeNewClients().subscribe((client: ServicePeerHandler) => {
+    observeNewClients().subscribe((client: any) => {
       this.handlers.add(client);
       client.on('close', () => this.handlers.delete(client));
       map(s => client.connect(s), workerServicesConnected as any);
     });
 
     return {
-      ...mainServicesConnected,
-      ...workerServicesConnected,
+      ...mainServicesConnected as GlobalServices,
+      ...workerServicesConnected as GlobalServices,
     } as GlobalServices;
   }
 
   protected initRenderer(): GlobalServices {
+    // eslint-disable-next-line no-console
     console.log('[DEBUG] ServicesManager: initRenderer called');
     const { workerServices, mainServices, getMainPeerHandler, getWorkerPeerHandler } = require('./renderer');
     const mainPeerHandler = getMainPeerHandler();
@@ -79,8 +83,8 @@ class ServicesManager {
     const workerServicesConnected = mapObject(workerServices, workerPeerHandler);
 
     return {
-      ...mainServicesConnected,
-      ...workerServicesConnected,
+      ...mainServicesConnected as GlobalServices,
+      ...workerServicesConnected as GlobalServices,
     } as GlobalServices;
   }
 
@@ -102,15 +106,15 @@ class ServicesManager {
     // impl
     const mainServicesConnected = mapObject(mainServices);
     map(s => handler.connect(s), mainServicesConnected as any);
-    observeNewClients().subscribe((client: ServicePeerHandler) => {
+    observeNewClients().subscribe((client: any) => {
       this.handlers.add(client);
       client.on('close', () => this.handlers.delete(client));
       map(s => client.connect(s), mainServicesConnected as any);
     });
 
     return {
-      ...workerServicesConnected,
-      ...mainServicesConnected,
+      ...workerServicesConnected as GlobalServices,
+      ...mainServicesConnected as GlobalServices,
     } as GlobalServices;
   }
 }

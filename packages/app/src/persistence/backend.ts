@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import * as Sequelize from 'sequelize';
 import { KeyValueProxy, ListProxy, MapProxy, SingletonProxy } from './mixins'; // We need this for cancellable Promises
 
+// @ts-ignore
 BluebirdPromise.config({
   longStackTraces: true,
   cancellation: true,
@@ -28,12 +29,13 @@ abstract class AbstractStateProxy<T> {
 
   async set(state: T, delay: number = DELAY) {
     this.cancelDelayed();
+    // @ts-ignore
     const delayed = BluebirdPromise.delay(delay);
     this.delayed.push(delayed);
     return new Promise((resolve, reject) => {
       delayed
         .then(() => this.actualSet(state))
-        .then(() => resolve())
+        .then(() => resolve(undefined))
         .catch(reject)
         .finally(() => {
           const index = this.delayed.indexOf(delayed);
@@ -41,7 +43,7 @@ abstract class AbstractStateProxy<T> {
             this.delayed.splice(index, 1);
           }
           if (delayed.isCancelled()) {
-            resolve();
+            resolve(undefined);
           }
         });
     });
@@ -63,6 +65,7 @@ abstract class AbstractStateProxy<T> {
 /**
  * This class is a helper to load/save simple state elements like 'app'
  */
+// @ts-ignore
 export class SingletonStateProxy<S extends Sequelize.Model<any, any>, T extends SingletonProxy<S> = SingletonProxy<S>>
   extends AbstractStateProxy<Immutable.Map<string, any>> implements StateProxy<Immutable.Map<string, any>> {
 
@@ -88,10 +91,11 @@ export class SingletonStateProxy<S extends Sequelize.Model<any, any>, T extends 
 
   async init() {
     if (!this.instance) {
+      // @ts-ignore
       return this.aclass.getOne().then((instance: T) => {
         this.instance = instance;
         return;
-      }).catch(err => {
+      }).catch((err: any) => {
         console.error('[persistence] SingletonStateProxy.init failed:', err);
         throw err;
       });
@@ -100,10 +104,11 @@ export class SingletonStateProxy<S extends Sequelize.Model<any, any>, T extends 
 
   async get() {
     if (!this.instance) {
+      // @ts-ignore
       return this.aclass.getOne().then((instance: T) => {
         this.instance = instance;
         return this.toState();
-      }).catch(err => {
+      }).catch((err: any) => {
         console.error('[persistence] SingletonStateProxy.get failed:', err);
         throw err;
       });
@@ -118,8 +123,10 @@ export class SingletonStateProxy<S extends Sequelize.Model<any, any>, T extends 
     }
     if (this.instance.isEmpty()) {
       if (state.size === 0) return;
+      // @ts-ignore
       this.instance = await this.aclass.create(state);
     } else if (state.size === 0) {
+      // @ts-ignore
       await this.aclass.truncate();
       this.clear();
     } else {
@@ -132,6 +139,7 @@ export class SingletonStateProxy<S extends Sequelize.Model<any, any>, T extends 
 /**
  * This class is a helper to load/save ordered list state elements like 'dock'
  */
+// @ts-ignore
 export class ListStateProxy<S extends Sequelize.Model<any, any>, T extends ListProxy<S> = ListProxy<S>>
   extends AbstractStateProxy<Immutable.List<any>> implements StateProxy<Immutable.List<any>> {
 
@@ -149,15 +157,17 @@ export class ListStateProxy<S extends Sequelize.Model<any, any>, T extends ListP
   }
 
   toState(): Promise<Immutable.List<any>> {
+    // @ts-ignore
     return this.aclass.toState(this.instances);
   }
 
   async get() {
     if (!this.instances) {
+      // @ts-ignore
       return this.aclass.getAll().then((instances: T[]) => {
         this.instances = instances;
         return this.toState();
-      }).catch(err => {
+      }).catch((err: any) => {
         console.error('[persistence] ListStateProxy.get failed:', err);
         throw err;
       });
@@ -169,8 +179,10 @@ export class ListStateProxy<S extends Sequelize.Model<any, any>, T extends ListP
     if (this.instances) {
       const currentList = await this.get();
       if (state.equals(currentList)) return;
+      // @ts-ignore
       await this.aclass.truncate();
     }
+    // @ts-ignore
     this.instances = await this.aclass.createAll(state);
     return;
   }
@@ -179,6 +191,7 @@ export class ListStateProxy<S extends Sequelize.Model<any, any>, T extends ListP
 /**
  * This class is a helper to load/save map state elements like 'applications'
  */
+// @ts-ignore
 export class MapStateProxy<S extends Sequelize.Model<any, any>, T extends MapProxy<S> = MapProxy<S>>
   extends AbstractStateProxy<Immutable.Map<string, any>> implements StateProxy<Immutable.Map<string, any>> {
 
@@ -209,13 +222,14 @@ export class MapStateProxy<S extends Sequelize.Model<any, any>, T extends MapPro
 
   async get() {
     if (!this.instances) {
+      // @ts-ignore
       return this.aclass.getAll().then((instances: T[]) => {
         this.instances = Immutable.Map();
         for (const instance of instances) {
-          this.instances = this.instances.set(instance.getObjectKey(), instance);
+          this.instances = this.instances!.set(instance.getObjectKey(), instance);
         }
         return this.toState();
-      }).catch(err => {
+      }).catch((err: any) => {
         console.error('[persistence] MapStateProxy.get failed:', err);
         throw err;
       });
@@ -225,8 +239,8 @@ export class MapStateProxy<S extends Sequelize.Model<any, any>, T extends MapPro
 
   async actualSet(state: Immutable.Map<string, any>) {
     const instances = await this.get();
-    const instancesKeys = Immutable.Set(instances.keys());
-    const stateKeys = Immutable.Set(state.keys());
+    const instancesKeys = Immutable.Set<string>(instances.keys());
+    const stateKeys = Immutable.Set<string>(state.keys());
     const needUpdate = instancesKeys.intersect(stateKeys);
     const needCreation = stateKeys.subtract(instancesKeys);
     const needDeletion = instancesKeys.subtract(stateKeys);
@@ -236,40 +250,41 @@ export class MapStateProxy<S extends Sequelize.Model<any, any>, T extends MapPro
     for (const key of needCreation) {
       subState = state.get(key);
       await
+        // @ts-ignore
         this.aclass.findOrCreate(subState)
-          .then(data => {
+          .then((data: any) => {
             this.instances = this.instances!.set(key, data);
             return this.instances;
           })
-          .catch(err => { // eslint-disable-line no-loop-func
+          .catch((err: any) => { // eslint-disable-line no-loop-func
             errors.push(addErrorDetails(err, `Insert error: [${this.aclass.name}] ${subState}`));
           });
     }
     for (const key of needUpdate) {
       subState = state.get(key);
       await
-        this.instances!.get(key).update(subState)
-          .then(data => {
+        this.instances!.get(key)!.update(subState)
+          .then((data: any) => {
             this.instances = this.instances!.set(key, data);
             return this.instances;
           })
-          .catch((err: Error) => { // eslint-disable-line no-loop-func
+          .catch((err: any) => { // eslint-disable-line no-loop-func
             errors.push(addErrorDetails(err, `Update error: [${this.aclass.name}] ${subState}`));
           });
     }
     for (const key of needDeletion) {
       await
-        this.instances!.get(key).delete()
+        this.instances!.get(key)!.delete()
           .then(() => {
             this.instances = this.instances!.delete(key);
             return this.instances;
           })
-          .catch((err: Error) => { // eslint-disable-line no-loop-func
+          .catch((err: any) => { // eslint-disable-line no-loop-func
             errors.push(addErrorDetails(err, `Delete error: [${this.aclass.name}] ${key}`));
           });
     }
     if (errors.length > 0) {
-      throw new Error(errors);
+      throw new Error(errors as any);
     }
     return;
   }
@@ -278,6 +293,7 @@ export class MapStateProxy<S extends Sequelize.Model<any, any>, T extends MapPro
 /**
  * This class is a helper to load/save key/value map state elements like 'serviceData[...]'
  */
+// @ts-ignore
 export class KeyValueStateProxy<S extends Sequelize.Model<any, any>, T extends KeyValueProxy<S> = KeyValueProxy<S>>
   extends AbstractStateProxy<Immutable.Map<string, any>> implements StateProxy<Immutable.Map<string, any>> {
 
@@ -295,15 +311,17 @@ export class KeyValueStateProxy<S extends Sequelize.Model<any, any>, T extends K
   }
 
   toState(): Promise<Immutable.Map<string, any>> {
+    // @ts-ignore
     return this.aclass.toState(this.instances);
   }
 
   async get() {
     if (!this.instances) {
+      // @ts-ignore
       return this.aclass.getAll().then((instances: T[]) => {
         this.instances = instances;
         return this.toState();
-      }).catch(err => {
+      }).catch((err: any) => {
         console.error('[persistence] KeyValueStateProxy.get failed:', err);
         throw err;
       });
@@ -315,8 +333,10 @@ export class KeyValueStateProxy<S extends Sequelize.Model<any, any>, T extends K
     if (this.instances) {
       const currentList = await this.get();
       if (state.equals(currentList)) return;
+      // @ts-ignore
       await this.aclass.truncate();
     }
+    // @ts-ignore
     this.instances = await this.aclass.createAll(state);
     return;
   }

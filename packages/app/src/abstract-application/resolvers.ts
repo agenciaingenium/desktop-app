@@ -51,22 +51,23 @@ const resolvers: Resolvers = {
         .pipe(map(bxApp => bxApp.manifest));
     },
     settings: ({ manifestURL }, __, context) =>
+      // @ts-ignore
       subscribeStore(
         context.store,
-        state => getSettingsByManifestURL(state, manifestURL!)
-      ),
+        state => getSettingsByManifestURL(state as any, manifestURL!)
+      ) as any,
     instances: ({ manifestURL }, __, context) =>
       combineLatest(
         subscribeStore(context.store, state => state),
         context.manifestProvider.get(manifestURL!)
           .pipe(map(bxApp => bxApp.manifest)),
         (state: StationState, manifest: BxAppManifest) => {
-          const applications = getApplicationsByManifestURL(state, manifestURL!);
+          const applications = getApplicationsByManifestURL(state as any, manifestURL!);
 
           return applications
             .valueSeq()
             .map((application: ApplicationImmutable) => {
-              const link = getLink(state, getApplicationId(application));
+              const link = getLink(state as any, getApplicationId(application));
               const id = getApplicationId(application);
               const name = label(state, manifest, application);
               const logoUrl = getApplicationIconURL(application) || interpretedIconUrl(manifest);
@@ -88,7 +89,7 @@ const resolvers: Resolvers = {
         ...extensions
           .filter(e => e.extensionFor.includes(manifestURL!))
           .map(e => context.manifestProvider.get(e.manifestURL).pipe(map(m => ({ ...m, manifestURL: e.manifestURL })))),
-        memoize((manifestURLs: List<string>, ...extensionsManifests: any[]) =>
+        (memoize as any)((manifestURLs: List<string>, ...extensionsManifests: any[]) =>
           extensionsManifests.map(extensionManifest => {
             const { manifest } = extensionManifest;
 

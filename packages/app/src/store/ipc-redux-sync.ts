@@ -7,6 +7,7 @@
  */
 import { Middleware } from 'redux';
 
+// @ts-ignore no declaration file
 const transit = require('transit-immutable-js');
 
 // IPC channel names

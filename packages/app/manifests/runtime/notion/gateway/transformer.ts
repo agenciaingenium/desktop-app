@@ -15,8 +15,8 @@ export type PageInfo = {
 
 export const userContentToWorkspaces = (userContent: any): Workspace[] =>
   Object.values(userContent.recordMap.space)
-    .map(({ value: { id, name, domain, icon, pages } }) =>
-      ({ id, name, domain, icon, pages }));
+    .map((item: any) =>
+      ({ id: item.value.id, name: item.value.name, domain: item.value.domain, icon: item.value.icon, pages: item.value.pages }));
 
 export const publicPageToWorkspace = ({ spaceName, spaceId, spaceDomain, icon }: any): Workspace => ({
   id: spaceId,
@@ -27,7 +27,7 @@ export const publicPageToWorkspace = ({ spaceName, spaceId, spaceDomain, icon }:
 });
 
 export const pagesInfos = (value: any): PageInfo[] =>
-  value.results.map(p => ({
+  value.results.map((p: any) => ({
     id: p.value.id,
     label: getLabel(p.value),
   }));

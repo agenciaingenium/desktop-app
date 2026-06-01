@@ -6,8 +6,9 @@ import SubWindowManager from '../windows/utils/SubWindowManager';
 import { getSubwindows } from './selectors';
 import { StationSubWindowsImmutable } from './types';
 
+// @ts-ignore
 const subwindowsObserver = observer(
-  (state: StationState) => getSubwindows(state),
+  (state: StationState) => getSubwindows(state) as any,
   (_dispatch: any, subwindows: StationSubWindowsImmutable, previousSubwindows: StationSubWindowsImmutable) => {
     if (subwindows === previousSubwindows) return;
     const windowsToAdd = subwindows.subtract(previousSubwindows);

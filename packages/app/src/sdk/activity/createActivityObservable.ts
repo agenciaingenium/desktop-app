@@ -28,37 +28,37 @@ const createActivityFilter = (options: Options): GlobalActivityFilter => {
   const filterWhereResource: GlobalActivityFilter = !where.resourceIds
     ? identity
     : is(Array, where.resourceIds) ?
-      filter(e => where.resourceIds!.includes(e.resourceId)) :
+      filter((e: any) => where.resourceIds!.includes(e.resourceId)) :
       filter(propEq('resourceId', where.resourceIds));
 
   const filterWhereManifest: GlobalActivityFilter = !where.manifestURLs
     ? identity
     : is(Array, where.manifestURLs) ?
-      filter(e => where.manifestURLs!.includes(e.manifestURL!)) :
+      filter((e: any) => where.manifestURLs!.includes(e.manifestURL!)) :
       filter(propEq('manifestURL', where.manifestURLs));
 
   const filterWhereType: GlobalActivityFilter = !where.types
     ? identity
     : is(Array, where.types) ?
-      filter(e => where.types!.includes(e.type)) :
+      filter((e: any) => where.types!.includes(e.type)) :
       filter(propEq('type', where.types));
 
   const filterWhereNotResource: GlobalActivityFilter = !whereNot.resourceIds
     ? identity
     : is(Array, whereNot.resourceIds) ?
-      filter(e => !whereNot.resourceIds!.includes(e.resourceId)) :
+      filter((e: any) => !whereNot.resourceIds!.includes(e.resourceId)) :
       filter(complement(propEq('resourceId', whereNot.resourceIds)));
 
   const filterWhereNotManifest: GlobalActivityFilter = !whereNot.manifestURLs
     ? identity
     : is(Array, whereNot.manifestURLs) ?
-      filter(e => !whereNot.manifestURLs!.includes(e.manifestURL!)) :
+      filter((e: any) => !whereNot.manifestURLs!.includes(e.manifestURL!)) :
       filter(complement(propEq('manifestURL', whereNot.manifestURLs)));
 
   const filterWhereNotType: GlobalActivityFilter = !whereNot.types
     ? identity
     : is(Array, whereNot.types) ?
-      filter(e => !whereNot.types!.includes(e.type)) :
+      filter((e: any) => !whereNot.types!.includes(e.type)) :
       filter(complement(propEq('type', whereNot.types)));
 
   return pipe(
@@ -89,6 +89,7 @@ const orderAndLimit = <T extends Record<K, number>, K extends keyof T>(
   ascending: boolean = true,
   limit: number,
 ): Reducer<T[], T[]> => {
+  // @ts-ignore: type mismatch
   return (sortedEntries, newEntries) => {
     return flatten(newEntries.map(newEntry => {
       const getBiggerValueIndex = createGetBiggerValueIndex<T, K>(newEntry, sortKey, ascending);
@@ -130,6 +131,7 @@ const createActivityObservable = (
 
   return of(limitedDbResults)
     .pipe(
+      // @ts-ignore: concat type mismatch with rxjs operators
       operators.concat(limitedGlobalActivity$), // all filtered results (history results + activity results)
       operators.map(pipe(
         activityFilter,

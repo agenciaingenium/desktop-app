@@ -7,11 +7,11 @@ import { AbstractProvider } from '../common';
 export default class HistoryProvider extends AbstractProvider<history.HistoryConsumer> {
 
   public entries: BehaviorSubject<history.HistoryEntry[]>;
-  protected subscriptions: Subscription;
+  protected subscriptions!: Subscription;
 
   constructor() {
     super();
-    this.entries = new BehaviorSubject([]);
+    this.entries = new BehaviorSubject<history.HistoryEntry[]>([]);
   }
 
   addConsumer(consumer: history.HistoryConsumer) {

@@ -1,4 +1,5 @@
 import { MultiInstanceConfigPreset } from '../applications/manifest-provider/types';
+// @ts-ignore
 import { format } from '../utils/handlebars';
 import { getEmail } from '../user-identities/get';
 import { getIdentityById } from '../user-identities/selectors';

@@ -6,6 +6,7 @@ export interface OwnProps {
   className?: string,
   onMouseEnter?: React.MouseEventHandler<any>,
   onMouseLeave?: React.MouseEventHandler<any>,
+  children?: React.ReactNode,
 }
 
 export interface StateToProps {
@@ -26,11 +27,12 @@ class Popover extends React.PureComponent<StateToProps & OwnProps, {}> {
     };
 
     return (
-      <div className={classNames('popover-container', className)} style={containerStyle} {...rest}>
+      <div className={(classNames as any)('popover-container', className)} style={containerStyle} {...rest}>
         {children}
       </div>
     );
   }
 }
 
-export default withGradient(GradientType.withDarkOverlay)(Popover);
+// @ts-ignore
+export default (withGradient(GradientType.withDarkOverlay) as any)(Popover);

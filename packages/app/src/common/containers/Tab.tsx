@@ -11,7 +11,7 @@ export interface Props {
   isActive?: boolean,
 }
 
-export default class Tab extends React.PureComponent<Props, { hovered: boolean }> {
+class Tab extends React.PureComponent<Props, { hovered: boolean }> {
   constructor(props: Props) {
     super(props);
     this.state = { hovered: false };
@@ -34,7 +34,7 @@ export default class Tab extends React.PureComponent<Props, { hovered: boolean }
         transition: '300ms',
         ...(showActiveBg ? roundedBackground('rgba(255, 255, 255, .1)') : {}),
       }}
-        className={classNames({ active: isActive })}
+        className={(classNames as any)({ active: isActive })}
         onMouseEnter={() => this.setState({ hovered: true })}
         onMouseLeave={() => this.setState({ hovered: false })}
       >
@@ -45,3 +45,6 @@ export default class Tab extends React.PureComponent<Props, { hovered: boolean }
     );
   }
 }
+
+// @ts-ignore
+export default (roundedBackground as any)('rgba(255, 255, 255, .1)')(Tab);

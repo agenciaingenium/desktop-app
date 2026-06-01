@@ -72,7 +72,9 @@ class NotificationCenterHeader extends React.PureComponent<Props, {}> {
     const syncWithOS = snoozeDurationInMs === SYNC_WITH_OS;
     const snoozeInfinite = snoozeDurationInMs === INFINITE;
 
+    // @ts-ignore
     const endDate = currentSnoozeStartedOn && !syncWithOS && !snoozeInfinite ?
+      // @ts-ignore
       moment(currentSnoozeStartedOn).add(snoozeDurationInMs, 'ms') : null;
 
     return (

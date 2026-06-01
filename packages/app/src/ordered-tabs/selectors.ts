@@ -11,7 +11,7 @@ export const getOrderedTabsForApplicationId = createCachedSelector(
   [getTabsForApplication, getOrderedTabsIdsForApplication],
   (tabs, orderedTabs) => {
 
-    return orderedTabs.map(tabId => tabs.get(tabId))
+    return orderedTabs.map((tabId: any) => tabs.get(tabId))
       .filter((tab: any) => Boolean(tab))
       .map((tab: any) =>
         tab.set('id', `${getTabId(tab) || 'none'}_${tab.get('favoriteId') || 'none'}`)

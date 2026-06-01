@@ -80,7 +80,7 @@ function parseIdToken(idToken: string): {
  * @see https://tools.ietf.org/html/rfc8252#section-7.3
  */
 class LoopbackRedirectServer {
-  private server: http.Server;
+  private server!: http.Server;
   private redirectPromise: Promise<string>;
 
   constructor(options: { port: number; callbackPath: string; successRedirectURL: string }) {

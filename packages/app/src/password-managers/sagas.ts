@@ -143,7 +143,7 @@ function* unlockPasswordManagerFlow(): SagaIterator {
         yield callService('tabWebContents', 'askAutoLoginCredentials', webcontentsId);
       }
     } catch (error) {
-      logger.notify(error);
+      logger.notify(error as Error);
       const opts = {
         ...unlockProcess,
         step: UnlockStep.Error,
@@ -222,7 +222,7 @@ function* loadAccountsFlow(): SagaIterator {
         data,
       }));
     } catch (e) {
-      logger.notify(e);
+      logger.notify(e as Error);
     }
   }
 }
@@ -277,6 +277,7 @@ function* addPasswordManagerFlow(): SagaIterator {
       const passwordManager = yield select(getPasswordManager);
       const accountsOpts = { ...accountsProcess, passwordManager, step: AccountsStep.Load };
       yield put(accounts(accountsOpts));
+      // @ts-ignore
       yield put(setVisibilityTeamApp(false));
     }
 

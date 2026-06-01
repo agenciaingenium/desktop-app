@@ -221,8 +221,9 @@ const OnboardingWithHooks: React.FC<any> = (props) => {
 };
 
 const Onboarding = compose(
+  // @ts-ignore
   connect<{}, DispatchFromProps, {}>(
-    (state: Immutable.Map<string, any>) => ({
+    (state: any) => ({
       ui: state.getIn(['ui', 'onboarding'], Immutable.Map({
         onboardingType: OnboardingType.Undefined,
         step: 0,
@@ -233,12 +234,13 @@ const Onboarding = compose(
         onboardingSessionId: undefined,
       })).toJS(),
     }),
+    // @ts-ignore
     dispatch => bindActionCreators(
       {
         onAppStoreStepFinished: appStoreStepFinished,
         updateUI: (uiState: Object) => updateUI('onboarding', uiState),
       },
-      dispatch
+      dispatch as any
     )
   ),
   withApollo,

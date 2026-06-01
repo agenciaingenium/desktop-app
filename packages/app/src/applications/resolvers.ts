@@ -43,6 +43,7 @@ const resolvers: Resolvers = {
 
       return of([...mostPop, ...allOthers]);
     },
+    // @ts-ignore
     getApplicationById: (_obj, args, context) => {
       const { applicationId } = args;
       if (!applicationId) {
@@ -105,7 +106,7 @@ const resolvers: Resolvers = {
       subscribeStore(
         context.store,
         state => getIsApplicationSnoozed(state, application.get('applicationId'))
-      ).pipe(distinctUntilChanged()),
+      ).pipe(distinctUntilChanged() as any),
     fullDomain: (application, _, context) => {
       const subdomain = getApplicationSubdomain(application);
       const customURL = getApplicationCustomURL(application);
@@ -128,39 +129,39 @@ const resolvers: Resolvers = {
     },
     passwordManagerLogin: (application, _, context) =>
       subscribeStore(context.store, state => {
-        const passwordManagerLink = getLink(state, application.applicationId);
+        const passwordManagerLink = getLink(state as any, (application as any).applicationId);
         return passwordManagerLink ? passwordManagerLink.get('login') : null;
-      }).pipe(distinctUntilChanged()),
+      }).pipe(distinctUntilChanged() as any),
     identity: (application, _, context) =>
       subscribeStore(context.store, state => {
         const identityId = getApplicationIdentityId(application);
         if (!identityId) return null;
-        const identityById = getIdentityById(state, identityId);
+        const identityById = getIdentityById(state as any, identityId);
         if (!identityById) return null;
 
-        return identityById.toJS();
-      }).pipe(distinctUntilChanged()),
+        return (identityById as any).toJS();
+      }).pipe(distinctUntilChanged() as any),
     tabApplicationHome: (application, _, context) =>
       subscribeStore(context.store, state => {
         const applicationId = getApplicationId(application);
-        const tabs = getTabsForApplication(state, applicationId);
-        return tabs.find((tab) => getTabIsApplicationHome(tab));
+        const tabs = getTabsForApplication(state as any, applicationId);
+        return (tabs as any).find((tab: any) => getTabIsApplicationHome(tab));
       }).pipe(distinctUntilChanged(), map(tab => {
         if (!tab) {
           return null;
         }
-        return tab.toJS();
+        return (tab as any).toJS();
       })),
     orderedTabsForSubdock: (application, _, context) =>
       subscribeStore(context.store, state => {
         const applicationId = getApplicationId(application);
-        return getOrderedTabsForApplicationId(state, applicationId);
-      }).pipe(distinctUntilChanged(), map(tabs => tabs.toJS())),
+        return (getOrderedTabsForApplicationId(state as any, applicationId) as any).toJS();
+      }).pipe(distinctUntilChanged() as any),
     orderedFavoritesForSubdock: (application, _, context) =>
       subscribeStore(context.store, state => {
         const applicationId = getApplicationId(application);
-        return getOrderedFavoritesForApplicationId(state, applicationId);
-      }).pipe(distinctUntilChanged(), map(tabs => tabs.toJS())),
+        return (getOrderedFavoritesForApplicationId(state as any, applicationId) as any).toJS();
+      }).pipe(distinctUntilChanged() as any),
     associatedBxResource: async (application, _payload, { store, resourceRouter }) => {
       const state = store.getState();
       const tabId = getApplicationActiveTab(application);

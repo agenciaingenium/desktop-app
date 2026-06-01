@@ -1,6 +1,6 @@
-import ms = require('ms');
+import ms from 'ms';
 import { take } from 'rxjs/operators';
-import * as BluebirdPromise from 'bluebird';
+import Bluebird from 'bluebird';
 import { BxAppManifest } from './manifest-provider/bxAppManifest';
 import { BrowserXAppWorker } from '../app-worker';
 import ManifestProvider from './manifest-provider/manifest-provider';
@@ -26,7 +26,7 @@ export async function getManifestOrTimeout(appWorker: BrowserXAppWorker | IManif
 
   const $firstManifest = manifestProvider.get(manifestURL).pipe(take(1));
 
-  const manifest = await BluebirdPromise.resolve(
+  const manifest = await Bluebird.resolve(
     $firstManifest.toPromise()
   ).timeout(ms('30sec'), `Could not get the manifest ${manifestURL}`);
 
@@ -35,7 +35,7 @@ export async function getManifestOrTimeout(appWorker: BrowserXAppWorker | IManif
 
 export async function getAllManifests(appWorker: BrowserXAppWorker | ManifestProvider, manifestURLs: string[]):
   Promise<Map<string, BxAppManifest>> {
-  const manifests = await BluebirdPromise.map(manifestURLs, async manifestURL => {
+  const manifests = await Bluebird.map(manifestURLs, async (manifestURL: string) => {
     const manifest = await getManifestOrTimeout(appWorker, manifestURL);
     return [manifestURL, manifest] as [string, BxAppManifest];
   });

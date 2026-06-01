@@ -43,6 +43,7 @@ function getItemStyles(props: Props) {
   };
 }
 
+// @ts-ignore
 @DragLayer(monitor => ({
   item: monitor.getItem(),
   itemType: monitor.getItemType(),
@@ -50,6 +51,7 @@ function getItemStyles(props: Props) {
   currentOffset: monitor.getSourceClientOffset(),
   isDragging: monitor.isDragging(),
 }))
+// @ts-ignore
 export default class SubdockItemDragLayer extends React.PureComponent<Props> {
   render() {
     const { item, isDragging, itemType, dragType } = this.props;
@@ -57,6 +59,7 @@ export default class SubdockItemDragLayer extends React.PureComponent<Props> {
       return null;
     }
     if (!isDragging) {
+      // @ts-ignore
       return null;
     }
 
@@ -64,7 +67,9 @@ export default class SubdockItemDragLayer extends React.PureComponent<Props> {
       <div style={layerStyles}>
         <ul style={getItemStyles(this.props)}>
           <SubdockItem
+            // @ts-ignore
             application={item.application}
+            // @ts-ignore
             item={item.item}
           />
         </ul>

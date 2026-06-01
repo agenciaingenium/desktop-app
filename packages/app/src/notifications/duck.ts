@@ -82,7 +82,9 @@ export default function notifications(state: ImmutableNotifications = defaultSta
   switch (action.type) {
 
     case ADD_NOTIFICATION: {
+      // @ts-ignore
       const { notificationId, applicationId, tabId, title, timestamp, body, icon, full, silent, webContentsId } = action;
+      // @ts-ignore
       return state.set(notificationId, fromJS({
         notificationId,
         applicationId,

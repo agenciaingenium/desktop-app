@@ -188,7 +188,7 @@ export class AppDockIcon extends React.PureComponent<Props> {
 
   render() {
     const { loading, active, dramaticEnter } = this.props;
-    const svgClassName = classNames('app-dock-icon', {
+    const svgClassName = (classNames as any)('app-dock-icon', {
       active,
       'scale-up-animation': dramaticEnter,
     });

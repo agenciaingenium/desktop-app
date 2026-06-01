@@ -15,9 +15,7 @@ const STYLE = {
     fontSize: 14,
     fontWeight: 'bold',
   } as React.CSSProperties,
-  button: {
-    marginTop: 10,
-  } as React.CSSProperties,
+  button: 'button',
 };
 
 export default class SettingsOpenSourceInfo extends React.PureComponent<{}, {}> {
@@ -32,7 +30,7 @@ export default class SettingsOpenSourceInfo extends React.PureComponent<{}, {}> 
           <p>
             <Button
               onClick={() => openExternal('https://github.com/getstation/desktop-app')}
-              className={STYLE.button}
+              className={STYLE.button as any}
               btnSize={Size.XXSMALL}
             >
               Open Github

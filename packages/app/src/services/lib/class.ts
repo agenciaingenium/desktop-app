@@ -11,6 +11,7 @@ import { serialize, unserialize } from './serialization';
 import { Endpoint, EndpointMap, IServiceBase, RPC, ServiceBaseConstructorOptions, SubscriptionConstructorParam } from './types';
 
 const { v4: uuidv4 } = require('uuid');
+// @ts-ignore no declaration file
 const d = require('debug')('service:utils:class');
 
 const getRequestsMetadata = (constructor: Function | undefined): EndpointMap => {
@@ -30,7 +31,9 @@ const maybeSetServicePeer = (sph: ServicePeerHandler, srvc: ServiceBase, peer: R
     // ⚠️ Only valid for `ServicePeer` because of the 1-1 link between a peer and its Service.
     // A `ServiceBase` can have multiple peers (like all global __default__ services for instance),
     // and thus we can't assume that closing a peer will also destroy the Service.
+    // @ts-ignore
     eos(peer, () => {
+      // @ts-ignore
       srvc.destroy();
     });
   }
@@ -42,7 +45,9 @@ const maybeSetServicePeer = (sph: ServicePeerHandler, srvc: ServiceBase, peer: R
   };
   srvc.emitter.once('destroyed', onDestroyed);
 
+  // @ts-ignore
   eos(peer, () => {
+    // @ts-ignore
     srvc.emitter.removeListener('destroyed', onDestroyed);
   });
 };
@@ -91,6 +96,7 @@ export class ServicePeerHandler extends EventEmitter {
       this.debug.check();
     }
 
+    // @ts-ignore
     eos(peer, () => {
       d('peer ended', fulluri);
       this.connectedServices.delete(fulluri);
@@ -138,7 +144,7 @@ export class ServicePeerHandler extends EventEmitter {
       peer.setRequestHandler(methodIdentifier, (params: any[]) => {
         d('request handler called', methodName);
         try {
-          const fn = Reflect.apply(Reflect.get(srvc, methodName), srvc, unserialize(this, params));
+          const fn = Reflect.apply(Reflect.get(srvc, methodName), srvc, unserialize(this, params)) as any;
           return fn.then(se);
         } catch (e) {
           console.error(e);

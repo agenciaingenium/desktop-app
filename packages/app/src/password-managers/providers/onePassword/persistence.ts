@@ -6,6 +6,7 @@ import { PasswordManagers } from '../../../database/model';
 const OnePasswordProxyMixin = MapProxyMixin({
   model: PasswordManagers.OnePassword,
   key: 'id',
+  // @ts-ignore
   mapStateToObject: async (state: Immutable.Map<string, any>) => {
     if (!state) return {};
     return {
@@ -25,4 +26,5 @@ const OnePasswordProxyMixin = MapProxyMixin({
 
 class OnePasswordProxy extends OnePasswordProxyMixin {}
 
+// @ts-ignore
 export default new MapStateProxy(OnePasswordProxy);

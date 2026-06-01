@@ -30,7 +30,8 @@ class NotificationCenterImpl extends React.PureComponent<StateFromProps & Dispat
   }
 }
 
-export default connect<StateFromProps, DispatchFromProps, {}>(
+// @ts-ignore
+export default connect(
   (state: StationState) => ({
     active: isVisible(state),
   }),

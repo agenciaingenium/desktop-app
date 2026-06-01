@@ -6,7 +6,8 @@ import { subscribeStore } from '../utils/observable';
 import { Resolvers } from '../graphql/resolvers-types.generated';
 
 import { getAppAutoLaunchEnabledStatus, getAppHideMainMenuStatus, getAppMinimizeToTrayStatus, getPromptDownloadEnabled } from './selectors';
-import { getStationStatus } from '../app/selectors';
+import { getStationStatus, StationStatus } from '../app/selectors';
+// @ts-ignore no declaration file
 import { enableAutoLaunch, hideMainMenu, minimizeToTray, togglePromptDownload } from './duck';
 
 const resolvers: Resolvers = {
@@ -31,7 +32,7 @@ const resolvers: Resolvers = {
       return subscribeStore(
         context.store,
         state => getStationStatus(state)
-      ).pipe(distinctUntilChanged(Immutable.is), map(x => x.toJS()));
+      ).pipe(distinctUntilChanged(Immutable.is) as any, map((x: StationStatus) => x.toJS()));
     },
   },
 
@@ -55,8 +56,8 @@ const resolvers: Resolvers = {
   },
 
   StationStatus: {
-    isOnline: prop('isOnline'),
-    focus: prop('focus'),
+    isOnline: prop('isOnline') as any,
+    focus: prop('focus') as any,
   },
 };
 

@@ -22,7 +22,7 @@ export class ServicesLink extends ApolloLink {
       };
       const sub = services.apolloLink.request(req, observer({
         onResponse: (res: SerializedExecutionResult) => {
-          obs.next(res);
+          obs.next(res as ExecutionResult);
         },
         onError: (e: Error) => {
           obs.error(e);

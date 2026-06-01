@@ -60,7 +60,7 @@ const dockAppTarget = {
       return;
     }
 
-    const domNode = findDOMNode(component);
+    const domNode = findDOMNode(component) as Element;
     if (!domNode) return;
     const hoverBoundingRect = domNode.getBoundingClientRect();
 
@@ -84,9 +84,11 @@ const dockAppTarget = {
   },
 };
 
+// @ts-ignore: decorator typing issue
 @DropTarget('APP_DOCK_APP', dockAppTarget, connect => ({
   connectDropTarget: connect.dropTarget(),
 }))
+// @ts-ignore: decorator typing issue
 @DragSource('APP_DOCK_APP', dockAppSource, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   connectDragPreview: connect.dragPreview(),
@@ -136,6 +138,7 @@ const DraggableAppDockIcon: React.FC<OwnProps> = (props) => {
 
   const application = oc(data).application();
 
+  // @ts-ignore
   return <DraggableAppDockIconInner {...props} application={application} />;
 };
 

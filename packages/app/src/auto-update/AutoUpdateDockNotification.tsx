@@ -6,7 +6,9 @@ import { bindActionCreators, Dispatch } from 'redux';
 import DockApplicationSubdock from '../common/containers/DockApplicationSubdock';
 import NativeAppDockIcon from '../dock/components/NativeAppDockIcon';
 import AutoUpdateSubdock from './components/AutoUpdateSubdock';
+// @ts-ignore no declaration file
 import { openReleaseNotes, quitAndInstall, setReleaseNotesSubdockVisibility, toggleReleaseNotesSubdockVisibility } from './duck';
+// @ts-ignore no declaration file
 import { getReleaseName, isSubdockOpen as getIsSubdockOpen, isUpdateAvailable as getIsUpdateAvailable } from './selectors';
 
 export interface Props {
@@ -72,4 +74,5 @@ export default connect(
     onToggleReleaseNotesSubdockVisibility: toggleReleaseNotesSubdockVisibility,
     onSetReleaseNotesSubdockVisibility: (visible: boolean) => setReleaseNotesSubdockVisibility(visible),
   }, dispatch)
+// @ts-ignore
 )(AutoUpdateDockNotificationImpl);

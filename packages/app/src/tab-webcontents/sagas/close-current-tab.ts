@@ -26,7 +26,7 @@ export function* getTabsAvailableForBackNavigation(): SagaIterator {
 function* closeWindowIfNotMain(): SagaIterator {
   const {
     mainWindowManager,
-  }: BrowserXAppWorker = yield getContext('bxApp');
+  }: any = yield getContext('bxApp');
 
   if (!mainWindowManager.window) {
     return false;

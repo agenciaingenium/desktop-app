@@ -3,6 +3,7 @@ import * as memoize from 'memoizee';
 
 declare const __non_webpack_require__: NodeRequire | undefined;
 
+// @ts-ignore
 export const asNativeImage = memoize((url: string): Promise<Electron.NativeImage> => {
   return new Promise((resolve, reject) => {
     if (url.startsWith('data:')) {
@@ -30,7 +31,8 @@ export const asNativeImage = memoize((url: string): Promise<Electron.NativeImage
 export function getDoNotDisturb(): boolean {
   if (process.platform === 'win32') {
     try {
-      const { getFocusAssist } = __non_webpack_require__('windows-focus-assist');
+      // @ts-ignore no declaration file
+      const { getFocusAssist } = require('windows-focus-assist');
       const focusAssist: string = getFocusAssist().name;
       return focusAssist == 'PRIORITY_ONLY' || focusAssist == 'ALARMS_ONLY';
     } catch (error) {

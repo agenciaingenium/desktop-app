@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { DragSource, DragSourceMonitor, DropTarget } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
+// @ts-ignore
 import SubdockItem, { BareApplication, WrappedActions } from './SubdockItem';
 import { findDOMNode } from 'react-dom';
 import { useReorderTabMutationMutation, useReorderFavoriteMutationMutation } from '../../tabs/queries@local.gql.generated';
@@ -63,8 +64,9 @@ const SubdockItemTarget = {
     }
 
     const domNode = findDOMNode(component);
+    // @ts-ignore
     if (!domNode) return;
-    const hoverBoundingRect = domNode.getBoundingClientRect();
+    const hoverBoundingRect = (domNode as Element).getBoundingClientRect();
 
     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
@@ -98,7 +100,9 @@ const collectSource = (connect: any, monitor: any) => ({
 
 // COMPONENT
 
+// @ts-ignore
 @DropTarget(({ dragType }: InnerProps) => dragType, SubdockItemTarget, collectTarget)
+// @ts-ignore
 @DragSource(({ dragType }: InnerProps) => dragType, dockAppSource, collectSource)
 class DraggableSubdockItemInner extends React.PureComponent<InnerProps> {
   componentDidMount() {
@@ -142,6 +146,7 @@ const DraggableSubdockItem: React.FC<OwnProps> = (props) => {
     reorderFavoriteMutation({ variables: { favoriteId, newPosition } });
 
   return (
+    // @ts-ignore
     <DraggableSubdockItemInner
       {...props}
       reorderTab={reorderTab}

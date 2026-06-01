@@ -1,11 +1,11 @@
 import { EventEmitter } from 'events';
-import ms = require('ms');
+import ms from 'ms';
 import log from 'electron-log';
 import { delay } from 'bluebird';
 
 export default class AutoUpdaterMock extends EventEmitter {
 
-  url: string;
+  url!: string;
 
   setFeedURL(url: string) {
     log.debug('autoUpdater.mock: setFeedURL', url);

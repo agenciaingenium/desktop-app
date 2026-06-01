@@ -4,7 +4,9 @@ import { getActiveApplication, getApplications, getApplicationById } from '../ap
 import { isDone } from '../onboarding/selectors';
 import { getTabApplicationId } from '../tabs/get';
 import { RecursiveImmutableMap, StationState, StationRawState } from '../types';
+// @ts-ignore no declaration file
 import { getWindowCurrentTabId } from '../windows/get';
+// @ts-ignore no declaration file
 import { getWindow } from '../windows/selectors';
 import { getTabs } from '../tabs/selectors';
 import { StationTabImmutable } from '../tabs/types';
@@ -128,7 +130,7 @@ export const getKeyAboveTab = (state: StationState): string => {
   const windowsCommonKeymap = {};
   const linuxCommonKeymap = {};
 
-  const keymap = { ...appleCommonKeymap, ...windowsCommonKeymap, ...linuxCommonKeymap };
+  const keymap: Record<string, string> = { ...appleCommonKeymap, ...windowsCommonKeymap, ...linuxCommonKeymap };
   return keymap[getKeyboardLayout(state)] || '';
 };
 

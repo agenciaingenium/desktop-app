@@ -47,7 +47,7 @@ export class ApolloLinkServiceImpl extends ApolloLinkService implements RPC.Inte
       execute(
         this.link!,
         getGQLRequest(req),
-      ).subscribe(obs.onResponse, obs.onError, obs.onComplete),
+      ).subscribe(obs.onResponse as any, obs.onError as any, obs.onComplete as any),
       obs
     );
   }

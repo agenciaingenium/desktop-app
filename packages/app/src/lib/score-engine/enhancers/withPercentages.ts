@@ -3,9 +3,11 @@ import { compose, map, sum, values } from 'ramda';
 import { ScoreAlgorithm, ScoreMap, Transformer } from '../types';
 import { divideBy } from '../utils';
 
-const sumAbsoluteValues = compose(sum, map(Math.abs), map(sum), values);
+// @ts-ignore
+const sumAbsoluteValues = (compose(sum, map(Math.abs), map(sum), values) as any);
 
-const computePercentagesScore: Transformer<ScoreMap> = (scoreMap) => {
+// @ts-ignore
+const computePercentagesScore: Transformer<ScoreMap> = (scoreMap: any) => {
   const totalScore = sumAbsoluteValues(scoreMap);
   if (totalScore === 0) return scoreMap;
   const transformScores: Transformer<number[]> = map(divideBy(totalScore));

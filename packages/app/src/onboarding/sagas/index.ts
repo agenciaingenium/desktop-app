@@ -1,13 +1,14 @@
 import { SagaIterator } from 'redux-saga';
 import { all, delay, fork, put, putResolve, select, take } from 'redux-saga/effects';
 import { updateUI } from '../../ui/redux-ui-compat';
+// @ts-ignore no declaration file
 import { setLoadingScreenVisibility, setShowLogin } from '../../app/duck';
 import { getShowLogin } from '../../app/selectors';
 import { changeSelectedApp } from '../../applications/duck';
 import { getFirstApplicationIdInDock } from '../../dock/selectors';
 import { OnboardingType } from '../../ui/types';
 import { APP_STORE_STEP_FINISHED, markOnboardingAsDone } from '../duck';
-import ms = require('ms');
+import ms from 'ms';
 
 function* doOnboardingIfNecessary() {
   const isOnboarded: boolean = yield select(getShowLogin);

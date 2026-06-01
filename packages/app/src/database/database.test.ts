@@ -12,9 +12,9 @@ export const createEngine = () => {
   });
 
   const ns = cls.createNamespace('station');
-  Sequelize.useCLS(ns);
+  (Sequelize as any).useCLS(ns);
   // http://docs.sequelizejs.com/class/lib/sequelize.js~Sequelize.html#instance-constructor-constructor
-  const e = new Sequelize({
+  const e = new (Sequelize as any)({
     database: 'station',
     dialect: 'sqlite',
     pool: {

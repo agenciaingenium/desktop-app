@@ -28,7 +28,7 @@ export default class NotificationOverride {
     const { notifications } = this.bx;
     // FIXME Here we receive notifications of ALL apps
     // TODO by default, receive only Notifications for current App (i.e. Slack in this case)
-    notifications.intercept('new', (e, a) => {
+    notifications.intercept('new', (e: any, a: any) => {
       if (!a.applicationId || !a.applicationId.startsWith('slack-')) return;
       if (isNudgeNotification(a.props.body)) {
         // Do not trigger notification if it's a nudge

@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default class DockApplication extends React.PureComponent<Props, {}> {
-  subdockContainer: HTMLDivElement | null;
+  subdockContainer!: HTMLDivElement | null;
 
   render() {
     const { onClickOutside, onRequestClose } = this.props;

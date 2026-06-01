@@ -58,6 +58,7 @@ const styles = {
 export default class ShortcutsOverlay extends React.PureComponent<Props, {}> {
   render() {
     return (
+      // @ts-ignore missing withClickOutside prop
       <Overlay
         onClose={() => this.props.setVisibility(false)}
         title="Keyboard shortcuts"

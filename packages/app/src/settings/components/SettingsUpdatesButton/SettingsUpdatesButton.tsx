@@ -44,6 +44,7 @@ const SettingsUpdatesButton: React.FC = () => {
   const isUpdateAvailable = status?.isUpdateAvailable ?? false;
   const releaseName = status?.releaseName ?? null;
 
+  // @ts-ignore
   React.useEffect(() => {
     if (prevCheckingRef.current && !isCheckingUpdate) {
       setJustCheckedForUpdate(true);
@@ -51,6 +52,7 @@ const SettingsUpdatesButton: React.FC = () => {
       return () => clearTimeout(timer);
     }
     prevCheckingRef.current = isCheckingUpdate;
+  // @ts-ignore
   }, [isCheckingUpdate]);
 
   if (isCheckingUpdate) {

@@ -17,7 +17,7 @@ export class ChromeExtensionsServiceImpl extends ChromeExtensionsService impleme
     initConfiguration();
   }
 
-  async loadExtension(extensionId: string) {
+  async loadExtension(extensionId: string): Promise<any /* Extension */ | null> {
     if (isExtensionLoaded(extensionId)) {
       return this.getExtension(extensionId);
     }
@@ -38,7 +38,7 @@ export class ChromeExtensionsServiceImpl extends ChromeExtensionsService impleme
     return true;
   }
 
-  async getExtension(_extensionId: string) {
+  async getExtension(_extensionId: string): Promise<any /* Extension */ | null> {
     // const extension = await ECx.get(extensionId);
     // return serializeExtension(extension);
     return null;

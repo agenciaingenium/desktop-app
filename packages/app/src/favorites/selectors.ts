@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 import createCachedSelector from 're-reselect';
 
+// @ts-ignore no declaration file
 import { getFrontActiveTabId } from '../applications/utils';
 import { getApplications } from '../applications/selectors';
 import { removeHashFromURL } from '../tab-webcontents/api';

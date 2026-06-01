@@ -38,20 +38,20 @@ const observeDownloadItemStateChanged = (item: Electron.DownloadItem): Observabl
     };
   });
 
-const isUpdateState: (state: DownloadState) => boolean = anyPass([
+const isUpdateState = anyPass([
   equals('progressing'),
   equals('interrupted'),
-]);
+]) as any;
 
-const isDoneState: (state: DownloadState) => boolean = anyPass([
+const isDoneState = anyPass([
   equals('interrupted'),
   equals('cancelled'),
   equals('completed'),
-]);
+]) as any;
 
 const downloadFinished = (doneState: DownloadDoneState, savePath: string) => {
   if (doneState === 'completed') {
-    if (isDarwin) {
+    if (isDarwin && app.dock) {
       app.dock.downloadFinished(savePath);
     }
   }

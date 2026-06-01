@@ -7,7 +7,7 @@ import { join } from 'path';
 import * as fs from 'fs-extra';
 // @ts-ignore: no declaration file
 import * as isBlank from 'is-blank';
-import ms = require('ms');
+import ms from 'ms';
 import {
   IManifestProvider,
   ManifestURL,
@@ -226,7 +226,7 @@ export default class ManifestProvider implements IManifestProvider {
     const cacheLimit = loaded.lastChecked.clone();
     cacheLimit.add(this.cacheLimit, 'ms');
 
-    return moment().isAfter(cacheLimit);
+    return (moment as any)().isAfter(cacheLimit);
   }
 
   private async saveToCache(url: ManifestURL, app: IBxApp) {

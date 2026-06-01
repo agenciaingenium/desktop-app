@@ -18,7 +18,7 @@ import {
 } from '../selectors';
 import { getStartURL } from './helpers';
 
-export function* goToStartUrlAfterSetConfigData({ applicationId, configData }: SetConfigDataAction) {
+export function* goToStartUrlAfterSetConfigData({ applicationId, configData }: SetConfigDataAction): SagaIterator {
   const bxApp: BrowserXAppWorker = yield getContext('bxApp');
   const application = yield select(getApplicationById, applicationId);
   if (!application) return;

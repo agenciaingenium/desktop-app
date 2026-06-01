@@ -1,5 +1,6 @@
 import { Button, Size, Style } from '@getstation/theme';
 import * as React from 'react';
+// @ts-ignore: no declaration file
 import gDriveIcon from '../../static/bang/googledrive.svg';
 
 export interface Props {

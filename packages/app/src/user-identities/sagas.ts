@@ -25,7 +25,7 @@ function* signinAndAddIdentity(action: RequestSignInAction): SagaIterator {
   try {
     const signinResult = yield call(signInWithGoogle, scopes);
     yield put(createIdentity(signinResult));
-  } catch (err) {
+  } catch (err: any) {
     yield put(signinError(JSON.stringify(err.originalError)));
     // filter errors
     if (!(err instanceof GoogleSigninError)) throw err;

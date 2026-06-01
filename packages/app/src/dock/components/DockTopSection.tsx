@@ -52,8 +52,10 @@ export default class DockTopSection extends React.PureComponent<Props, {}> {
           <TrafficLightsContainer onClose={onClose} />
         }
 
+        {/* @ts-ignore */}
         <DockNavigation />
 
+        {/* @ts-ignore */}
         <SearchWrapper
           onQuit={() => handlePaneEscape('center-modal')}
         />
@@ -66,7 +68,9 @@ export default class DockTopSection extends React.PureComponent<Props, {}> {
           highlightedItemId={highlightedRecentSubdockItemId}
           setHighlightedItemId={setHighlightedRecentSubdockItemId}
           recentApplications={recentApplications}
+          // @ts-ignore
           selectItem={
+            // @ts-ignore
             (item: SearchResultSerialized, via: SearchPaneItemSelectedVia, position: number) =>
               selectItem(item, position, via, 'subdock')
           }

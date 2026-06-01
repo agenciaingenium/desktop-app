@@ -1,7 +1,7 @@
-import * as Immutable from 'immutable';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
+// @ts-ignore no declaration file
 import { getCurrentActiveTabProperty } from '../applications/utils';
 import { executeWebviewMethodForCurrentTab } from '../tab-webcontents/duck';
 import DockNavigationButtons from './components/DockNavigationButtons';
@@ -41,14 +41,16 @@ class DockNavigationContainerImpl extends React.PureComponent<Props, {}> {
         canGoForward={this.props.canGoForward}
         onGoBack={this.handleGoBack}
         onGoForward={this.handleGoForward}
+        // @ts-ignore
         showPopover={true}
       />
     );
   }
 }
 
-const DockNavigationContainer = connect<StateToProps, DispatchFromProps, {}>(
-  (state: Immutable.Map<string, any>) => ({
+// @ts-ignore
+const DockNavigationContainer = (connect as any)(
+  (state: any) => ({
     canGoBack: getCurrentActiveTabProperty(state, 'canGoBack'),
     canGoForward:getCurrentActiveTabProperty(state, 'canGoForward'),
   }),

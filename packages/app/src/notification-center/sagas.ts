@@ -7,6 +7,7 @@ import {
   enableNotifications,
   navigateToApplicationTabAutomatically,
 } from '../applications/duck';
+// @ts-ignore no declaration file
 import { MAIN_APP_READY } from '../app/duck';
 import { ASK_ENABLE_NOTIFICATIONS, TOGGLE_NOTIFICATIONS } from '../applications/duck';
 import { getNotificationsEnabled } from '../applications/selectors';
@@ -71,7 +72,7 @@ import { getSnoozeDuration, isVisible } from './selectors';
 import { RPC } from '../services/lib/types';
 import { OSNotification } from '../services/services/os-notification/interface';
 
-const ms = require('ms');
+import ms from 'ms';
 
 function* sagaSnooze(action: SetSnoozeDurationAction): SagaIterator {
   const { snooze }: DeprecatedSDKProvider = yield call(getProvider);
@@ -187,13 +188,16 @@ function* sagaMarkAllAsRead(): SagaIterator {
 }
 
 function* interceptNotificationEventsFromWebContents({ webcontentsId, tabId }: { webcontentsId: number, tabId: string }) {
+  // @ts-ignore yield
   const tab = yield select(getTabById, tabId);
   if (!tab) return;
   const applicationId = getTabApplicationId(tab);
 
   const newNotificationChannel = createWebContentsServiceObserverChannel(
     webcontentsId, 'addNotificationsObserver', 'onNewNotification', 'intercept-notif-open');
+  // @ts-ignore nested generator
   yield takeEveryWitness(newNotificationChannel, function* handle(props: NewNotificationProps) {
+    // @ts-ignore yield
     const isNotifEnabled = yield select(getNotificationsEnabled, applicationId);
     // disable notification if explicity choose it
     if (isNotifEnabled === false) return;

@@ -40,6 +40,7 @@ export interface ServiceRuntime {
 
 const ensureActivator: Transformer<SDKActivator, Activator> = activate => async (sdk: SDK, bx?: SDKConsumer) => {
   const result = await activate(sdk, bx);
+  // @ts-ignore
   return result instanceof Observable ? result : Observable.of();
 };
 

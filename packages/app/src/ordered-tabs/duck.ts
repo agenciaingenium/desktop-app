@@ -55,6 +55,7 @@ export default function orderedTabsReducer(
       const { tabId, applicationId } = action;
 
       // push tabId to the top of the list
+      // @ts-ignore
       const nextOrder = Immutable.List([tabId]).concat(state.getIn([applicationId, 'order'], []));
 
       return state.set(

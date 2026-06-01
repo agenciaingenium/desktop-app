@@ -4,7 +4,7 @@ import { RPC } from '../../lib/types';
 import { ManifestService } from './interface';
 
 export class ManifestServiceImpl extends ManifestService implements RPC.Interface<ManifestService> {
-  protected manifestProvider: ManifestProvider;
+  protected manifestProvider!: ManifestProvider;
 
   async getManifest(manifestURL: string) {
     try {

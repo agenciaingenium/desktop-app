@@ -9,6 +9,7 @@ export default function getPasswordManagerLinks(models: any) {
   const PasswordManagerLinkProxyMixin = MapProxyMixin({
     model: PasswordManagers.Link,
     key: 'applicationId',
+    // @ts-ignore
     mapStateToObject: async (state: Immutable.Map<string, any>) => {
       if (!state) return {};
       return {
@@ -32,5 +33,6 @@ export default function getPasswordManagerLinks(models: any) {
 
   class PasswordManagerLinkProxy extends PasswordManagerLinkProxyMixin {}
 
+  // @ts-ignore
   return new MapStateProxy(PasswordManagerLinkProxy);
 }

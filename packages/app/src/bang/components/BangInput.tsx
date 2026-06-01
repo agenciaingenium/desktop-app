@@ -22,7 +22,7 @@ export default class BangInput extends React.PureComponent<Props> {
     onContextMenu: () => {},
   };
 
-  private inputEl: HTMLInputElement | null;
+  private inputEl!: HTMLInputElement | null;
 
   constructor(props: Props) {
     super(props);

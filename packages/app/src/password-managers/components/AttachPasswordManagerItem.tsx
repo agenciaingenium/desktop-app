@@ -1,5 +1,6 @@
 import { Chooser, Input, Modal, theme } from '@getstation/theme';
-import * as Fuse from 'fuse.js';
+// @ts-ignore
+import Fuse from 'fuse.js';
 // @ts-ignore: no declaration file
 import * as isBlank from 'is-blank';
 import * as React from 'react';
@@ -113,11 +114,13 @@ export default class AttachPasswordManagerItem extends React.PureComponent<Props
     }
   }
 
-  onCancel() {
+  onCancel = () => {
+    const { onCancel } = this.props;
     onCancel();
   }
 
-  onSelect(account: Account) {
+  onSelect = (account: Account) => {
+    const { onSelect } = this.props;
     onSelect(account);
   }
 
@@ -142,7 +145,7 @@ export default class AttachPasswordManagerItem extends React.PureComponent<Props
               type="search"
               placeholder="Search among your logins…"
               value={query}
-              onChange={e => this.handleInputChange(e)}
+              onChange={(e: any) => this.handleInputChange(e)}
             />
           </div>
 
@@ -153,9 +156,10 @@ export default class AttachPasswordManagerItem extends React.PureComponent<Props
             </div>
             :
             <Chooser
-              style={chooserStyle}
+              // @ts-ignore
+              style={chooserStyle as any}
               items={accounts.map((account: Account) => ({ title: account.title, description: account.username, value: account }))}
-              onSelect={this.onSelect}
+              onSelect={this.onSelect as any}
             />
           }
         </div>

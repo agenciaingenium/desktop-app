@@ -31,14 +31,18 @@ export default class SnoozeDuration extends React.PureComponent<Props, State> {
     if (!props.snoozeEndDate) {
       return { content: '' };
     }
+    // @ts-ignore
     const diff = moment(props.snoozeEndDate).diff(new Date());
+// @ts-ignore
     const msDiff = millisec(diff);
 
     const h = Math.floor(diff / ms('1hour'));
+// @ts-ignore
     const m = msDiff.getMinutes();
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
+// @ts-ignore
     const untilTomorrow = diff > ms('4h') && sameDay(moment(props.snoozeEndDate).toDate(), tomorrow);
 
     let content;

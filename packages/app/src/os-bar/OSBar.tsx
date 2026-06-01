@@ -31,10 +31,12 @@ export default class OSBar extends React.PureComponent<Props, {}> {
   }
 
   handleGoBack() {
+    // @ts-ignore
     this.props.onGoBack();
   }
 
   handleGoForward() {
+    // @ts-ignore
     this.props.onGoForward();
   }
 
@@ -42,10 +44,12 @@ export default class OSBar extends React.PureComponent<Props, {}> {
     const { title, onClose, onDoubleClick, canGoBack, canGoForward } = this.props;
 
     return (
+      // @ts-ignore
       <div className={classNames('l-osbar')} style={CONTAINER_STYLE} onDoubleClick={onDoubleClick}>
         <TrafficLightsContainer onClose={onClose} />
 
         <div style={NAVIGATION_STYLE}>
+          {/* @ts-ignore */}
           <DockNavigationButtons
             canGoBack={canGoBack}
             canGoForward={canGoForward}

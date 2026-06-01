@@ -117,7 +117,7 @@ export default function reducer(state: StationUserIdentitiesImmutable = Immutabl
         accessToken,
         refreshToken,
         profileData,
-      }));
+      }) as any);
     }
     case DELETE: {
       const { identityId } = action;

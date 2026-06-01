@@ -14,7 +14,9 @@ import { server } from 'shared-redux';
 import { Duplex } from 'stream';
 import { firstConnectionHandler } from '../utils/stream-ipc-proxy';
 import { BrowserXAppWorker } from '../app-worker';
+// @ts-ignore no declaration file
 import { ready } from '../app/duck';
+// @ts-ignore no declaration file
 import observers, { delayedObservers } from '../observers';
 import rootReducer from '../reducers';
 import rootSaga from '../sagas';
@@ -41,6 +43,7 @@ function asyncInit(store: StationStoreWorker, sagaMiddleware: SagaMiddleware<any
     });
     const persistor = createPersistor(
       store,
+      // @ts-ignore
       storage.getPersistConfig(),
     );
     persistor.pause();
@@ -65,6 +68,7 @@ function asyncInit(store: StationStoreWorker, sagaMiddleware: SagaMiddleware<any
       sagaPromise,
       promiseState,
     ]).then(([, restoredState]) => restoredState)
+      // @ts-ignore
       .then(restoredState => persistor.rehydrate(restoredState.toObject()))
       .then(() => persistor.resume())
       .then(() => store.dispatch({ type: REHYDRATION_COMPLETE }))
@@ -105,13 +109,18 @@ export function configureStore(bxApp: BrowserXAppWorker) {
     composeEnhancers = compose;
   }
 
+  // @ts-ignore: no declaration file
   const eventEmitter = new EventEmitter();
   const readyPromise = new Promise<void>(resolve => eventEmitter.once('ready', resolve));
 
+  // @ts-ignore
+  // @ts-ignore
   const { forwardToClients, replayActionServer } = server(
     (cb: (socket: Duplex) => void) => {
+      // eslint-disable-next-line no-console
       console.log('[DEBUG] Worker: Setting up firstConnectionHandler for bx-redux');
       firstConnectionHandler((socket) => {
+        // eslint-disable-next-line no-console
         console.log('[DEBUG] Worker: New bx-redux connection received');
         cb(socket);
       }, namespace);

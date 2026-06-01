@@ -105,8 +105,8 @@ const App: React.FC<OwnProps> = ({ highlighted = false, manifestURL, attachAppRe
   const applicationThemeColor = manifest.theme_color() ?? '';
   const applicationCxExtensionId = manifest.cxExtensionId() ?? undefined;
   const instanceWording = manifest.bx_multi_instance_config?.instance_wording() ?? 'instance';
-  const instances: Instances = List(instancesData() ?? []);
-  const extensions: Extension[] = extensionsData() ?? [];
+  const instances: Instances = List(instancesData() ?? []) as any;
+  const extensions: Extension[] = extensionsData() ?? [] as any;
   const useInstanceLogoInDock = settings.instanceLogoInDock() ?? false;
 
   const extensionState = useSelector((state: StationState) =>
@@ -170,7 +170,7 @@ const App: React.FC<OwnProps> = ({ highlighted = false, manifestURL, attachAppRe
     <div
       ref={attachAppRef}
       key={manifestURL}
-      className={classNames('settings-app-item', { highlighted })}
+      className={(classNames as any)('settings-app-item', { highlighted })}
       style={highlighted ? { ...itemStyle, ...highlightedItemStyle } : itemStyle}
     >
       {(removeState.removeApplication || removeState.instancesToRemove.count() > 0) &&

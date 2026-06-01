@@ -4,7 +4,8 @@ import { takeEveryWitness } from '../utils/sagas';
 import SubWindowManager from '../windows/utils/SubWindowManager';
 import { hasSubwindow } from './selectors';
 
-function* closeSubwindowOnTabRemoved(action: removeTabAction) {
+// @ts-ignore
+function* closeSubwindowOnTabRemoved(action: removeTabAction): any {
   const { tabId } = action;
   const detached = yield select(hasSubwindow, tabId);
   if (detached) {

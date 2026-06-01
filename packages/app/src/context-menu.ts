@@ -3,14 +3,14 @@ import {
   clipboard,
   ContextMenuParams,
   Menu,
-  MenuItem,
   MenuItemConstructorOptions,
 } from 'electron';
 import { EventEmitter } from 'events';
+// @ts-ignore: no declaration file
+import uuid from 'uuid';
 import { openExternal } from './utils/shell';
 import { isPackaged } from './utils/env';
 import { serializedKeyboardEvent } from './services/services/menu/helpers';
-import uuid = require('uuid');
 
 export type ContextMenuContext = {
   webContents?: Electron.WebContents,
@@ -52,7 +52,7 @@ export default class ContextMenu extends EventEmitter {
 
     const editFlags = props.editFlags;
     const hasText = props.selectionText.trim().length > 0;
-    const can = (type: string) => editFlags[`can${type}`] && hasText;
+    const can = (type: string) => (editFlags as any)[`can${type}`] && hasText;
 
     let menuTpl: MenuItemConstructorOptions[] = [
       {
@@ -89,7 +89,7 @@ export default class ContextMenu extends EventEmitter {
         // role: 'pasteandmatchstyle',
         enabled: editFlags.canPaste,
         visible: props.isEditable,
-        click(_menuItem: Electron.MenuItem, _browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) {
+        click(_menuItem: any, _browserWindow: any, event: any) {
           emitClikItem(event, 'paste-and-match-style');
         },
       },
@@ -153,7 +153,7 @@ export default class ContextMenu extends EventEmitter {
         {
           id: 'openLinkInNewPage',
           label: 'Open Link In a New Page',
-          click(_menuItem: Electron.MenuItem, _browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) {
+          click(_menuItem: any, _browserWindow: any, event: any) {
             emit('click-item', { event: serializedKeyboardEvent(event), action: 'new-page', args: [props.linkURL] });
           },
         },
@@ -179,7 +179,7 @@ export default class ContextMenu extends EventEmitter {
           id: 'back',
           label: 'Back',
           enabled: canGoBack,
-          click(_menuItem: Electron.MenuItem, _browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) {
+          click(_menuItem: any, _browserWindow: any, event: any) {
             emitClikItem(event, 'page-go-back');
           },
         },
@@ -187,14 +187,14 @@ export default class ContextMenu extends EventEmitter {
           id: 'forward',
           label: 'Forward',
           enabled: canGoForward,
-          click(_menuItem: Electron.MenuItem, _browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) {
+          click(_menuItem: any, _browserWindow: any, event: any) {
             emitClikItem(event, 'page-go-forward');
           },
         },
         {
           id: 'reload',
           label: 'Reload',
-          click(_menuItem: Electron.MenuItem, _browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) {
+          click(_menuItem: any, _browserWindow: any, event: any) {
             emitClikItem(event, 'page-reload');
           },
         },
@@ -202,7 +202,7 @@ export default class ContextMenu extends EventEmitter {
         {
           id: 'copyPageURL',
           label: 'Copy Current Page\'s URL',
-          click(_menuItem: Electron.MenuItem, _browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) {
+          click(_menuItem: any, _browserWindow: any, event: any) {
             emitClikItem(event, 'copy-url-to-clipboard');
           },
         },
@@ -210,7 +210,7 @@ export default class ContextMenu extends EventEmitter {
         {
           id: 'reset-current-application',
           label: 'Reset Current Application',
-          click(_menuItem: Electron.MenuItem, _browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) {
+          click(_menuItem: any, _browserWindow: any, event: any) {
             emitClikItem(event, 'reset-current-application');
           },
         },
@@ -224,11 +224,14 @@ export default class ContextMenu extends EventEmitter {
         {
           id: 'inspect',
           label: 'Inspect Element',
-          click(_item: MenuItem, win: BrowserWindow) {
-            win.webContents.inspectElement(props.x, props.y);
-
-            if (win.webContents.isDevToolsOpened()) {
-              win.webContents.devToolsWebContents.focus();
+          click(_item: any, _browserWindow: any, _event: any) {
+            // @ts-ignore: Electron popup window context
+            const win = BrowserWindow.getFocusedWindow();
+            if (win) {
+              win.webContents.inspectElement(props.x, props.y);
+              if (win.webContents.isDevToolsOpened()) {
+                win.webContents.devToolsWebContents?.focus();
+              }
             }
           },
         },

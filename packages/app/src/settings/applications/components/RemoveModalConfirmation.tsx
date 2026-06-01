@@ -35,12 +35,13 @@ class RemoveModalConfirmation extends React.Component<Props> {
     onCancel: () => { },
   };
 
-  getInstanceTypeWording = () => pluralize(this.props.instanceTypeWording, this.props.instancesToRemove.size);
+  getInstanceTypeWording = () => (pluralize as any)(this.props.instanceTypeWording, (this.props.instancesToRemove as any).size);
 
-  getPluralForm = () => this.props.instancesToRemove.size > 1;
+  getPluralForm = () => (this.props.instancesToRemove as any).size > 1;
 
   getItems = (): Immutable.Collection.Indexed<ListItemType> =>
-    withInstanceNumber(this.props.instancesToRemove).map((instance: Instance) => ({
+    // @ts-ignore
+    withInstanceNumber(this.props.instancesToRemove as any).map((instance: Instance) => ({
       id: instance.id,
       name: instance.needConfiguration ? `${this.props.applicationName} (Not connected)` : instance.name,
       imageURL: instance.logoUrl,
@@ -76,7 +77,7 @@ class RemoveModalConfirmation extends React.Component<Props> {
 
   shouldRenderModal = () => {
     const { applicationName, instancesToRemove } = this.props;
-    return applicationName && instancesToRemove.size > 0;
+    return applicationName && (instancesToRemove as any).size > 0;
   }
 
   render() {
@@ -98,7 +99,8 @@ class RemoveModalConfirmation extends React.Component<Props> {
               iconSize={25}
               items={this.getItems()}
             />
-            <p style={hintValueStyle}>
+            <p // @ts-ignore
+              style={hintValueStyle}>
               {this.getHintText()}
             </p>
           </div>

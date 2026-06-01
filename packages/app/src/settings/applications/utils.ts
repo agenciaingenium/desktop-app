@@ -1,12 +1,12 @@
-import { Seq, List } from 'immutable';
+import { List } from 'immutable';
 import { Instance, Instances } from './types';
 
 export const withInstanceNumber = (instances: Instances): Instances => {
-  const grouped: Seq.Keyed<string, Instances> = instances.groupBy((acc: Instance) => acc.name);
+  const grouped = instances.groupBy((acc: Instance) => acc.name);
 
   return grouped
     .map((groupedInstances: Instances) => {
-      if (groupedInstances.size > 1) {
+      if ((groupedInstances as any).size > 1) {
         return groupedInstances.map(
           (instance: Instance, i: number) =>
             ({ ...instance, name: `${instance.name} #${i + 1}` })
@@ -16,7 +16,8 @@ export const withInstanceNumber = (instances: Instances): Instances => {
       return groupedInstances;
     })
     .toList()
-    .flatten();
+    .flatten()
+    .filter(Boolean) as unknown as Instances;
 };
 
 export const orderInstances = (instances: Instances, applicationIds: List<string>): Instances => {
@@ -25,5 +26,5 @@ export const orderInstances = (instances: Instances, applicationIds: List<string
       return instances.find((instance: Instance) => instance.id === id);
     })
     .filter(Boolean)
-  );
+  ) as unknown as Instances;
 };

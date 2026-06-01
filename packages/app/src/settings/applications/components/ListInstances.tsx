@@ -66,9 +66,9 @@ class ListInstances extends React.Component<Props> {
     };
 
     // Get an array of ID of docks apps.
-    const applicationsList: ListImmutable<string> = applications.map(app => app.get('applicationId'));
+    const applicationsList: ListImmutable<string> = (applications as any).map((app: any) => app.get('applicationId'));
 
-    const items = orderInstances(instances, applicationsList)
+    const items = orderInstances(instances, applicationsList as any)
     .map(
       (instance: Instance) => ({
         id: `removeAccount_${instance.id}`,
@@ -81,9 +81,10 @@ class ListInstances extends React.Component<Props> {
     );
 
     return (
+      // @ts-ignore
       <List
         iconSize={25}
-        title={pluralize(instanceTypeWording)}
+        title={(pluralize as any)(instanceTypeWording)}
         items={items}
       />
     );

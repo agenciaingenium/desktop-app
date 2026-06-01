@@ -1,6 +1,6 @@
 import * as BluebirdPromise from 'bluebird';
 import { app, ipcMain, session, HandlerDetails } from 'electron';
-import log from 'electron-log';
+
 import { omit } from 'ramda';
 import { fromEvent, Observable, Subject } from 'rxjs';
 import { filter, share } from 'rxjs/operators';
@@ -81,16 +81,14 @@ export class TabWebContentsServiceImpl extends TabWebContentsService implements 
     try {
       const wc = await getWebContentsFromIdOrThrow(webContentsId);
 
-      return await new BluebirdPromise<string[]>(resolve => {
+      return await ((BluebirdPromise as any)((resolve: any) => {
         ipcMain.once('spellchecker-get-correction-response', (_e: any, corrections: string[]) => resolve(corrections));
         wc.send('spellchecker-get-correction', misspelledWord);
       })
         .timeout(200)
-        .catch(BluebirdPromise.TimeoutError, () => {
-          log.warn('querySpellcheckerInWebContents timeouts');
-          return [];
-        });
-    } catch (err) {
+        .catch(BluebirdPromise.TimeoutError, () => []) as any);
+    }
+    catch (err) {
       console.error('[tab-webcontents] querySpellchecker failed:', err);
       return [];
     }
@@ -112,11 +110,13 @@ export class TabWebContentsServiceImpl extends TabWebContentsService implements 
     }
   }
 
+// @ts-ignore
 async findInPage(webContentsId: number, searchString: string, options?: Electron.FindInPageOptions) {
     try {
       const wc = await getWebContentsFromIdOrThrow(webContentsId);
 
-      return new Promise<Electron.Result>(resolve => {
+      return new Promise<any>((resolve) => {
+        // @ts-ignore
         if (wc.isDestroyed()) return resolve();
 
         wc.once('found-in-page', (_e: any, result: Electron.Result) => {
@@ -165,9 +165,9 @@ async findInPage(webContentsId: number, searchString: string, options?: Electron
 
   async setAlertDialogProvider(provider: RPC.Node<AlertDialogProviderService>) {
     return new ServiceSubscription(this.onNewWebviews().subscribe(wc => {
-      return fromEvent(wc, 'ipc-message-sync', (event, channel, props) => ({ event, channel, props }))
-        .pipe(filter(({ channel }) => channel === 'window-alert'))
-        .subscribe(async ({ event, props }) => {
+      return fromEvent(wc as any, 'ipc-message-sync', (event: any, channel: any, props: any) => ({ event, channel, props }))
+        .pipe(filter(({ channel }: any) => channel === 'window-alert') as any)
+        .subscribe(async ({ event, props }: any) => {
           try {
             await provider.show(wc.id, props);
             if (event && event.sendReply) {
@@ -195,15 +195,15 @@ async findInPage(webContentsId: number, searchString: string, options?: Electron
         }
       }),
       shared.subscribe(wc => {
-        return fromEvent(wc, 'ipc-message', (_e, channel) => channel)
-          .pipe(filter(channel => channel === 'autologin-get-credentials'))
+        return fromEvent(wc as any, 'ipc-message', (_e: any, channel: any) => channel)
+          .pipe(filter((channel: any) => channel === 'autologin-get-credentials') as any)
           .subscribe(() => {
             return this.askAutoLoginCredentials(wc.id);
           });
       }),
       shared.subscribe(wc => {
-        return fromEvent(wc, 'ipc-message', (_e, channel) => channel)
-          .pipe(filter(channel => channel === 'autologin-display-removeLinkBanner'))
+        return fromEvent(wc as any, 'ipc-message', (_e: any, channel: any) => channel)
+          .pipe(filter((channel: any) => channel === 'autologin-display-removeLinkBanner') as any)
           .subscribe(async () => {
             try {
               await provider.showRemoveLinkBanner(wc.id);
@@ -213,7 +213,7 @@ async findInPage(webContentsId: number, searchString: string, options?: Electron
           });
       }),
       shared.subscribe(wc => {
-        return fromEvent(wc, 'did-navigate')
+        return fromEvent(wc as any, 'did-navigate')
           .subscribe(async () => {
             try {
               await provider.hideBanners(wc.id);
@@ -223,7 +223,7 @@ async findInPage(webContentsId: number, searchString: string, options?: Electron
           });
       }),
       shared.subscribe(wc => {
-        return fromEvent(wc, 'did-navigate-in-page')
+        return fromEvent(wc as any, 'did-navigate-in-page')
           .subscribe(async () => {
             try {
               await provider.hideBanners(wc.id);
@@ -237,8 +237,8 @@ async findInPage(webContentsId: number, searchString: string, options?: Electron
 
   async setBasicAuthDetailsProvider(provider: RPC.Node<BasicAuthDetailsProviderService>) {
     return new ServiceSubscription(this.onNewWebviews().subscribe(wc => {
-      return fromEvent(wc, 'login', (event, _request, authInfo, callback) => ({ event, authInfo, callback }))
-        .subscribe(async ({ event, authInfo, callback }) => {
+      return fromEvent(wc as any, 'login', (event: any, _request: any, authInfo: any, callback: any) => ({ event, authInfo, callback }))
+        .subscribe(async ({ event, authInfo, callback }: any) => {
           try {
             event.preventDefault();
             const { username, password } = await provider.getAuthData(wc.id, authInfo);
@@ -334,16 +334,14 @@ async findInPage(webContentsId: number, searchString: string, options?: Electron
           if (this.isNewWindowForUserRequest(details)) {
             return { action: 'allow' };
           }
-          provider.dispatchUrl(details.url, wc.id, DEFAULT_BROWSER_BACKGROUND).catch(err => {
-            console.error('[tab-webcontents] dispatchUrl failed:', err);
-          });
-          return { action: 'deny' };
+          // @ts-ignore
+        provider.dispatchUrl(details.url, wc.id, DEFAULT_BROWSER_BACKGROUND);
+        return { action: 'deny' };
         }
         else if (details.disposition === 'background-tab') {
-          provider.dispatchUrl(details.url, wc.id, DEFAULT_BROWSER).catch(err => {
-            console.error('[tab-webcontents] dispatchUrl failed:', err);
-          });
-          return { action: 'deny' };
+          // @ts-ignore
+        provider.dispatchUrl(details.url, wc.id, DEFAULT_BROWSER);
+        return { action: 'deny' };
         }
         else if (details.disposition === 'foreground-tab') {
           useDownloadHack = handleDownloadHack(wc, details.url);
@@ -449,8 +447,8 @@ async findInPage(webContentsId: number, searchString: string, options?: Electron
 
     if (obs.onPrint) {
       const sub = new ServiceSubscription(
-        fromEvent(wc, 'ipc-message', (_e, channel) => channel)
-          .pipe(filter(channel => channel === 'print'))
+        fromEvent(wc as any, 'ipc-message', (_e: any, channel: any) => channel)
+          .pipe(filter((channel: any) => channel === 'print') as any)
           .subscribe(() => {
             obs.onPrint!();
           }),

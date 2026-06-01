@@ -10,6 +10,7 @@ const umzug = new Umzug({
 
   migrations: {
     glob: process.platform === 'win32'
+            // @ts-ignore
             ? path.resolve(__dirname, 'umzug-runs', '*.js').replaceAll('\\', '/')
             : path.resolve(__dirname, 'umzug-runs', '*.js'),
     resolve({ name }) {

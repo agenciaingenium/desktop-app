@@ -20,7 +20,7 @@ export enum FILE {
 export const createLockFile = (file: FILE) => {
   const filepath = path.resolve(getUserDataPath(), file);
 
-  fs.writeFile(filepath, null, (err: any) => {
+  fs.writeFile(filepath, '' as any, (err: any) => {
     if (err) {
       log.error(`[APP DATA] Error with creation of file ${file}`);
       throw err;

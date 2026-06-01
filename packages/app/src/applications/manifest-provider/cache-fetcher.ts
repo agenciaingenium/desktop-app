@@ -27,7 +27,7 @@ export default class CacheFetcher implements IFetcher {
 
         const app = {
           manifest,
-          lastChecked: moment(lastModified),
+          lastChecked: (moment as any)(lastModified),
           source: Source.CACHE,
         };
 

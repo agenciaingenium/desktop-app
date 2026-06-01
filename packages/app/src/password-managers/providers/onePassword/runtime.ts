@@ -19,7 +19,7 @@ import Abstract from '../abstract/runtime';
 const binaryFolderPath = join(window.station.app.getPath('userData'), 'Resources', '1PasswordCLI', 'op');
 
 class OnePassword extends Abstract implements IProviderRuntime {
-  private session: Session;
+  private session!: Session;
 
   public async setSession(credentials: any) {
     this.session = await getSessionToken(credentials, binaryFolderPath);
@@ -36,7 +36,7 @@ class OnePassword extends Abstract implements IProviderRuntime {
       await this.setSession(credentials);
       return true;
     } catch (e) {
-      logger.notify(e);
+      logger.notify(e as Error);
       return false;
     }
   }

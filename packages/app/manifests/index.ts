@@ -40,7 +40,7 @@ export function allApplicationsDictionary(): Record<string, Manifest> {
   return ids.reduce((acc, id) => {
     acc[id] = getApplicationById(id);
     return acc;
-  }, {});
+  }, {} as Record<string, Manifest>);
 }
 
 export function listMostPopularApplications(): PopularApps {
@@ -123,7 +123,7 @@ export function manifestToApplicationItem(manifest: Manifest): ApplicationItem {
  * @returns {Manifest[]}
  */
 export function search(query: string): MinimalApplication[] {
-  const fuse = new Fuse(listAllApplications().map(manifestToMinimalApplication), {
+  const fuse = new (Fuse as any)(listAllApplications().map(manifestToMinimalApplication), {
     threshold: 0.4,
     keys: ['name'],
   });

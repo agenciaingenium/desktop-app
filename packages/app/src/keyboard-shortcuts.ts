@@ -308,6 +308,7 @@ export const SHORTCUTS = <{ [key: string]: KeyboardShortcut }>{
   },
 };
 
+// @ts-ignore
 export const getShortcutsByCategory = memoize((category: CATEGORY): KeyboardShortcut[] => {
   return Object
     .keys(SHORTCUTS)

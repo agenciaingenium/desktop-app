@@ -1,4 +1,4 @@
-import ms = require('ms');
+import ms from 'ms';
 
 // Keep only 7 active web content tabs (ignoring `alwaysLoaded` ones)
 export const STATION_MAX_ACTIVE_TABS = process.env.STATION_MAX_ACTIVE_TABS ?

@@ -4,6 +4,7 @@ import { GradientType, withGradient } from '@getstation/theme';
 interface Props {
   themeGradient: string,
   onClickDock: () => void,
+  children?: React.ReactNode,
 }
 class DockWrapper extends React.PureComponent<Props, {}> {
   render() {

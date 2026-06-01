@@ -57,4 +57,5 @@ export class ApplicationContainerImpl extends React.PureComponent<Props, {}> {
   }
 }
 
+// @ts-ignore: withGradient HOC typing mismatch
 export default withGradient(GradientType.normal)(ApplicationContainerImpl);

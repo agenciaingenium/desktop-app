@@ -2,8 +2,11 @@ import { ipcRenderer } from 'electron';
 import { SagaIterator } from 'redux-saga';
 import { all, call, delay, getContext, put, race, select, spawn, take } from 'redux-saga/effects';
 import { BrowserXAppWorker } from '../../app-worker';
+// @ts-ignore no declaration file
 import { MAIN_APP_READY } from '../../app/duck';
 import { getFocusedTabId } from '../../app/selectors';
+// @ts-ignore no declaration file
+import { getFrontActiveTabId } from '../../applications/utils';
 import { isAlwaysLoaded } from '../../application-settings/api';
 import { getApplicationsSettings } from '../../application-settings/selectors';
 import { ApplicationsSettingsImmutable } from '../../application-settings/types';
@@ -13,7 +16,6 @@ import { getApplicationId } from '../../applications/get';
 import { BxAppManifest } from '../../applications/manifest-provider/bxAppManifest';
 import { getApplicationsByManifestURLs, getInstalledManifestURLs } from '../../applications/selectors';
 import { ApplicationsImmutable } from '../../applications/types';
-import { getFrontActiveTabId } from '../../applications/utils';
 import { MARK_AS_DONE } from '../../onboarding/duck';
 import { isDone } from '../../onboarding/selectors';
 import { closeTab, updateBackForwardState, updateLastActivity, updateTabURL } from '../../tabs/duck';
@@ -59,7 +61,7 @@ import {
 } from '../selectors';
 import sleepingSagas from './sleeping';
 import closeCurrentTabSagas from './close-current-tab';
-import ms = require('ms');
+import ms from 'ms';
 import { ContextMenuService } from '../../services/services/menu/interface';
 
 let seenWebcontents = new Set();
@@ -76,11 +78,12 @@ function* reloadTabIfCrashed(action: FrontActiveTabChangeAction): SagaIterator {
 
 function* interceptPrint({ webcontentsId, tabId }: NewWebcontentsAttachedToTabAction): SagaIterator {
   let waitingForPrint = false;
-  const printChannel = createWebContentsServiceObserverChannel(
+  const printChannel = (createWebContentsServiceObserverChannel as any)(
     webcontentsId, 'addPrintObserver', 'onPrint', 'intercept-print');
 
   // Listen for print events
-  yield takeEveryWitness(printChannel, function* handle() {
+  yield takeEveryWitness(printChannel, function* handle(): any {
+    // @ts-ignore
     const currentActiveTabId = yield select(getFrontActiveTabId);
     if (currentActiveTabId === tabId) {
       // If print is called on  current active tab, show print modal...
@@ -94,12 +97,13 @@ function* interceptPrint({ webcontentsId, tabId }: NewWebcontentsAttachedToTabAc
   });
 
   // Listen for active tab change events
-  yield takeLatestWitness(FRONT_ACTIVE_TAB_CHANGE, function* handle(action: FrontActiveTabChangeAction) {
+  yield takeLatestWitness(FRONT_ACTIVE_TAB_CHANGE, function* handle(action: FrontActiveTabChangeAction): any {
     // When active tab is changed, if the new active tab is in the print queue,
     // trigger the print modal.
     if (waitingForPrint && action.tabId === tabId) {
       waitingForPrint = false;
 
+      // @ts-ignore
       const wcId = yield select(getWebcontentsIdForTabId, action.tabId);
       yield callService('tabWebContents', 'print', wcId);
     }
@@ -107,10 +111,11 @@ function* interceptPrint({ webcontentsId, tabId }: NewWebcontentsAttachedToTabAc
 }
 
 function* interceptDestroyedEvents({ webcontentsId, tabId }: NewWebcontentsAttachedToTabAction): SagaIterator {
-  const destroyedChannel = createWebContentsServiceObserverChannel(
+  const destroyedChannel = (createWebContentsServiceObserverChannel as any)(
     webcontentsId, 'addLifeCycleObserver', 'onDestroyed', 'intercept-destroyed');
 
-  yield takeEveryWitness(destroyedChannel, function* () {
+  yield takeEveryWitness(destroyedChannel, function* (): any {
+    // @ts-ignore
     const twc = yield select(getTabWebcontentsByWebContentsId, webcontentsId);
     // only clear tabWebcontents if the tabIb have not been reattached
     if (twc && getWebcontentsTabId(twc) === tabId) {
@@ -141,6 +146,7 @@ function* interceptWebcontentsReady({ webcontentsId, tabId }: DomReadyAction) {
     webcontentsId, 'addLifeCycleObserver', 'onDomReady', 'intercept-ready');
 
   yield takeEveryWitness(domReadyEventChannel, function* handle() {
+    // eslint-disable-next-line no-console
     console.log(`[DEBUG] interceptWebcontentsReady: DOM_READY for tabId=${tabId}, wcId=${webcontentsId}`);
     yield put(domReady(webcontentsId, tabId));
   });
@@ -167,7 +173,7 @@ function* closeSubwindowIfReattachedOrTimeout({ tabId }: CloseAfterReattachedOrT
   yield call([SubWindowManager, SubWindowManager.close], tabId);
 }
 
-function* getTabsToLoadOnStartup() {
+function* getTabsToLoadOnStartup(): any {
   const bxApp: BrowserXAppWorker = yield getContext('bxApp');
 
   const manifestURLs = yield select(getInstalledManifestURLs);
@@ -185,15 +191,17 @@ function* getTabsToLoadOnStartup() {
 
   const tabs: StationTabsImmutable = yield select(getTabs);
   return tabs.filter(tab => {
+
     const applicationId = getTabApplicationId(tab);
     return applicationIds.includes(applicationId);
   });
 }
 
-function* startProgressiveWarmup() {
+function* startProgressiveWarmup(): any {
   const isOnboardingDone = yield select(isDone);
 
   if (!isOnboardingDone) {
+    // @ts-ignore
     yield take((action: any) => action.type === MARK_AS_DONE && action.done);
   }
 
@@ -209,7 +217,7 @@ function* startProgressiveWarmup() {
   // wait for the first tab to load correctly
   yield delay(ms('15sec'));
 
-  for (const tab of tabsToLoad.values()) {
+  for (const tab of (tabsToLoad as any).values()) {
     yield put(doAttach(getTabId(tab)));
     yield delay(ms('4sec'));
   }
@@ -267,7 +275,7 @@ function* sagaExecuteWebviewMethodForCurrentTab({ method }: ExecuteWebviewMethod
 function* interceptAutofill({ webcontentsId }: { webcontentsId: number }) {
   const autofillMenu: ContextMenuService = yield callService('contextMenu', 'create', { webcontentsId });
   // const popupChannel = serviceAddObserverChannel(autofillMenu, 'onAskAutofillPopup', 'autofill-popup-asked');
-  const clickChannel = serviceAddObserverChannel(autofillMenu, 'onClickItem', 'autofill-popup-value-selected');
+  const clickChannel = (serviceAddObserverChannel as any)(autofillMenu, 'onClickItem', 'autofill-popup-value-selected');
 
   yield takeEveryWitness(clickChannel, function* handle({ action, args }: any) {
     // Use proxy through main process instead of deprecated sendTo

@@ -43,17 +43,17 @@ class RecentDockContainer extends React.PureComponent<Props, State> {
 
   onOverStateChange = (isHover: boolean) => {
     if (this.timeoutSubdock !== null) {
-      clearTimeout(this.timeoutSubdock);
+      clearTimeout(this.timeoutSubdock as any);
       this.timeoutSubdock = null;
     }
     if (isHover) {
       this.timeoutSubdock = setTimeout(() => {
         this.props.showRecentSubdock();
-      }, 300);
+      }, 300) as any;
     } else {
       this.timeoutSubdock = setTimeout(() => {
         this.props.hideRecentSubdock('mouse-leave');
-      }, 200);
+      }, 200) as any;
     }
   }
 
@@ -70,10 +70,11 @@ class RecentDockContainer extends React.PureComponent<Props, State> {
   onClickIcon = () => {
     const { recentApplications } = this.props;
     if (this.timeoutSubdock !== null) {
-      clearTimeout(this.timeoutSubdock);
+      clearTimeout(this.timeoutSubdock as any);
       this.timeoutSubdock = null;
     }
     if (recentApplications.length === 0) return;
+    // @ts-ignore
     this.handleSelectItem(recentApplications[0], 'click-recent-dock-icon', 0);
   }
 

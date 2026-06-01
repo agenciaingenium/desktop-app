@@ -14,7 +14,7 @@ import { getHeader } from '../../../session';
 /**
  * Returns true if the request was a download in the main frame.
  */
-function isAttachmentAsMainframe(details: Electron.OnCompletedListenerDetails) {
+function isAttachmentAsMainframe(details: any) {
   if (details.resourceType !== 'mainFrame') {
     return false;
   }
@@ -54,8 +54,12 @@ const makeOnWillDownload = (downloadService: DownloadServiceImpl) => {
         const downloadItemService = new DownloadItemServiceImpl({ downloadItem, webContentsId, promptDownloadEnabled });
         observer.next(downloadItemService);
       };
+      // @ts-ignore
       session.on('will-download', listener);
-      return () => session.removeListener('will-download', listener);
+      return () => {
+        // @ts-ignore
+        session.removeListener('will-download', listener);
+      };
     });
 };
 
@@ -120,7 +124,7 @@ export class DownloadServiceImpl extends DownloadService implements RPC.Interfac
     await app.whenReady();
     const { defaultSession } = electronSession;
     if (defaultSession && observer.onRequestCompleted) {
-      const listener = (details: Electron.OnCompletedDetails) => {
+      const listener = (details: any) => {
         if (isAttachmentAsMainframe(details)) {
           observer.onRequestCompleted!({
             ...details,
@@ -128,9 +132,9 @@ export class DownloadServiceImpl extends DownloadService implements RPC.Interfac
           });
         }
       };
-      defaultSession.webRequest.onCompleted(listener);
+      const req = defaultSession.webRequest.onCompleted(listener) as any;
       return () => {
-        defaultSession.webRequest.onCompleted.removeListener(listener);
+        if (req && req.removeListener) req.removeListener(listener);
       };
     }
     return () => { };

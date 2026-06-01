@@ -5,6 +5,7 @@ import { getTabWebcontentsByWebContentsId, getWebcontentsTabId } from '../tab-we
 import { getApplicationIdByTabId } from '../tabs/selectors';
 import { DEFAULT_BROWSER_BACKGROUND, NEW_TAB, Targets } from './constants';
 import { dispatchUrlSaga } from './sagas';
+// @ts-ignore: no declaration file
 import { StationStoreWorker } from 'app/types';
 
 export class UrlDispatcherProviderServiceImpl extends UrlDispatcherProviderService

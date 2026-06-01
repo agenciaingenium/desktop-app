@@ -18,7 +18,7 @@ interface StateFromProps {
 type Props = StateFromProps & OwnProps;
 
 class DockApplicationSubdockImpl extends React.PureComponent<Props, {}> {
-  subdockContainer: HTMLDivElement | null;
+  subdockContainer!: HTMLDivElement | null;
 
   constructor(props: Props) {
     super(props);
@@ -63,7 +63,7 @@ class DockApplicationSubdockImpl extends React.PureComponent<Props, {}> {
     return (
       <DockApplication open={open} onRequestClose={onRequestClose} onClickOutside={this.handleClickOutside}>
         {iconComponent}
-        <div ref={this.setSubdockContainerRef} className={classNames('subdock-container', className)} style={containerStyle}>
+        <div ref={this.setSubdockContainerRef} className={(classNames as any)('subdock-container', className)} style={containerStyle}>
           {contentComponent}
         </div>
       </DockApplication>
@@ -71,4 +71,5 @@ class DockApplicationSubdockImpl extends React.PureComponent<Props, {}> {
   }
 }
 
-export default withGradient(GradientType.withDarkOverlay)(DockApplicationSubdockImpl);
+// @ts-ignore
+export default (withGradient(GradientType.withDarkOverlay) as any)(DockApplicationSubdockImpl);

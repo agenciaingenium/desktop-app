@@ -21,6 +21,7 @@ export type SearchResultSerialized =
     },
   };
 
+// @ts-ignore
 export interface SearchSectionSerialized extends SearchSection {
   sectionKind: SectionKinds,
   results?: SearchResultSerialized[];

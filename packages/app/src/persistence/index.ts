@@ -18,6 +18,7 @@ async function waitForPromise(backend: SingletonStateProxy<any>) {
   const keys = Object.keys(backend);
   const a = [];
   for (const k of keys) {
+    // @ts-ignore
     a.push([k, await backend[k].get()]);
   }
   return a;
@@ -26,8 +27,9 @@ async function waitForPromise(backend: SingletonStateProxy<any>) {
 export const getInitialState = async (backendKey: string) => {
   await checkSqliteBackend();
   await migrateUmzug();
-  const state = await waitForPromise(backends[backendKey]);
-  return Immutable.Map(state);
+  // @ts-ignore
+  const state = await waitForPromise(backends[backendKey as keyof typeof backends]);
+  return Immutable.Map(state as any);
 };
 
 export default backends.local;

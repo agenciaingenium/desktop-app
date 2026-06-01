@@ -1,3 +1,4 @@
+// @ts-ignore: no declaration file
 import * as memoize from 'memoizee';
 import { createSelector } from 'reselect';
 import { getApplicationId } from '../applications/get';
@@ -10,12 +11,12 @@ const APP_STORE_MANIFEST_URL = process.env.APP_STORE_MANIFEST_URL!;
 
 export const getState = (state: StationState) => state.get('appStore');
 
-export const getAppStoreApplication = memoize((state: StationState): any =>
+export const getAppStoreApplication = (memoize as any)((state: StationState): any =>
   state.get('applications').find((app: any) => app.get('manifestURL') === APP_STORE_MANIFEST_URL));
 
-export const getAppStoreTab = memoize((state: StationState) => {
+export const getAppStoreTab = (memoize as any)((state: StationState) => {
   const appStoreApplication = getAppStoreApplication(state);
-  if (!appStoreApplication) return;
+  if (!appStoreApplication) return undefined;
   return state.get('tabs')
     .find((t: any) =>
       (t.get('applicationId') === appStoreApplication.get('applicationId')) && t.get('isApplicationHome')

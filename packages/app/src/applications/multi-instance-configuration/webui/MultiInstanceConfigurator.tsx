@@ -16,7 +16,7 @@ const {
 } = Preset;
 
 const isOnlyOnPremise = (presets: Preset[]) => presets.length === 1 && presets[0] === OnPremisePreset;
-const interpretedIconUrl = (manifest: BxAppManifest) => manifest.icon;
+const interpretedIconUrl = (manifest: BxAppManifest) => manifest.icons?.[0]?.src;
 
 const getHostname = (url: string): string => {
   try {

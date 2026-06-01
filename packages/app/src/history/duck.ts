@@ -1,4 +1,4 @@
-import { SearchResultSerialized } from 'app/bang/duck';
+import { SearchResultSerialized } from '../bang/duck';
 import { fromJS } from '../utils/ts';
 import { StationHistoryImmutable } from './get';
 
@@ -17,9 +17,10 @@ export const setHistoryItems = (items: SearchResultSerialized[]): SetHistoryItem
   items,
 });
 
+// @ts-ignore
 const defaultStateStationHistory: StationHistoryImmutable = fromJS({
   items: [],
-});
+}) as StationHistoryImmutable;
 
 export default function bang(state: StationHistoryImmutable = defaultStateStationHistory, action: HistoryAction) {
   switch (action.type) {

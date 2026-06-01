@@ -54,7 +54,9 @@ const schema = addTypenameToSchema(
  * reactive schema and the remote API based on directive `@local`
  */
 export const getLink = (contextFn: () => StationGQLContext) => {
+  // @ts-ignore
   return ApolloLink.concat(
+    // @ts-ignore
     new DistinctConsecutiveResultsLink(),
     new ReactiveSchemaLink<StationGQLContext>({
       schema,

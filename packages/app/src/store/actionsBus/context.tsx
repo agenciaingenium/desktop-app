@@ -29,9 +29,11 @@ export const withActionsBus = () =>
         return (
           <ActionsBusReactContext.Consumer>
             {
-            ({ actionsBus }: { actionsBus: ActionsBus }) => (
+            // @ts-ignore
+            ({ actionsBus }: { actionsBus: ActionsBus | null }) => (
               // having the typing of `this.props` correct is difficult
-              <WrappedComponent actionsBus={actionsBus} {...this.props as any} />
+              // @ts-ignore
+              <WrappedComponent actionsBus={actionsBus} {...this.props} />
             )}
           </ActionsBusReactContext.Consumer>
         );

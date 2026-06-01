@@ -186,22 +186,22 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
 
   private onAny(key: string, callback?: Function) {
     if (!callback || !this.window) return noop;
-    return fromEvent(this.window, key).subscribe(() => callback());
+    return fromEvent(this.window as any, key).subscribe(() => callback());
   }
 
   private onAnyWebContents(key: string, callback?: Function) {
     if (!callback || !this.window) return noop;
-    return fromEvent(this.window.webContents, key).subscribe(() => callback());
+    return fromEvent(this.window.webContents as any, key).subscribe(() => callback());
   }
 
   private onContextMenu(callback?: RPC.ObserverNode<BrowserWindowServiceObserver>['onContextMenu']) {
     if (!callback || !this.window) return noop;
-    return fromEvent(this.window.webContents, 'context-menu', (_e, params) => params).subscribe(callback);
+    return fromEvent(this.window.webContents as any, 'context-menu', (_e: any, params: any) => params).subscribe(callback);
   }
 
   private onSwipe(callback?: RPC.ObserverNode<BrowserWindowServiceObserver>['onSwipe']) {
     if (!callback || !this.window) return noop;
-    return fromEvent(this.window, 'swipe', (_e, direction) => direction).subscribe(callback);
+    return fromEvent(this.window as any, 'swipe', (_e: any, direction: any) => direction).subscribe(callback);
   }
 
   private onReadyToShow(callback?: Function) {
@@ -231,11 +231,13 @@ export class BrowserWindowServiceImpl extends BrowserWindowService implements RP
 
   private startInitPositionManager(savePosition?: string): Partial<BrowserWindowServiceConstructorOptions> {
     if (!savePosition) return {};
+    // @ts-ignore no declaration file
     const sanitize = require('sanitize-filename');
     const sanitizedFilename = sanitize(savePosition);
     if (!sanitizedFilename) throw new Error(`Invalid file name ${savePosition}`);
 
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+    // @ts-ignore no declaration file
     this.stateManager = windowStateKeeper({
       defaultWidth: width - 40,
       defaultHeight: height - 40,

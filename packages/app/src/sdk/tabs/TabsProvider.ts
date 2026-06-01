@@ -33,7 +33,8 @@ export default class TabsProvider extends AbstractProvider<tabs.TabsConsumer> {
   constructor(store: Store<StationState>) {
     super();
     this.store = store;
-    this.observableState = subscribeStore(store).pipe(share<StationState>());
+    // @ts-ignore: RxJS type mismatch
+    this.observableState = subscribeStore(store).pipe(share());
   }
 
   addConsumer(consumer: tabs.TabsConsumer) {
@@ -44,19 +45,19 @@ export default class TabsProvider extends AbstractProvider<tabs.TabsConsumer> {
 
   getProviderInterface(): tabs.TabsProviderInterface {
     return {
-      nav: this.nav.bind(this),
-      create: this.create.bind(this),
-      getTabs: this.getTabs.bind(this),
-      getTab: this.getTab.bind(this),
-      updateTab: this.updateTab.bind(this),
-      navToTab: this.navToTab.bind(this),
-      executeJavaScript: this.executeJavaScript.bind(this),
-      getTabWebContentsState: this.getTabWebContentsState.bind(this),
+      nav: this.nav.bind(this) as any,
+      create: this.create.bind(this) as any,
+      getTabs: this.getTabs.bind(this) as any,
+      getTab: this.getTab.bind(this) as any,
+      updateTab: this.updateTab.bind(this) as any,
+      navToTab: this.navToTab.bind(this) as any,
+      executeJavaScript: this.executeJavaScript.bind(this) as any,
+      getTabWebContentsState: this.getTabWebContentsState.bind(this) as any,
     };
   }
 
   nav(): Observable<tabs.Nav> {
-    return this.observableState
+    return ((this.observableState as any)
       .pipe(
         map((state: StationState) => getFocusedTabId(state)),
         filter(x => Boolean(x)),
@@ -66,12 +67,12 @@ export default class TabsProvider extends AbstractProvider<tabs.TabsConsumer> {
             tabId,
             previousTabId: nav.tabId,
           };
-        }, {}),
+        }, {} as Partial<tabs.Nav>),
         filter((x: Partial<tabs.Nav>) => Boolean(x.tabId)),
         distinctUntilChanged(
           (before: tabs.Nav, after: tabs.Nav) => equals(before, after)
         ),
-      );
+      ));
   }
 
   create({ applicationId, url }: tabs.CreateOptions) {
@@ -94,11 +95,11 @@ export default class TabsProvider extends AbstractProvider<tabs.TabsConsumer> {
       )
       .toList()
       .flatten(1)
-      .toJS();
+      .toJS() as tabs.Tab[];
   }
 
   getTab(tabId: string): Observable<StationTab> {
-    return this.observableState
+    return ((this.observableState as any)
       .pipe(
         map((state: StationState) => getTabById(state, tabId)),
         filter((tab: StationTabImmutable | undefined) => Boolean(tab)),
@@ -107,7 +108,7 @@ export default class TabsProvider extends AbstractProvider<tabs.TabsConsumer> {
             is(before, after)
         ),
         map((tab: StationTabImmutable) => tab.toJS()),
-      );
+      ));
   }
 
   updateTab(tabId: string, updatedTab: tabs.TabUpdate) {

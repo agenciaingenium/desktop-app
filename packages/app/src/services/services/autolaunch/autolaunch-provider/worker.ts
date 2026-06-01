@@ -1,3 +1,4 @@
+// @ts-ignore no declaration file
 import { setAutoLaunchEnabled } from '../../../../app/duck';
 import { getAppName } from '../../../../app/selectors';
 import { StationStoreWorker } from '../../../../types';

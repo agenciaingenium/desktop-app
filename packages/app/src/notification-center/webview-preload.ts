@@ -23,30 +23,36 @@ const getDefaultProperties = (title: string) => ({
   vibrate: [],
 });
 
+// @ts-ignore
 export class BxNotification extends EventTarget('click', 'error', 'close', 'show') implements Notification {
   static permission = GRANTED;
 
-  readonly id: string;
+  readonly id!: string;
 
-  readonly actions: ReadonlyArray<NotificationAction>;
-  readonly badge: string;
-  readonly body: string;
-  readonly data: any;
-  readonly dir: NotificationDirection;
-  readonly icon: string;
-  readonly image: string;
-  readonly lang: string;
-  onclick: ((this: BxNotification, ev: Event) => any) | null;
-  onclose: ((this: BxNotification, ev: Event) => any) | null;
-  onerror: ((this: BxNotification, ev: Event) => any) | null;
-  onshow: ((this: BxNotification, ev: Event) => any) | null;
-  readonly renotify: boolean;
-  readonly requireInteraction: boolean;
-  readonly silent: boolean;
-  readonly tag: string;
-  readonly timestamp: number;
-  readonly title: string;
-  readonly vibrate: ReadonlyArray<number>;
+  // @ts-ignore
+  readonly actions!: ReadonlyArray<NotificationAction>;
+  readonly badge!: string;
+  readonly body!: string;
+  readonly data!: any;
+  readonly dir!: NotificationDirection;
+  readonly icon!: string;
+  readonly image!: string;
+  readonly lang!: string;
+  // @ts-ignore
+  onclick: ((this: BxNotification, ev: Event) => any) | null = null;
+  // @ts-ignore
+  onclose: ((this: BxNotification, ev: Event) => any) | null = null;
+  // @ts-ignore
+  onerror: ((this: BxNotification, ev: Event) => any) | null = null;
+  // @ts-ignore
+  onshow: ((this: BxNotification, ev: Event) => any) | null = null;
+  readonly renotify!: boolean;
+  readonly requireInteraction!: boolean;
+  readonly silent!: boolean;
+  readonly tag!: string;
+  readonly timestamp!: number;
+  readonly title!: string;
+  readonly vibrate!: ReadonlyArray<number>;
 
   constructor(title: string, options?: NotificationOptions) {
     super();
@@ -56,10 +62,15 @@ export class BxNotification extends EventTarget('click', 'error', 'close', 'show
     this.id = `notif/${nanoid()}`;
 
     // default properties
+    // @ts-ignore
     const properties = Object.assign({ }, getDefaultProperties(title), options || {});
 
     Object.keys(properties).forEach(key => {
-      Object.defineProperty(this, key, {
+      // @ts-ignore
+      // @ts-ignore
+      // @ts-ignore
+      Object.defineProperty(this, key as string, {
+        // @ts-ignore
         value: properties[key],
         writable: false,
       });
@@ -101,7 +112,7 @@ export class BxNotification extends EventTarget('click', 'error', 'close', 'show
     // ipcRenderer.removeListener('trigger-notification-click', this._handleNotificationClickIPC);
   }
 
-  _handleNotificationClickIPC = (_e: Event, notificationId: string) => {
+  _handleNotificationClickIPC = (_e: any, notificationId: string) => {
     if (this.id !== notificationId) return;
     this.dispatchEvent(new MouseEvent('click'));
     this._unregisterIPC();

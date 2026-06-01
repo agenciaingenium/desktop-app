@@ -1,5 +1,4 @@
 import { theme } from '@getstation/theme';
-import * as Immutable from 'immutable';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { CSSTransition } from 'react-transition-group';
@@ -69,8 +68,9 @@ class NotificationCenterSubdockContentImpl extends React.PureComponent<Props, {}
   }
 }
 
+// @ts-ignore
 const NotificationCenterSubdockContent = connect(
-  (state: Immutable.Map<string, any>) => ({
+  (state: any) => ({
     currentSnoozeDuration: getSnoozeDuration(state),
     currentSnoozeStartedOn: getSnoozeStartedOn(state),
   }),

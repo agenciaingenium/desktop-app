@@ -97,6 +97,7 @@ const SubdockContainerInner: React.FC<ConnectedProps> = (props) => {
     <Subdock
       {...props}
       loading={loading}
+      // @ts-ignore
       application={application}
       onSelectFavorite={onSelectFavorite}
       onSelectTab={onSelectTab}
@@ -105,6 +106,7 @@ const SubdockContainerInner: React.FC<ConnectedProps> = (props) => {
   );
 };
 
+// @ts-ignore
 const SubdockContainer = compose(
   connect(
     (state: StationState, ownProps: ConnectedProps) => {

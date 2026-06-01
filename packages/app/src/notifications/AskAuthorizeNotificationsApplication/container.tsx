@@ -77,11 +77,13 @@ class AskAuthorizeNotificationsApplicationImpl extends React.PureComponent<Props
 }
 
 const connector = compose(
+  // @ts-ignore
   connect<any, any, {}>(
-    (state: Immutable.Map<string, any>) => ({
+    (state: any) => ({
       notificationsRequests: getNotificationsRequests(state),
     }),
     (dispatch: Dispatch<any>) => bindActionCreators({
+      // @ts-ignore
       onAnswer: (notificationRequest) => askEnableNotifications(notificationRequest),
     }, dispatch)
   ),

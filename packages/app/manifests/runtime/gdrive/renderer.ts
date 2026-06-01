@@ -1,6 +1,6 @@
 import { SDK } from '@getstation/sdk';
 import { createStore, Store } from 'redux';
-import { from, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { getReactTree } from './components/GDriveReduxProvider';
 import reducer, { updateAccounts } from './duck.renderer';
@@ -12,8 +12,8 @@ import { State, UpdateTokensAction } from './types';
  * @param store
  */
 function initIpcListener(sdk: SDK, store: Store<State>) {
-  return from(sdk.ipc)
-    .pipe(filter(m => m.type === 'UPDATE_TOKENS'))
+  return (sdk.ipc as any)
+    .pipe(filter((m: any) => m.type === 'UPDATE_TOKENS'))
     .subscribe((m: UpdateTokensAction) => {
       store.dispatch(updateAccounts(m.tokens));
     });
@@ -31,7 +31,7 @@ let subscription: Subscription;
 
 export default {
 
-  activate: (sdk): void => {
+  activate: (sdk: SDK): void => {
     const store = initRedux();
     subscription = initIpcListener(sdk, store);
 

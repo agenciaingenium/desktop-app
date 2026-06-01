@@ -36,6 +36,7 @@ type VisibilityTypes =
   | NOTIFICATION_CENTER_SET_VISIBILITY
   | BANG_SET_VISIBILITY;
 
+// @ts-ignore
 const actionCreatorsByActionTypes = Immutable.Map<VisibilityTypes, [VisibilityActions, () => boolean]>([
   [NOTIFICATION_CENTER_SET_VISIBILITY, [notificationCenterSetVisibility(false), notificationCenterIsVisible]],
   [BANG_SET_VISIBILITY, [bangSetVisibility('center-modal', false), bangIsVisible]],
@@ -91,10 +92,12 @@ function* sagaToggleVisibility(action: UiToggleVisibility): SagaIterator {
   const { key } = action;
   const isVisible: boolean = yield select((state: StationState) => state.getIn(['ui', ...key] as any, false));
 
+  // @ts-ignore
   yield put(updateUI(...key, !isVisible));
 }
 
 function* onBoardingState() {
+  // @ts-ignore
   const state = yield select(isDone);
   yield call(setStateMenuItemResetCurrentApplication, state);
 }

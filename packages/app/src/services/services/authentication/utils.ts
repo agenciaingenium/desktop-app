@@ -10,7 +10,7 @@ export const jsonFetch = (requestedUrl: string, init?: RequestInit) =>
     .then((asJson: any) => {
       return asJson;
     })
-    .catch(err => {
+    .catch((err: any) => {
       console.error('[jsonFetch] fetch failed:', err);
       throw err;
     });

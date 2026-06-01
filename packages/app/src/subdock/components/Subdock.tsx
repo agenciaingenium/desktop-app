@@ -63,12 +63,14 @@ export default class Subdock extends React.PureComponent<Props, {}> {
         <SubdockHead
           application={application}
           notificationsEnabled={notificationsEnabled}
+          // @ts-ignore
           openApplicationPreferences={openApplicationPreferences}
           toggleNotifications={toggleNotifications}
         />
 
         <div className="subdock-panels" style={panelsStyle}>
           {application &&
+            // @ts-ignore
             <SubdockPanel
               application={application}
               activeTab={activeTab}

@@ -71,6 +71,7 @@ export default class SettingsOverlay extends React.PureComponent<Props, {}> {
           </Tab>
           <Tab title="My Apps">
             {() => (
+              // @ts-ignore
               <SettingsMyApps onModalStateChanged={this.handleModalStateChanged} />
             )}
           </Tab>

@@ -5,6 +5,7 @@ import { observer } from 'redux-observers';
 import { getInstalledManifestURLs } from '../applications/selectors';
 import { activateService } from './duck';
 
+// @ts-ignore
 const observeAppsInstalled = observer(
   getInstalledManifestURLs,
   (dispatch: Dispatch, URLs: string[], previousURLs: string[]) => {

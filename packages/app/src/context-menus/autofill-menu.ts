@@ -34,7 +34,7 @@ export default class AutofillContextMenu extends EventEmitter {
     const emit = this.emit.bind(this);
     return emails.map(v => ({
       label: v,
-      click(_menuItem: Electron.MenuItem, _browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) {
+      click(_menuItem: any, _browserWindow: any, event: any) {
         emit('click-item', { event: serializedKeyboardEvent(event), action: 'autofill-value-chosen', args: [v] });
       },
     }));

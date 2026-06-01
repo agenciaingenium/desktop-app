@@ -24,7 +24,8 @@ const applyScoreMap = <K extends string, T extends { [key in K]: string }>(
  * @param options ScoreOptions<K>
  * @return ScoreComputation<T, C>
  */
-const scoreEngine = <K extends string, T extends { [key in K]: string }, C>(
+// @ts-ignore
+const scoreEngine = <K extends string, T extends { [key in K]: string }, C extends {} = {}>(
   algorithm: ScoreAlgorithm<T, C>,
   options: ScoreOptions<K, T>,
 ): ScoreComputation<T, C> => {

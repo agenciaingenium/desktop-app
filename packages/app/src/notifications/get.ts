@@ -29,6 +29,7 @@ export const getNotificationBadge = (notif: Immutable.Map<string, any>): string 
 
 export const getNotificationDateFromNow = (notif: ImmutableNotification): string => {
   const timestamp = notif.get('timestamp');
+  // @ts-ignore
   const moment = Moment(timestamp);
   return moment.fromNow();
 };

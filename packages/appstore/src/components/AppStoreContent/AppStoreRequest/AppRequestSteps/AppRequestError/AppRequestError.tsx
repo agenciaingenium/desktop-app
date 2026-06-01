@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { createUseStyles } from 'react-jss';
 
+// @ts-ignore no declaration file
 const astroAwkwardPath: string = require('./astr-awkward.png');
 
 const useStyles = createUseStyles({

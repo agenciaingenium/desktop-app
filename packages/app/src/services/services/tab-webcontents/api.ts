@@ -30,7 +30,7 @@ export const getWebContentsFromIdOrThrow = async (webContentsId: number, maxTrie
 
 export const addOnDestroyedObserver = (wc: Electron.WebContents, obs: RPC.ObserverNode<TabWebContentsLifeCycleObserver>) => {
   if (obs.onDestroyed) {
-    return fromEvent(wc, 'destroyed')
+    return fromEvent(wc as any, 'destroyed')
       .pipe(take(1))
       .subscribe(() => {
         obs.onDestroyed!();
@@ -51,7 +51,7 @@ export const awaitDomReady = (wc: Electron.WebContents) => {
 
 export const addOnDomReadyObserver = (wc: Electron.WebContents, obs: RPC.ObserverNode<TabWebContentsLifeCycleObserver>) => {
   if (obs.onDomReady) {
-    return fromEvent(wc, 'dom-ready')
+    return fromEvent(wc as any, 'dom-ready')
       .subscribe(() => {
         obs.onDomReady!();
       });
@@ -61,7 +61,7 @@ export const addOnDomReadyObserver = (wc: Electron.WebContents, obs: RPC.Observe
 
 export const addOnCloseObserver = (wc: Electron.WebContents, obs: RPC.ObserverNode<TabWebContentsLifeCycleObserver>) => {
   if (obs.onClose) {
-    return fromEvent(wc, 'close')
+    return fromEvent(wc as any, 'close')
       .subscribe(() => {
         obs.onClose!();
       });
@@ -72,9 +72,9 @@ export const addOnCloseObserver = (wc: Electron.WebContents, obs: RPC.ObserverNo
 export const addOnNavigateObserver = (wc: Electron.WebContents, obs: RPC.ObserverNode<TabWebContentsLifeCycleObserver>) => {
   if (obs.onNavigate) {
     const allEvents = merge(
-      fromEvent(wc, 'did-fail-load'),
-      fromEvent(wc, 'did-finish-load'),
-      fromEvent(wc, 'did-navigate-in-page'),
+      fromEvent(wc as any, 'did-fail-load'),
+      fromEvent(wc as any, 'did-finish-load'),
+      fromEvent(wc as any, 'did-navigate-in-page'),
     );
     return allEvents.subscribe(() => {
       obs.onNavigate!({
@@ -101,9 +101,12 @@ export const addOnPreventUnload = (wc: Electron.WebContents, _: RPC.ObserverNode
 
 export const addOnNewNotificationObserver = (wc: Electron.WebContents, obs: RPC.ObserverNode<TabWebContentsNotificationsObserver>) => {
   if (obs.onNewNotification) {
-    return fromEvent(wc, 'ipc-message', (_e, channel, id, props) => ({ channel, id, props }))
-      .pipe(filter(({ channel }) => channel === 'new-notification'))
-      .subscribe(({ id, props }) => {
+    // @ts-ignore
+    return fromEvent(wc, 'ipc-message', (_e: any, channel: any, id: any, props: any) => ({ channel, id, props }))
+      // @ts-ignore
+      .pipe(filter(({ channel }: { channel: any }) => channel === 'new-notification'))
+      // @ts-ignore
+      .subscribe(({ id, props }: { id: any, props: any }) => {
         obs.onNewNotification!({
           ...props,
           id,
@@ -115,9 +118,12 @@ export const addOnNewNotificationObserver = (wc: Electron.WebContents, obs: RPC.
 
 export const addOnNotificationCloseObserver = (wc: Electron.WebContents, obs: RPC.ObserverNode<TabWebContentsNotificationsObserver>) => {
   if (obs.onNotificationClose) {
-    return fromEvent(wc, 'ipc-message', (_e, channel, id) => ({ channel, id }))
-      .pipe(filter(({ channel }) => channel === 'notification-close'))
-      .subscribe(({ id }) => {
+    // @ts-ignore
+    return fromEvent(wc, 'ipc-message', (_e: any, channel: any, id: any) => ({ channel, id }))
+      // @ts-ignore
+      .pipe(filter(({ channel }: { channel: any }) => channel === 'notification-close'))
+      // @ts-ignore
+      .subscribe(({ id }: { id: any }) => {
         obs.onNotificationClose!(id);
       });
   }

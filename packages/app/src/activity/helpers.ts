@@ -56,7 +56,7 @@ export const favoriteAsActivityEntry = (
   state: StationState
 ): ActivityEntry => {
   const favoriteId = favorite.get('favoriteId');
-  const tab: StationTabImmutable = getFavorite(state, favoriteId) as StationTabImmutable;
+  const tab: StationTabImmutable = getFavorite(state, favoriteId) as unknown as StationTabImmutable;
 
   return {
     resourceId: favoriteId,

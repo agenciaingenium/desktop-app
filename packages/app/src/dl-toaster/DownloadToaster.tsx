@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import * as Immutable from 'immutable';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { compose, bindActionCreators } from 'redux';
 import { getThemeColors } from '../theme/selectors';
 import { ImmutableList, ObjectToImmutable } from '../types';
 import DownloadToast from './components/DownloadToast';
+// @ts-ignore no declaration file
 import { openDownloadedFile, removeToastForDownload } from './duck';
+// @ts-ignore no declaration file
 import { getFormatedDownloadsToShow } from './selectors';
 import { Style, ButtonIcon, IconSymbol } from '@getstation/theme';
 
@@ -91,9 +92,11 @@ class DownloadToasterImpl extends React.PureComponent<Props, {}> {
   }
 }
 
+// @ts-ignore
 const connector = compose(
+  // @ts-ignore
   connect(
-    (state: Immutable.Map<string, any>) => ({
+    (state: any) => ({
       downloads: getFormatedDownloadsToShow(state),
       themeColor: getThemeColors(state)[3],
     }),

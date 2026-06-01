@@ -4,7 +4,7 @@ import { getNotificationBadge } from '../notifications/get';
 import { getNotifications as getNotificationsObjects } from '../notifications/selectors';
 import { StationState } from '../types';
 import { INFINITE, SYNC_WITH_OS } from './constants';
-import ms = require('ms');
+import ms from 'ms';
 
 export const getSnoozeDuration = (state: StationState): string | undefined =>
   state.getIn(['notificationCenter', 'snoozeDuration']);
@@ -21,6 +21,7 @@ export const getSnoozeDurationInMs = (state: StationState): number | string | un
 export const getSnoozeState = (state: StationState): boolean => {
   const currentSnoozeDurationInMs = getSnoozeDurationInMs(state);
   if (!currentSnoozeDurationInMs) return false;
+  // @ts-ignore
   return currentSnoozeDurationInMs > 0 || currentSnoozeDurationInMs === SYNC_WITH_OS || currentSnoozeDurationInMs === INFINITE;
 };
 
@@ -54,21 +55,28 @@ export const getFullNotificationsOrderedGrouped = createSelector(
     let previousApplicationId: string | undefined = undefined;
     let currentApplicationId: string;
     // @ts-ignore: no proper iterator declaration
+    // @ts-ignore
     for (const notification of notifications.values()) {
-      currentApplicationId = notification.get('applicationId', 'station');
+      currentApplicationId = notification!.get('applicationId', 'station');
 
       if (currentApplicationId !== previousApplicationId || groups.size === 0) {
         groups = groups.push(Immutable.Map({
           applicationId: currentApplicationId,
-          applicationName: notification.get('applicationName', 'Station'),
+          // @ts-ignore
+          applicationName: notification!.get('applicationName', 'Station'),
+          // @ts-ignore
           icon: notification.get('icon'),
+          // @ts-ignore
           label: notification.get('label'),
           notifications: Immutable.List([notification]),
+          // @ts-ignore
           badge: getNotificationBadge(notification),
         }));
       } else {
         groups = groups.update(groups.size - 1,
+            // @ts-ignore
             m => m.update('notifications',
+                // @ts-ignore
                 notifs => notifs.push(notification)));
       }
 

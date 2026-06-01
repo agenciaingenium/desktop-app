@@ -25,6 +25,7 @@ export default class ReactProvider extends AbstractProvider<react.ReactConsumer>
 
   getProviderInterface(consumer: react.ReactConsumer): react.ReactProviderInterface {
     return {
+      // @ts-ignore
       createPortal: (children: ComponentClass, id: react.ValidPortalIds, position?: number) =>
         this.createPortal(consumer, children, id, position || 0),
     };

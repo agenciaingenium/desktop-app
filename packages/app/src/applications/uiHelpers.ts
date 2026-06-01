@@ -3,7 +3,7 @@
  */
 
 import * as memoize from 'memoizee';
-import ms = require('ms');
+import ms from 'ms';
 import { sortWith, descend } from 'ramda';
 import { resolve as resolveUrl } from 'url';
 // @ts-ignore no declaration file
@@ -35,7 +35,7 @@ async function safePromise<T>(p: Promise<T>): Promise<T | undefined> {
 }
 
 // used to attempt to have the best quality favicon
-export const getFavicon = memoize(async (originUrl: string): Promise<string | undefined> => {
+export const getFavicon = (memoize as any)(async (originUrl: string): Promise<string | undefined> => {
   // `fetch-favicon` can throw synchronously on redirect/header edge cases.
   const favicon: string | undefined = await safePromise(Promise.resolve().then(() => fetchFavicon(originUrl)));
   if (!favicon) return undefined;
@@ -48,7 +48,7 @@ export const getFavicon = memoize(async (originUrl: string): Promise<string | un
 }, { promise: true, maxAge: ms('1 day') });
 
 // used to get base64 raw image dimensions
-const getImageDimensions = memoize((url: string): Promise<SizedFavicon> => {
+const getImageDimensions = (memoize as any)((url: string): Promise<SizedFavicon> => {
   return new Promise(resolve => {
     const img = new Image();
 

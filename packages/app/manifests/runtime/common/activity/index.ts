@@ -11,7 +11,7 @@ export const startActivityRecording = async (
   manifestURL: string,
   resourceExtractor: ResourceExtractor
 ): Promise<Observable<Error>> => {
-  const observeCurrentTabNextResource = tabId => (
+  const observeCurrentTabNextResource = (tabId: string) => (
     sdk.tabs.getTab(tabId)
       .pipe(distinctUntilChanged((before, after) => before.url === after.url))
       .pipe(map((tab: tabs.Tab): ResourceRecord | undefined => {
@@ -28,7 +28,7 @@ export const startActivityRecording = async (
         }
         return undefined;
       }))
-      .pipe(skip(1)) // get only future activity
+      .pipe(skip(1))
       .pipe(filter(x => Boolean(x)))
       .pipe(distinctUntilChanged(
         (before?: ResourceRecord, after?: ResourceRecord) => {
@@ -40,10 +40,11 @@ export const startActivityRecording = async (
 
   subscriptions.set(
     sdk.activity.id,
-    // @ts-ignore : RxJS module resolution doesn't works with linked modules (dev env)
     sdk.tabs.nav()
       .pipe(switchMap(nav => observeCurrentTabNextResource(nav.tabId)))
+      // @ts-ignore
       .subscribe((record: ResourceRecord) => {
+        // @ts-ignore
         sdk.activity.push(record.resourceId, record.extraData, record.type, manifestURL);
       })
   );

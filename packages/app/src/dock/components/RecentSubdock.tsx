@@ -1,6 +1,8 @@
 import { GradientType, theme, withGradient } from '@getstation/theme';
 import * as React from 'react';
 import { findDOMNode } from 'react-dom';
+// @ts-ignore: Mousetrap UMD global
+declare const Mousetrap: any;
 import {
   SearchPaneItemSelectedVia,
   cyclingStep as bangCyclingStep,
@@ -48,24 +50,24 @@ const navigationIconStyle: React.CSSProperties = {
 };
 
 class RecentSubdock extends React.PureComponent<Props> {
-  private highlightedItemComponent: BangItem | null;
+  private highlightedItemComponent!: React.ReactElement | null;
 
   constructor(props: Props) {
     super(props);
 
     if (!props.isCycling && props.recentApplications.length > 0) {
-      props.setHighlightedItemId(getId(props.recentApplications[0]));
+      props.setHighlightedItemId(getId(props.recentApplications[0] as any));
     }
 
     this.componentDidUpdate = throttle(this.componentDidUpdate, 100, { leading: false });
   }
 
-  getHighlightedItem = () => findItemById(this.props.highlightedItemId!, this.props.recentApplications);
+  getHighlightedItem = () => findItemById(this.props.highlightedItemId!, this.props.recentApplications as any);
 
   previousHighlightedItemIndex(via: SearchPaneItemsListCycleVia) {
     const withCycling = via !== 'keyboard-arrow';
     const item = this.getHighlightedItem();
-    const newIndex = this.props.recentApplications.indexOf(item!) - 1;
+    const newIndex = (this.props.recentApplications as any).indexOf(item!) - 1;
 
     if (newIndex < 0) {
       return withCycling ? this.props.recentApplications.length - 1 : null;
@@ -76,7 +78,7 @@ class RecentSubdock extends React.PureComponent<Props> {
   nextHighlightedItemIndex(via: SearchPaneItemsListCycleVia) {
     const withCycling = via !== 'keyboard-arrow';
     const item = this.getHighlightedItem();
-    const newIndex = this.props.recentApplications.indexOf(item!) + 1;
+    const newIndex = (this.props.recentApplications as any).indexOf(item!) + 1;
 
     if (newIndex >= this.props.recentApplications.length) {
       return withCycling ? 0 : null;
@@ -87,7 +89,7 @@ class RecentSubdock extends React.PureComponent<Props> {
   cyclingStep = (index: number | null, direction: SearchPaneItemsListCycleDirection, via: SearchPaneItemsListCycleVia) => {
     if (index === null) return;
     const items = this.props.recentApplications;
-    return this.props.cyclingStep(items[index], index, direction, 'subdock', via);
+    return this.props.cyclingStep(items[index] as any, index, direction, 'subdock', via);
   }
 
   componentDidMount() {
@@ -96,7 +98,8 @@ class RecentSubdock extends React.PureComponent<Props> {
   }
 
   componentDidUpdate() {
-    const item = findDOMNode(this.highlightedItemComponent);
+    // @ts-ignore
+    const item = findDOMNode(this.highlightedItemComponent!) as Element | null;
     if (item) {
       item.scrollIntoView({ behavior: 'smooth' });
     }
@@ -108,38 +111,38 @@ class RecentSubdock extends React.PureComponent<Props> {
   }
 
   handleKeyboardShortcuts() {
-    Mousetrap.bind(['enter'], (e) => {
+    Mousetrap.bind(['enter'], (e: any) => {
       const { isCycling, recentApplications, highlightedItemId } = this.props;
       e.preventDefault();
 
       if (isCycling) return;
 
-      const index = recentApplications.findIndex(app => getId(app) === highlightedItemId);
+      const index = recentApplications.findIndex(app => getId(app as any) === highlightedItemId);
 
       if (index > -1) {
         const application = recentApplications[index];
         const altKey = e.getModifierState('Alt');
         switch (altKey) {
           case false: {
-            this.props.selectItem(application, 'keyboard-enter', index);
+            this.props.selectItem(application as any, 'keyboard-enter', index);
             break;
           }
         }
       }
     });
-    Mousetrap.bind(['ctrl+esc', 'esc'], (e) => {
+    Mousetrap.bind(['ctrl+esc', 'esc'], (e: any) => {
       e.preventDefault();
 
       this.props.onEsc();
     });
-    Mousetrap.bind(['tab', 'down'], (e) => {
+    Mousetrap.bind(['tab', 'down'], (e: any) => {
       e.preventDefault();
       if (this.props.isCycling) return;
 
       const via = e.key === 'Tab' ? 'keyboard-tab' : 'keyboard-arrow';
       this.cyclingStep(this.nextHighlightedItemIndex(via), 'down', via);
     });
-    Mousetrap.bind(['shift+tab', 'up'], (e) => {
+    Mousetrap.bind(['shift+tab', 'up'], (e: any) => {
       e.preventDefault();
       if (this.props.isCycling) return;
 
@@ -190,23 +193,27 @@ class RecentSubdock extends React.PureComponent<Props> {
                 type,
                 themeColor,
               } = entry;
-              const isHighLighted = getId(entry) === highlightedItemId;
+              const isHighLighted = getId(entry as any) === highlightedItemId;
 
-              return <BangItem
+              return (
+                // @ts-ignore
+                <BangItem
                 ctrlTabCycling={isCycling}
-                key={getId(entry)}
+                key={getId(entry as any)}
                 label={label}
                 context={context!}
                 imgUrl={imgUrl!}
                 type={type as unknown as SearchPaneItemSelectedItem}
                 themeColor={themeColor!}
                 selected={isHighLighted}
-                onClick={() => selectItem(entry, 'click', index)}
+                onClick={() => selectItem(entry as any, 'click', index)}
                 smallSize={true}
-                ref={(itemComp: HTMLDivElement) => {
+                // @ts-ignore
+                ref={(itemComp: any) => {
                   if (isHighLighted) this.highlightedItemComponent = itemComp;
                 }}
-              />;
+              />
+              );
             })}
           </div>
         </div>

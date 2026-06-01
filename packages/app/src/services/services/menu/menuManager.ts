@@ -16,7 +16,7 @@ const openPrivacyPolicies = () => {
 
 export class BrowserXMenuManager extends EventEmitter {
 
-  protected _menu: Electron.Menu;
+  protected _menu!: Electron.Menu;
 
   get menu() {
     if (!this._menu) {

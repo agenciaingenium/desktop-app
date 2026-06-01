@@ -3,6 +3,7 @@ import { createUseStyles } from 'react-jss';
 import * as classNames from 'classnames';
 
 import styles from './styles';
+// @ts-ignore no declaration file
 const asideSvgSpitePath: string = require('../../aside-svg-spite.svg');
 
 const useStyles = createUseStyles(styles);

@@ -37,6 +37,7 @@ function getItemStyles(props: Props) {
   };
 }
 
+// @ts-ignore
 @DragLayer(monitor => ({
   item: monitor.getItem(),
   itemType: monitor.getItemType(),
@@ -44,6 +45,8 @@ function getItemStyles(props: Props) {
   currentOffset: monitor.getSourceClientOffset(),
   isDragging: monitor.isDragging(),
 }))
+// @ts-ignore
+// @ts-ignore
 class DockIconDragLayer extends React.PureComponent<Props> {
 
   componentDidUpdate(prevProps: Props) {
@@ -86,6 +89,8 @@ class DockIconDragLayer extends React.PureComponent<Props> {
           <AppDockIcon
             applicationId={item.applicationId}
             active={true}
+            // @ts-ignore
+            iconRef={() => {}}
           />
         </div>
       </div>

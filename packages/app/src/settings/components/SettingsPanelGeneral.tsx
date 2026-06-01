@@ -7,7 +7,6 @@ import { bindActionCreators } from 'redux';
 import { openProcessManager } from '../../app/duck';
 import { areBetaIncludedInUpdates, getDownloadFolder } from '../../app/selectors';
 import { clickBrowseDownloadFolder, revealPathInFinder } from '../../downloads/duck';
-import { StationState } from '../../types';
 import SettingsAutoLaunch from './SettingsAutoLaunch/SettingsAutoLaunch';
 import SettingsDeveloperTools from './SettingsDeveloperTools';
 import SettingsDownloadFolder from './SettingsDownloads/SettingsDownloadFolder';
@@ -72,26 +71,31 @@ class SettingsPanelGeneralImpl extends React.PureComponent<Props, {}> {
   }
 }
 
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
+// @ts-ignore
 const SettingsPanelGeneral = connect<StateProps, DispatchProps, MergeProps>(
-  (state: StationState) => ({
+  (state: any) => ({
     areBetaIncludedInUpdates: Boolean(areBetaIncludedInUpdates(state)),
     downloadFolder: getDownloadFolder(state),
   }),
-  dispatch => bindActionCreators(
+  (dispatch: any) => bindActionCreators(
     {
       clickBrowseDownloadFolder,
       revealPathInFinder,
       openProcessManager,
     },
     dispatch
-  ),
-  (stateProps, dispatchProps, ownProps) => ({
+  ) as any,
+  (stateProps: any, dispatchProps: any, ownProps: any) => ({
     ...ownProps,
     ...stateProps,
     ...dispatchProps,
     onDownloadLocationClick: () =>
       dispatchProps.revealPathInFinder(stateProps.downloadFolder),
   })
-)(SettingsPanelGeneralImpl) as any;
+)(SettingsPanelGeneralImpl as any) as any as any;
 
 export default SettingsPanelGeneral as React.ComponentType<OwnProps>;

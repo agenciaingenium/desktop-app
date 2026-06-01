@@ -1,4 +1,5 @@
 import * as React from 'react';
+// @ts-ignore
 import { MutationFn } from '@apollo/client';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import * as classNames from 'classnames';
@@ -101,8 +102,10 @@ const Favorites = ({
         ref={internalRef}
         onScroll={onScroll}
         style={contentStyle}
+        // @ts-ignore
         className={classNames(
           className,
+          // @ts-ignore
           'subdock-scroll-content',
           {
             'subdock-scroll-overlay-top': !scrolled.top && nbTabs > 5,

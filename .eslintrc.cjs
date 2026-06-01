@@ -24,7 +24,7 @@ module.exports = {
     '@typescript-eslint/ban-types': 'off',
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-empty-interface': 'off',
-    '@typescript-eslint/no-explicit-any': ['warn', { ignoreRestArgs: true }],
+    '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-extra-non-null-assertion': 'off',
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
@@ -36,7 +36,7 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'warn',
     '@typescript-eslint/prefer-as-const': 'off',
     'no-case-declarations': 'off',
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    'no-console': ['warn', { allow: ['warn', 'error', 'debug'] }],
     'no-constant-condition': 'off',
     'no-empty': ['error', { allowEmptyCatch: true }],
     'no-async-promise-executor': 'off',
@@ -61,6 +61,7 @@ module.exports = {
       files: ['**/*.{ts,tsx}'],
       rules: {
         '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+        '@typescript-eslint/no-var-requires': 'off',
       },
     },
     {

@@ -28,7 +28,7 @@ export default class List extends React.PureComponent<Props, {}> {
         {title && <div style={STYLE.title}>{title}</div>}
 
         <ul style={STYLE.itemsWrapper}>
-          { items.map((item: ListItemType) =>
+          { (items as any).toArray().map((item: ListItemType) =>
             <ListItem key={item.id} iconSize={iconSize} item={item} />
           )}
         </ul>

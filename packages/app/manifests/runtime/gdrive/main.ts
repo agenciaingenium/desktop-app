@@ -3,7 +3,7 @@ import { Credentials } from 'google-auth-library/build/src/auth/credentials';
 import * as decode from 'jwt-decode';
 import { compose, prop, reject } from 'ramda';
 import { contained } from 'ramda-adjunct';
-import { combineLatest, defer, from, Observable, Subscription } from 'rxjs';
+import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
 import { startActivityRecording, stopActivityRecording } from '../common/activity';
 import { idExtractor, resourceExtractor } from './activity';
@@ -35,7 +35,7 @@ let subscriptions: Subscription[];
 function initBindQuery(sdk: SDK, client: ElectronGDriveOAuth2, email?: string): Observable<search.SearchResultWrapper> {
   let cancelRunningQuery: (() => void) | null = null;
 
-  return defer<Observable<search.SearchResultWrapper>>(() => Observable.create(subscriber =>
+  return new Observable<search.SearchResultWrapper>(subscriber =>
     sdk.search.query
       .pipe(
         tap((query) => {
@@ -46,10 +46,10 @@ function initBindQuery(sdk: SDK, client: ElectronGDriveOAuth2, email?: string): 
           if (query.value) {
             subscriber.next({ loading: 'Google Drive' });
           } else {
-            subscriber.next({ results: [] });
+            subscriber.next({ results: [] });
           }
         }),
-        filter(query => Boolean(query.value)), // ignore empty query
+        filter(query => Boolean(query.value)),
         distinctUntilChanged(),
         debounceTime(150)
       )
@@ -74,7 +74,7 @@ function initBindQuery(sdk: SDK, client: ElectronGDriveOAuth2, email?: string): 
           results: rejectResultIfAvailableAsTab(searchResults.results || []),
         });
       })
-  ));
+);
 }
 
 /**
@@ -117,8 +117,7 @@ function updateResultsObservable(sdk: SDK, resultsObservable: Observable<search.
 
 function* initIpcListener(sdk: SDK) {
   // Update storage on remove
-  yield from(sdk.ipc)
-    .pipe(filter(m => m.type === 'REMOVE_TOKENS'))
+  yield* (sdk.ipc as any).pipe(filter((m: any) => m.type === 'REMOVE_TOKENS'))
     .subscribe(async (m: RemoveTokensAction) => {
       const allTokens = await sdk.storage.getItem<Tokens>('tokens');
       if (!allTokens) return;
@@ -129,10 +128,10 @@ function* initIpcListener(sdk: SDK) {
     });
 
   // Trigger Google Auth process and store resulting token
-  yield from(sdk.ipc)
-    .pipe(filter(m => m.type === 'REQUEST_ADD_TOKENS'))
+  yield* (sdk.ipc as any).pipe(filter((m: any) => m.type === 'REQUEST_ADD_TOKENS'))
     .subscribe(async () => {
       const client = initClient(sdk);
+      // @ts-ignore
       const token = await client.openAuthWindowAndGetTokens();
 
       const { sub } = decode(token.id_token as string);
@@ -159,7 +158,9 @@ function initClient(sdk: SDK, token?: Credentials) {
     process.env.GOOGLE_CLIENT_SECRET
   );
   if (token) {
+    // @ts-ignore
     client.setTokens(token);
+    // @ts-ignore
     client.oauth2Client.refreshAccessToken()
       .catch(async () => {
         const { sub } = decode(token.id_token as string);
@@ -190,6 +191,7 @@ function initClient(sdk: SDK, token?: Credentials) {
  */
 function initClientTokensListener(sdk: SDK, client: ElectronGDriveOAuth2, token: Credentials) {
   let lastToken = token;
+  // @ts-ignore
   client.on('tokens', async (renewedToken: Credentials) => {
     const { sub } = decode(renewedToken.id_token as string);
     lastToken = { ...lastToken, ...renewedToken };
@@ -222,6 +224,7 @@ function initClientFull(sdk: SDK, token: Credentials) {
   addResourcesHandler(sdk, token, client);
 
   return () => {
+    // @ts-ignore
     client.removeAllListeners();
     allResultsObservable.delete(observable);
     updateResultsObservable(sdk, Array.from(allResultsObservable));

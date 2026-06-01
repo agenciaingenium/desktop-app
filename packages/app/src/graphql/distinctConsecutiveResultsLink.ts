@@ -1,3 +1,4 @@
+// @ts-ignore
 import { ApolloLink, ExecutionResult, NextLink, Operation } from '@apollo/client/link/core';
 import { Observable as ZenObservable } from '@apollo/client/core';
 import log from 'electron-log';
@@ -25,7 +26,9 @@ export const compare = (operation: Operation) => <T>(a: ExecutionResult<T>, b: E
  * Before sending a result, it is compared to the previous item.
  * If they match, new result is not sent.
  */
+// @ts-ignore
 export class DistinctConsecutiveResultsLink extends ApolloLink {
+  // @ts-ignore
   request(operation: Operation, forward: NextLink) {
     const observable = forward(operation);
     // zen -> rx -> distinct -> zen

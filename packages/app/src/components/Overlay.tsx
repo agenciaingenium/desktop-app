@@ -79,7 +79,7 @@ class Overlay extends React.PureComponent<Props & HocProps> {
           <h1 style={{ flexGrow: 1 }}>{title}</h1>
         </div>
         }
-        <div className={classNames('overlay-content', contentClassName)} style={{ ...{ flexGrow: 1, maxWidth: '1000px', alignSelf: 'center' }, ...contentStyle }}>
+        <div className={(classNames as any)('overlay-content', contentClassName)} style={{ ...{ flexGrow: 1, maxWidth: '1000px', alignSelf: 'center' }, ...contentStyle }}>
           {this.renderChildren()}
         </div>
       </div>
@@ -87,4 +87,4 @@ class Overlay extends React.PureComponent<Props & HocProps> {
   }
 }
 
-export default withGradient(GradientType.withOverlay)(Overlay);
+export default (withGradient(GradientType.withOverlay) as any)(Overlay);

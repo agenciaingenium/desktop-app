@@ -16,6 +16,7 @@ export const createFuseSearch = (
   limit: number | undefined = undefined,
   options: Fuse.FuseOptions<Item> = defaultFuseOption
 ) => {
+  // @ts-ignore: no declaration file
   const fuse = new Fuse(fuseCommands, options);
   return (searchValue?: string): search.SearchResultWrapper => {
     const results = isBlank(searchValue) ? fuseCommands : fuse.search(searchValue!);

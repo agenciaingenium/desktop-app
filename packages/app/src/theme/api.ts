@@ -43,8 +43,8 @@ export const getMomentOfTheDay = (suncalc?: SunCalc): string | undefined => {
   const seconds = getSecondsSinceMidnight();
   const keys = Array.from(startTransition.keys());
   const values = Array.from(startTransition.values());
-  let value = values.reduce(
-    (res, val) => {
+  let value = (values as any).reduce(
+    (res: number, val: number) => {
       if (val <= seconds && val > res) return val;
       return res;
     },
@@ -54,7 +54,7 @@ export const getMomentOfTheDay = (suncalc?: SunCalc): string | undefined => {
   if (value === 0 && values.indexOf(0) === -1) {
     value = values[values.length - 1];
   }
-  return keys[values.indexOf(value)];
+  return keys[values.indexOf(value) as number] as string | undefined;
 };
 
 export const getMomentOfTheDayAndProgress = (suncalc?: SunCalc): [string, number] => {
@@ -80,7 +80,8 @@ export function getGradient(color1: string, color2: string, ratio: number) {
   return gradient(color1, color2, ratio);
 }
 
-export const getMyCoordinates = memoize(
+export const getMyCoordinates = (memoize as any)(
+  // @ts-ignore
   (): Promise<Coordinates | undefined> =>
     getMyPublicIPv4()
       .then((ip: string) => new Promise((resolve, reject) => {
@@ -107,23 +108,22 @@ export const getMyCoordinates = memoize(
   }
 );
 
-export const getSunCalc = memoize(
+export const getSunCalc = (memoize as any)(
+  // @ts-ignore
   (coords?: Coordinates): SunCalc | undefined => {
-    // If coordinates are undefined = abort
     if (!coords) {
       return undefined;
     }
 
     const times = SunCalc.getTimes(new Date(), coords.latitude, coords.longitude);
-    let suncalc = {};
+    const suncalc: Record<string, number> = {};
 
     Object.keys(times).forEach((key: string) => {
-      suncalc = {...suncalc, ...{
-        [key]: times[key].getHours() + (times[key].getMinutes() / 60),
-      }};
+      const t = times[key as keyof typeof times];
+      suncalc[key] = t.getHours() + (t.getMinutes() / 60);
     });
 
-    return suncalc;
+    return suncalc as unknown as SunCalc;
   },
   { maxAge: 60 * 60 * 1000 }
 );
@@ -155,7 +155,9 @@ export const getValidSuncalc = (suncalc: SunCalc): any => {
 };
 
 // Keys are in seconds (from midnight)
+// @ts-ignore
 export const getTransitionsMap = memoize((suncalc?: SunCalc) => {
+  // @ts-ignore
   const { dawn, sunrise, midday, afternoon, sunset, night } = suncalc ? getValidSuncalc(suncalc) : DEFAULT_SUNCALC;
   const morning = sunrise + 1;
 

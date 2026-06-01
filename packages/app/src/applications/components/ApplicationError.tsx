@@ -49,7 +49,7 @@ export default class ApplicationLoadingContainer extends React.PureComponent<Pro
             {this.renderErrorMessage()}
             <Button
               btnStyle={Style.SECONDARY}
-              className={{ width: '100%', marginTop: 20 }}
+              className={{ width: '100%', marginTop: 20 } as any}
               onClick={() => this.handleReloadClick()}
             >
               Try reloading

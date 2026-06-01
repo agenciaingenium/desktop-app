@@ -15,6 +15,7 @@ import {
   takeEvery,
   takeLatest,
   throttle,
+  CallEffect,
 } from 'redux-saga/effects';
 import { Observable } from 'rxjs';
 import { nanoid } from 'nanoid';
@@ -26,31 +27,40 @@ import { TabWebContentsService } from '../../services/services/tab-webcontents/i
 import services from '../../services/servicesManager';
 import { GlobalServices } from '../../services/types';
 
-export function tryCatch<Fn extends (...args: any[]) => any>(saga: Fn) {
+type AnyFunction = (...args: any[]) => any;
+
+export function tryCatch<Fn extends AnyFunction>(saga: Fn): AnyFunction {
   // Inspired by https://github.com/cyrilluce/redux-saga-catch
   // @author cyrilluce@gmail.com
   return function* wrappedTryCatch(...args: any[]) {
     try {
+      // @ts-ignore
       yield call(saga, ...args);
     } catch (e) {
       log.error(e);
+      // @ts-ignore
       logger.notify(e);
     }
-  };
+  } as any;
 }
 
-export function takeFirstWitness(pattern: Pattern | TakeableChannel, worker: Function, ...args: any[]): ForkEffect {
-  return fork(function* () {
+export function takeFirstWitness(pattern: Pattern<any> | TakeableChannel<any>, worker: AnyFunction, ...args: any[]): ForkEffect {
+  // @ts-ignore
+  return fork(function* (): any {
+    // @ts-ignore
     const action = yield take(pattern);
+    // @ts-ignore
     yield call(tryCatch(worker), ...args.concat(action));
   });
 }
 
-export function takeEveryWitness(pattern: Pattern | TakeableChannel, worker: Function, ...args: any[]): ForkEffect {
+export function takeEveryWitness(pattern: Pattern<any> | TakeableChannel<any>, worker: AnyFunction, ...args: any[]): ForkEffect {
+  // @ts-ignore
   return takeEvery(pattern, tryCatch(worker), ...args);
 }
 
-export function takeLatestWitness(pattern: Pattern | TakeableChannel, worker: Function, ...args: any[]): ForkEffect {
+export function takeLatestWitness(pattern: Pattern<any> | TakeableChannel<any>, worker: AnyFunction, ...args: any[]): ForkEffect {
+  // @ts-ignore
   return takeLatest(pattern, tryCatch(worker), ...args);
 }
 
@@ -59,36 +69,44 @@ export function takeLatestWitness(pattern: Pattern | TakeableChannel, worker: Fu
  * After spawning a task once, it blocks until spawned saga completes and then starts to listen for a pattern again.
  * In short, it is listening for the actions when it doesn't run a saga.
  */
-export function takeLeadingWitness(pattern: Pattern | TakeableChannel, worker: Function, ...args: any[]): ForkEffect {
-  return fork(function* () {
+export function takeLeadingWitness(pattern: Pattern<any> | TakeableChannel<any>, worker: AnyFunction, ...args: any[]): ForkEffect {
+  // @ts-ignore
+  return fork(function* (): any {
     while (true) {
+      // @ts-ignore
       const action = yield take(pattern);
+      // @ts-ignore
       yield call(tryCatch(worker), ...args.concat(action));
     }
   });
 }
 
 export function takeComplexLatestWitness(
-  pattern: Pattern | TakeableChannel,
-  getUnicityKey: Function,
-  worker: CallEffectFn<any>,
+  pattern: Pattern<any> | TakeableChannel<any>,
+  getUnicityKey: AnyFunction,
+  worker: AnyFunction,
   ...args: any[]
 ): ForkEffect {
-  return fork(function* () {
+  // @ts-ignore
+  return fork(function* (): any {
     const lastTaskMap = new Map();
     while (true) {
+      // @ts-ignore
       const action = yield take(pattern);
       const uniq = getUnicityKey(action);
       if (lastTaskMap.has(uniq)) {
+        // @ts-ignore
         yield cancel(lastTaskMap.get(uniq)); // cancel is no-op if the task has already terminated
         lastTaskMap.delete(uniq);
       }
+      // @ts-ignore
       lastTaskMap.set(uniq, yield fork(tryCatch(worker), ...args.concat(action)));
     }
   });
 }
 
-export function throttleWitness(ms: number, pattern: Pattern | TakeableChannel, worker: Function, ...args: any[]): ForkEffect {
+export function throttleWitness(ms: number, pattern: Pattern<any> | TakeableChannel<any>, worker: AnyFunction, ...args: any[]): ForkEffect {
+  // @ts-ignore
   return throttle(ms, pattern, tryCatch(worker), ...args);
 }
 
@@ -118,22 +136,24 @@ export function createEmitterEventChannel(
         eventEmitter.removeListener(eventName, eventHandler);
       }
     };
-  });
+  }) as any;
 }
 
-export function observableChannel<C extends Observable<R>, R>(observable: C): Channel<R> {
+export function observableChannel<C extends Observable<R>, R = any>(observable: C): Channel<any> {
   return eventChannel(
     ((emitter) => {
       const subscription = observable.subscribe({
-        next: (value: R) => emitter(value),
+        // @ts-ignore
+        next: (value: R) => emitter(value as any),
         complete: () => emitter(END),
-        error: err => emitter(err),
+        error: err => emitter(err as any),
       });
 
       return subscription.unsubscribe.bind(subscription);
     }),
+    // @ts-ignore
     buffers.expanding()
-  );
+  ) as any;
 }
 
 export function periodicTick(ms: number, stopAfter?: number): Channel<any> {
@@ -149,10 +169,10 @@ export function periodicTick(ms: number, stopAfter?: number): Channel<any> {
       }
     }, ms);
     return () => clearInterval(iv);
-  });
+  }) as any;
 }
 
-export type GenericCallEffectFn = CallEffectFn<(...args: any[]) => any>;
+export type GenericCallEffectFn = CallEffect<(...args: any[]) => any>;
 
 function tryCatchAck(saga: Function) {
   return function* wrappedTryCatch(...args: any[]) {
@@ -162,13 +182,14 @@ function tryCatchAck(saga: Function) {
       yield put(fin(__ack_id));
     } catch (e) {
       log.error(e);
-      logger.notify(e);
+      logger.notify(e as Error);
       yield put(error(__ack_id));
     }
   };
 }
 
-export function takeEveryWithAck(pattern: Pattern | TakeableChannel, worker: Function, ...args: any[]): ForkEffect {
+export function takeEveryWithAck(pattern: Pattern<any> | TakeableChannel<any>, worker: AnyFunction, ...args: any[]): ForkEffect {
+  // @ts-ignore
   return takeEvery(pattern, tryCatchAck(worker), ...args);
 }
 
@@ -179,18 +200,23 @@ export function wrapAck(action: any) {
   };
 }
 
-export function* putAck(action: any, worker: CallEffectFn<any>, errorWorker?: CallEffectFn<any>) {
+export function* putAck(action: any, worker: AnyFunction, errorWorker?: AnyFunction): any {
   const ackAction = wrapAck(action);
   yield put(ackAction);
 
+  // @ts-ignore
   const raceResult = yield race({
+    // @ts-ignore
     fin: take((act: FinAction) => act.type === FIN && act.id === ackAction.__ack_id),
+    // @ts-ignore
     error: take((act: ErrorAction) => act.type === ERROR && act.id === ackAction.__ack_id),
   });
 
   if (raceResult.fin) {
+    // @ts-ignore
     yield call(worker);
   } else if (raceResult.error && errorWorker) {
+    // @ts-ignore
     yield call(errorWorker);
   }
 }
@@ -203,19 +229,22 @@ export function* putAck(action: any, worker: CallEffectFn<any>, errorWorker?: Ca
  * @param {Function} saga
  * @param {Array} args
  */
-export function* debounceFor(ms: number, pattern: Pattern | TakeableChannel, saga: Function, ...args: any[]) {
-  function* delayedSaga(action: TakeEffect) {
+export function* debounceFor(ms: number, pattern: Pattern<any> | TakeableChannel<any>, saga: AnyFunction, ...args: any[]): any {
+  function* delayedSaga(action: TakeEffect): any {
     yield call(delay, ms);
-    yield call<TakeEffect, any>(saga, action, ...args);
+    // @ts-ignore
+    yield call(saga, action, ...args);
   }
 
-  let task;
+  let task: any;
   while (true) {
+    // @ts-ignore
     const action = yield take(pattern);
     if (task) {
       yield cancel(task);
     }
 
+    // @ts-ignore
     task = yield fork(delayedSaga, action);
   }
 }
@@ -227,7 +256,7 @@ export function callService<
     M extends keyof GlobalServices[K],
     P extends Parameters<IsFunctionWithArgs<GlobalServices[K][M]>>,
   >(service: K, method: M, ...params: P) {
-  return call([services[service], services[service][method as string]], ...params);
+  return call([services[service] as any, (services[service] as any)[method as string]], ...params);
 }
 
 type NodeWithObserver<T extends RPC.ObserverNode<T>, M extends string> = {
@@ -266,7 +295,7 @@ export function createServiceObserverChannel
           });
         };
       }),
-    );
+    ) as any;
   };
 }
 
@@ -306,7 +335,7 @@ export function createWebContentsServiceObserverChannel
         });
       };
     }),
-  );
+  ) as any;
 }
 
-export const serviceAddObserverChannel = createServiceObserverChannel('addObserver');
+export const serviceAddObserverChannel = createServiceObserverChannel('addObserver' as any);

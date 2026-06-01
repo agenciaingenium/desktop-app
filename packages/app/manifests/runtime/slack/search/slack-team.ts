@@ -26,15 +26,15 @@ class SlackTeam {
     tokenize: true,
   };
 
-  public readonly teamDomain;
-  public teamId: string;
-  public teamName: string;
+  public readonly teamDomain: string;
+  public teamId!: string;
+  public teamName!: string;
   public data: Map<string, search.SearchResultItem>;
-  public imsMapper: Map<string, string> = new Map();
+  public imsMapper: Map<string, string>;
   private readonly errors: Subject<Error>;
-  private readonly token;
+  private readonly token: string;
   private sdk: SDK;
-  private ws: WS;
+  private ws!: WS;
   private selfUser: any;
 
   constructor(sdk: SDK, teamDomain: string, token: string) {
@@ -42,6 +42,7 @@ class SlackTeam {
     this.data = new Map();
     this.teamDomain = teamDomain;
     this.token = token;
+    this.imsMapper = new Map();
     this.errors = new Subject();
   }
 
@@ -87,7 +88,9 @@ class SlackTeam {
   }
 
   public search(query: string): search.SearchResultItem[] {
-    const fuse = new Fuse(Array.from(this.data.values()), SlackTeam.fuseOptions);
+    // @ts-ignore
+    const fuse = new Fuse(Array.from(this.data.values()) as search.SearchResultItem[], SlackTeam.fuseOptions);
+    // @ts-ignore
     return fuse.search<search.SearchResultItem>(query).slice(0, 10);
   }
 
@@ -126,16 +129,16 @@ class SlackTeam {
     // Private channel run like groups but have different name representation
     // @see https://api.slack.com/types/group ('Consider a group object the same thing as a private channel object')
     if (channel.is_mpim) {
-      const members = channel.members
-        .filter(memberId => memberId !== this.selfUser.id)
+      const members = (channel.members as any[])
+        .filter((memberId: any) => memberId !== this.selfUser.id)
         .map(memberId => this.data.get(memberId))
         .filter(member => Boolean(member));
 
       // If you have groups that contains deactivated /deleted members we don't push the group
       if (members.length !== channel.members.length - 1) return; // @exp: -1 => remove self user
 
-      const label = join({
-        array: members.map(member => member.meta.first_name),
+      const label = (join as any)({
+        array: (members as any[]).map((member: any) => member.meta.first_name),
         separator: ', ',
         last: ' and ',
         max: 2,
@@ -148,7 +151,7 @@ class SlackTeam {
           category: `Slack: ${this.teamName}`,
           label,
           context: `Slack > ${this.teamName}`,
-          additionalSearchString: flatten(members.map(member => SlackTeam.getAdditionnalSearchString(member))),
+          additionalSearchString: flatten((members as any[]).map((member: any) => SlackTeam.getAdditionnalSearchString(member))),
           onSelect: this.onSelectRecord(channel.id),
           imgUrl: 'https://a.slack-edge.com/436da/marketing/img/meta/ios-144.png',
           manifestURL: this.sdk.search.id,
@@ -209,6 +212,7 @@ class SlackTeam {
   }
 
   private createWebSocketConnection(url: string) {
+    // @ts-ignore
     this.ws = WebSocketClient.from(url);
 
     /*
@@ -255,6 +259,7 @@ class SlackTeam {
       }
     });
 
+    // eslint-disable-next-line no-console
     this.ws.on('close', (event: any) => console.log(event));
   }
 }

@@ -1,4 +1,4 @@
-import ms = require('ms');
+import ms from 'ms';
 
 const defaultBackendSyncDelay = '1minute';
 export const STATION_BACKEND_SYNC_INTERVAL_DELAY = process.env.STATION_BACKEND_SYNC_INTERVAL_DELAY ?

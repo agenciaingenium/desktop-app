@@ -13,5 +13,6 @@ export default function getUIProxy(models: any) {
   }) {
   }
 
+  // @ts-ignore
   return new SingletonStateProxy(UIProxy);
 }

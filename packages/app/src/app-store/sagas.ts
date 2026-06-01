@@ -1,8 +1,11 @@
+// @ts-ignore
 import * as isBlank from 'is-blank';
+// @ts-ignore
 import * as _ from 'lodash';
 import { SagaIterator } from 'redux-saga';
 import { delay } from 'redux-saga/effects';
 import { all, call, getContext, put, putResolve, race, select } from 'redux-saga/effects';
+// @ts-ignore
 import {
   getBxAppManifestURL,
   listAllApplications,
@@ -11,6 +14,7 @@ import {
   manifestToMinimalApplication,
   search,
 } from '../../manifests';
+// @ts-ignore
 import { getPrivateManifests, saveNewApplication } from '../../manifests/private';
 import { BrowserXAppWorker } from '../app-worker';
 import { changeSelectedApp } from '../applications/duck';

@@ -7,7 +7,6 @@ import {
   HeadersReceivedResponse,
 } from 'electron';
 import enhanceWebRequest from 'electron-better-web-request';
-import log from 'electron-log';
 
 const enhancedSessions = new WeakSet<Session>();
 
@@ -118,16 +117,6 @@ export const getRefererForApp = (referer: string): string => {
   return referer && referer.startsWith('http://localhost') ? '' : referer;
 };
 
-const getOrigin = (url?: string) => {
-  if (!url) return undefined;
-
-  try {
-    return new URL(url).origin;
-  } catch (_e) {
-    return undefined;
-  }
-};
-
 const isMacMediaAccessBlocked = () => {
   if (process.platform !== 'darwin') return false;
 
@@ -143,7 +132,7 @@ const enhancePermissions = (session: Session) => {
   const targetSession = session as any;
 
   if (typeof targetSession.setPermissionCheckHandler === 'function') {
-    targetSession.setPermissionCheckHandler((_webContents: Electron.WebContents, permission: string, requestingOrigin?: string, details?: { requestingUrl?: string }) => {
+    targetSession.setPermissionCheckHandler((_webContents: Electron.WebContents, permission: string, _requestingOrigin?: string, _details?: { requestingUrl?: string }) => {
       if (permission !== 'media') return false;
       if (isMacMediaAccessBlocked()) return false;
 
@@ -152,7 +141,7 @@ const enhancePermissions = (session: Session) => {
   }
 
   if (typeof targetSession.setPermissionRequestHandler === 'function') {
-    targetSession.setPermissionRequestHandler((webContents: Electron.WebContents, permission: string, callback: (permissionGranted: boolean) => void, details?: { requestingUrl?: string }) => {
+    targetSession.setPermissionRequestHandler((_webContents: Electron.WebContents, permission: string, callback: (permissionGranted: boolean) => void, _details?: { requestingUrl?: string }) => {
       if (permission !== 'media') {
         callback(false);
         return;

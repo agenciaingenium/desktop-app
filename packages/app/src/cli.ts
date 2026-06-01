@@ -10,10 +10,10 @@ const commands: Record<string, Function> = {
 
 ipcRenderer.on('command', async (_e, command: string, ...args: string[]) => {
   try {
-    await commands[command](args);
+    await (commands[command] as any)(args);
     exit();
   } catch (e) {
     console.error(e);
-    webContents.getFocusedWebContents().openDevTools();
+    webContents.getFocusedWebContents()!.openDevTools();
   }
 });

@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { logger } from '../api/logger';
 
 type Selector<S, R> = (state: S) => R;
-export function subscribeStore<S, R>(store: Store<S>, selector?: Selector<S, R>) {
+export function subscribeStore<S = any, R = any>(store: Store<S>, selector?: Selector<S, R>) {
   return new Observable<S>((observer) => {
     // emit the first value immediately
     observer.next(store.getState());
@@ -19,9 +19,9 @@ export function subscribeStore<S, R>(store: Store<S>, selector?: Selector<S, R>)
         observer.next(store.getState());
       } catch (e) {
         log.error(e);
-        logger.notify(e);
+        logger.notify(e as Error);
       }
     });
-  }).pipe(map((state) => selector ? selector(state) : state))
-    .pipe(distinctUntilChanged<R>());
+  }).pipe(map((state: S) => selector ? selector(state) : state) as any)
+    .pipe(distinctUntilChanged<R>() as any);
 }

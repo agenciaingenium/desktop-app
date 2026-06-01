@@ -1,4 +1,6 @@
 import { EventEmitter } from 'events';
+// @ts-ignore no declaration file
+import ms from 'ms';
 
 import services from '../../services/servicesManager';
 
@@ -10,7 +12,6 @@ export default class ElectronNotificationStatePoller extends EventEmitter {
   constructor() {
     super();
 
-    const ms = require('ms');
     this.interval = ms('1sec');
     this.intervalId = undefined;
     this.state = null;

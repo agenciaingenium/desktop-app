@@ -109,7 +109,7 @@ const expandSectionIconStyle: React.CSSProperties = {
 };
 
 export default class BangList extends React.PureComponent<Props, State> {
-  private highlightedItemComponent: Element | null;
+  private highlightedItemComponent!: Element | null;
 
   constructor(props: Props) {
     super(props);
@@ -126,7 +126,7 @@ export default class BangList extends React.PureComponent<Props, State> {
   componentDidMount() {
     this.setState({
       collapseSections: this.props.items.reduce((state, item) => {
-        state[item.sectionName] = { collapsed: true };
+        (state as any)[item.sectionName] = { collapsed: true };
         return state;
       }, {}),
     });
@@ -145,7 +145,7 @@ export default class BangList extends React.PureComponent<Props, State> {
           ) {
             return collapseSectionsNewState;
           }
-          collapseSectionsNewState[item.sectionName] = { collapsed: true };
+          (collapseSectionsNewState as any)[item.sectionName] = { collapsed: true };
           return collapseSectionsNewState;
         },
         {},
@@ -224,6 +224,7 @@ export default class BangList extends React.PureComponent<Props, State> {
 
     return (
       <h4
+        // @ts-ignore
         className={classNames('bang-category', { clickable, collapsed })}
         style={categoryStyle}
         onClick={() => this.toggleCollapse(item)}
@@ -242,8 +243,11 @@ export default class BangList extends React.PureComponent<Props, State> {
     const collapsed = this.isCollapsedResults(item);
 
     return (
+      // @ts-ignore
       <svg
+        // @ts-ignore
         className={classNames('bang-expand-icon', { collapsed })}
+        // @ts-ignore
         style={expandSectionIconStyle}
         xmlns="http://www.w3.org/2000/svg"
         width="15"
@@ -270,6 +274,7 @@ export default class BangList extends React.PureComponent<Props, State> {
         type={item.type}
         themeColor={item.themeColor!}
         selected={highlighted}
+        // @ts-ignore
         ref={(itemComp: Element) => {
           if (highlighted) this.highlightedItemComponent = itemComp;
         }}
@@ -302,37 +307,27 @@ export default class BangList extends React.PureComponent<Props, State> {
               </div>
             </div>
           </>
-        ) : (
+) : (
+          // @ts-ignore
           items.some(i => i.sectionKind === 'top-hits') &&
           items.filter(shouldShowSection).map(item => (
+            // @ts-ignore
             <div
+              // @ts-ignore
               className={classNames('bang-section', {
                 'with-results': item.sectionName !== EMPTY_SECTION,
               })}
+              // @ts-ignore
               style={sectionBaseStyle}
-              key={item.sectionName}
             >
-              {item.sectionName === EMPTY_SECTION
-                ? null
-                : this.renderSectionTitle(item)}
-
-              {!this.isCollapsedResults(item) && (
-                <div
-                  className={classNames('bang-results', {
-                    collapsed: this.isCollapsedResults(item),
-                  })}
-                  style={resultsBaseStyle}
-                >
-                  {item.results
-                    ? item.results.map((result, position) => {
-                      if (forEmptyQuery && position === 0) {
-                        return null;
-                      }
-                      return this.renderItem(result, position);
-                    })
-                    : null}
-                </div>
-              )}
+              {item.results
+                ? item.results.map((result, position) => {
+                  if (forEmptyQuery && position === 0) {
+                    return null;
+                  }
+                  return this.renderItem(result, position);
+                })
+                : null}
             </div>
           ))
         )}

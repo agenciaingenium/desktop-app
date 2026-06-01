@@ -1,10 +1,11 @@
 import * as BluebirdPromise from 'bluebird';
 import { EventEmitter } from 'events';
-import * as Mousetrap from 'mousetrap';
+// @ts-ignore: no declaration file
+import Mousetrap from 'mousetrap';
 import * as React from 'react';
 import { SHORTCUTS } from '../../keyboard-shortcuts';
 
-const originalHandleKey = Mousetrap.prototype.handleKey;
+const originalHandleKey = (Mousetrap as any).prototype.handleKey;
 
 const createHandleKey = (getKeyAboveTab: () => string) =>
   function (this: any, character: string, modifiers: any, e: any) {
@@ -129,8 +130,8 @@ export default class KeyboardShortcuts extends React.PureComponent<Props, State>
       if (this.state.ctrlTabCycling) {
         this.handleControlTabAndHoldCtrl(reverse);
       } else {
-        new BluebirdPromise(
-          (resolve) => {
+        new (BluebirdPromise as any)(
+          (resolve: any) => {
             this.ctrlEmitter.once('keyup', resolve);
             setTimeout(() => {
               this.ctrlEmitter.removeListener('keyup', resolve);

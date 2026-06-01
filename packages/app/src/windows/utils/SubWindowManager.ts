@@ -1,8 +1,13 @@
+// @ts-ignore no declaration file
 import { attach } from '../../subwindows/duck';
+// @ts-ignore no declaration file
 import { closeAfterReattachedOrTimeout } from '../../tab-webcontents/duck';
-import { getUrlToLoad } from '../../utils/dev';
-import { isDarwin } from '../../utils/process';
+// @ts-ignore no declaration file
 import { updateTabId } from '../duck';
+// @ts-ignore no declaration file
+import { getUrlToLoad } from '../../utils/dev';
+// @ts-ignore no declaration file
+import { isDarwin } from '../../utils/process';
 import GenericWindowManager from './GenericWindowManager';
 import MainWindowManager from './MainWindowManager';
 

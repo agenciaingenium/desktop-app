@@ -70,7 +70,7 @@ export class OnboardingDockIcon extends React.PureComponent<IProps, IState> {
     this.setState({ removeAnimation: true }, () =>
       setTimeout(
         () =>
-          onRemove && onRemove(application, this.iconRef.current)
+          onRemove && onRemove(application, this.iconRef)
         , 1000,
       )
     );

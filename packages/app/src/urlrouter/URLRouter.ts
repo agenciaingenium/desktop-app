@@ -31,20 +31,25 @@ const normalizeURL = (url:string): string => new NodeURL(url).toString();
    - Incremental `buildScopesRadix` updates instead of full rebuild
  */
 export default class URLRouter {
-  public dataRouter: BehaviorSubject<ApplicationItem[] | null>;
+  public get dataRouter(): BehaviorSubject<ApplicationItem[] | null> {
+    if (!this._dataRouter) {
+      this._dataRouter = new BehaviorSubject<ApplicationItem[] | null>(null);
+      this._dataRouter.subscribe((data) => {
+        this.scopesRadix = this.buildScopesRadix(data);
+      });
+    }
+    return this._dataRouter;
+  }
+
   private getState: StationStore['getState'];
   private manifestProvider: ManifestProvider;
   private scopesRadix: any;
+  private _dataRouter: BehaviorSubject<ApplicationItem[] | null> | null;
 
   constructor(getState: StationStore['getState'], manifestProvider: ManifestProvider) {
     this.getState = getState;
-    this.dataRouter = new BehaviorSubject(null);
+    this._dataRouter = null;
     this.manifestProvider = manifestProvider;
-
-    // Observe all potential app scopes and build a tree when it arrives
-    this.dataRouter.subscribe((data) => {
-      this.scopesRadix = this.buildScopesRadix(data);
-    });
   }
 
   get state(): StationState {
@@ -102,7 +107,7 @@ export default class URLRouter {
 
     } catch (err) {
       console.warn('URL Router : routing failed, redirecting to browser');
-      handleError()(err);
+      handleError()(err as Error);
     }
 
     // URL not handled by anyone
@@ -229,7 +234,7 @@ export default class URLRouter {
         ...radixObject,
       });
     } catch (e) {
-      handleError()(e, {
+      handleError()(e as Error, {
         metaData: {
           scope,
           manifestURL: item.bxAppManifestURL,

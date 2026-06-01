@@ -75,6 +75,7 @@ export class IdentityProxy extends MapProxyMixin({
     // Create profileData if it does not exists
     if (state.has('profileData')) {
       const profileData = state.get('profileData');
+      // @ts-ignore
       obj.profileDataId = (await ProfileDataProxy.findOrCreate(profileData)).get().profileDataId;
     }
     return obj;
@@ -126,9 +127,9 @@ export class ApplicationProxy extends MapProxyMixin({
 }
 
 const serializeFavicons = (state: Immutable.Map<string, any>) => {
-  const favicons = state.get('favicons', null);
+  const favicons = state.get('favicons', null) as any;
   if (!favicons) return null;
-  return JSON.stringify(favicons.toArray());
+  return JSON.stringify((favicons as Immutable.Map<string, any>).toArray());
 };
 
 const unserializeFavicons = (obj: any) => {
@@ -145,6 +146,7 @@ export class TabProxy extends MapProxyMixin({
     tabId: state.get('tabId'),
     title: state.get('title'),
     url: state.get('url'),
+    // @ts-ignore
     favicons: serializeFavicons(state),
     lastActivityAt: state.get('lastActivityAt'),
   }),
@@ -154,6 +156,7 @@ export class TabProxy extends MapProxyMixin({
     tabId: obj.tabId,
     title: obj.title,
     url: obj.url,
+    // @ts-ignore
     favicons: unserializeFavicons(obj),
     lastActivityAt: obj.lastActivityAt,
   }),
@@ -168,6 +171,7 @@ export class FavoriteProxy extends MapProxyMixin({
     favoriteId: state.get('favoriteId'),
     title: state.get('title'),
     url: state.get('url'),
+    // @ts-ignore
     favicons: serializeFavicons(state),
   }),
   mapObjectToState: async obj => Immutable.Map({
@@ -175,6 +179,7 @@ export class FavoriteProxy extends MapProxyMixin({
     favoriteId: obj.favoriteId,
     title: obj.title,
     url: obj.url,
+    // @ts-ignore
     favicons: unserializeFavicons(obj),
   }),
 }) {
@@ -301,11 +306,11 @@ export class SubwindowProxy extends ListProxyMixin({
     }
     return l;
   },
-  mapArrayToState: async obj => Immutable.Set(obj).map((elt: any) => elt.tabId) as Immutable.List<any>,
+  mapArrayToState: async obj => (Immutable.Set(obj as any) as Immutable.Set<any>).map((elt: any) => elt.tabId).toList() as Immutable.List<any>,
 }) {
 }
 
-const favoriteProxy = new MapStateProxy(FavoriteProxy);
+const favoriteProxy = new MapStateProxy(FavoriteProxy as any);
 
 export class ApplicationSettingsProxy extends MapProxyMixin({
   model: ApplicationSettings,
@@ -355,28 +360,28 @@ export class FavoritesSubdockOrderProxy extends MapProxyMixin({
 
 export default function getBackend() {
   return {
-    app: new SingletonStateProxy(AppProxy),
-    applications: new MapStateProxy(ApplicationProxy),
-    nav: new SingletonStateProxy(NavProxy),
-    userIdentities: new MapStateProxy(IdentityProxy),
-    user: new SingletonStateProxy(UserProxy),
-    userWeeklyUsage: new ListStateProxy(UserWeeklyUsageProxy),
-    dock: new ListStateProxy(DockProxy),
+    app: new SingletonStateProxy(AppProxy as any),
+    applications: new MapStateProxy(ApplicationProxy as any),
+    nav: new SingletonStateProxy(NavProxy as any),
+    userIdentities: new MapStateProxy(IdentityProxy as any),
+    user: new SingletonStateProxy(UserProxy as any),
+    userWeeklyUsage: new ListStateProxy(UserWeeklyUsageProxy as any),
+    dock: new ListStateProxy(DockProxy as any),
     favorites: <StateProxy<Immutable.Map<string, any>>>{
       get: async () => Immutable.Map({
         favorites: await favoriteProxy.get(),
       }),
       set: async (state: Immutable.Map<string, any>) => favoriteProxy.set(state.get('favorites')),
     },
-    onboarding: new SingletonStateProxy(OnboardingProxy),
-    tabs: new MapStateProxy(TabProxy),
-    subwindows: new ListStateProxy(SubwindowProxy),
-    servicesData: new KeyValueStateProxy(ServicesDataProxyMixin),
+    onboarding: new SingletonStateProxy(OnboardingProxy as any),
+    tabs: new MapStateProxy(TabProxy as any),
+    subwindows: new ListStateProxy(SubwindowProxy as any),
+    servicesData: new KeyValueStateProxy(ServicesDataProxyMixin as any),
     ui: getUIProxy(models),
     passwordManagers: getPasswordManagers(),
     passwordManagerLinks: getPasswordManagerLinks(models),
-    applicationSettings: new MapStateProxy(ApplicationSettingsProxy),
-    orderedTabs: new MapStateProxy(TabsSubdockOrderProxy),
-    orderedFavorites: new MapStateProxy(FavoritesSubdockOrderProxy),
+    applicationSettings: new MapStateProxy(ApplicationSettingsProxy as any),
+    orderedTabs: new MapStateProxy(TabsSubdockOrderProxy as any),
+    orderedFavorites: new MapStateProxy(FavoritesSubdockOrderProxy as any),
   };
 }

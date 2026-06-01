@@ -74,7 +74,7 @@ const resolvers: Resolvers = {
       { store },
     ) => {
       const state = store.getState();
-      let { favorite, matchingTab } = getFavoriteAndMatchingTab(state, id);
+      const { favorite, matchingTab } = getFavoriteAndMatchingTab(state, id);
 
       // If not matching tab, create one new and get it
       if (!matchingTab) {
@@ -93,7 +93,7 @@ const resolvers: Resolvers = {
       { id },
       { store },
     ) => {
-      let { favorite, matchingTab } = getFavoriteAndMatchingTab(store.getState(), id);
+      const { favorite, matchingTab } = getFavoriteAndMatchingTab(store.getState(), id);
 
       // If not matching tab, create one new and get it
       if (!matchingTab) {
@@ -139,6 +139,7 @@ const createAndWaitTabInStore = async (
 
   const matchingTab = await subscribeStore(store)
     .pipe(
+      // @ts-ignore
       map((state: StationState) => getTabMatchingURL(state, url)),
       skipWhile((tab) => !Boolean(tab)),
       take(1)

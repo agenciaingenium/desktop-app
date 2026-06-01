@@ -5,7 +5,6 @@ import { bindActionCreators } from 'redux';
 import DockApplication from '../common/containers/DockApplication';
 import NativeAppDockIcon, { IconSymbol, Size } from '../dock/components/NativeAppDockIcon';
 import { SHORTCUTS } from '../keyboard-shortcuts';
-import { StationState } from '../types';
 import BangSubdock from './BangSubdock';
 import { SearchPaneClosedVia, setVisibility, toggleVisibility } from './duck';
 import { isVisible as getIsBangVisible } from './selectors';
@@ -49,17 +48,23 @@ class BangContainerImpl extends React.PureComponent<Props> {
 
     return (
       <DockApplication
+        // @ts-ignore
         open={isBangVisible}
+        // @ts-ignore
         onRequestClose={this.hide}
       >
         <NativeAppDockIcon
-          className={classNames('appcues-bang-input')}
+          className={(classNames as any)('appcues-bang-input')}
+          // @ts-ignore
           iconSymbolId={IconSymbol.SEARCH}
+          // @ts-ignore
           onClick={toggleBangVisibility}
           tooltip={isBangVisible ? undefined : toolTipText}
+          // @ts-ignore
           size={Size.BIG}
           style={{ opacity: 0.6 }}
         />
+        {/* @ts-ignore */}
         <ModalWrapper onClickOutside={this.hide} backgroundOverlay={false}>
           <BangSubdock onQuit={this.props.onQuit} />
         </ModalWrapper>
@@ -68,10 +73,12 @@ class BangContainerImpl extends React.PureComponent<Props> {
   }
 }
 
-const BangContainer = connect<StateProps, DispatchProps>(
-  (state: StationState) => ({
+// @ts-ignore
+const BangContainer = (connect as any)(
+  (state: any) => ({
     isBangVisible: getIsBangVisible(state),
   }),
+  // @ts-ignore
   dispatch => bindActionCreators(
     {
       toggleBangVisibility: () => toggleVisibility('center-modal', 'dedicated_button'),

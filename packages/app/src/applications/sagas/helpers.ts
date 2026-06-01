@@ -36,6 +36,7 @@ export function* getStartURL(
   }
 
   // handle presets start url
+  // @ts-ignore sagas and TS does not seem to go well together
   const startUrl = yield call(getStartURLForPreset, manifest, applicationId, presets, configData);
 
   // if no startUrl is computed, get multi instance configurator URL
@@ -58,6 +59,7 @@ export function* getNewPageURL(
   const presets = getPresets(manifest);
   const isMultiInstance = presets.length > 0;
   if (isMultiInstance) {
+    // @ts-ignore sagas and TS does not seem to go well together
     return yield call(getNewPageURLForPreset, manifest, applicationId, presets, configData);
   }
   return manifest.bx_new_page_url || manifest.start_url;
@@ -137,7 +139,7 @@ export function* getManifestByApplicationId(applicationId: string): SagaIterator
 
   const application = yield select(getApplicationById, applicationId);
   const manifestUrl = yield call(getApplicationManifestURL, application);
-  const { manifest } = yield manifestProvider.getFirstValue(manifestUrl);
+  const { manifest } = yield call(manifestProvider.getFirstValue, manifestUrl);
 
   return manifest;
 }

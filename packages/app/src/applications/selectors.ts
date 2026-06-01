@@ -1,6 +1,7 @@
 import * as Immutable from 'immutable';
 // @ts-ignore: no declaration file
 import * as isBlank from 'is-blank';
+// @ts-ignore: no declaration file
 import * as memoize from 'memoizee';
 import { uniq } from 'ramda';
 import { createSelector } from 'reselect';
@@ -104,13 +105,13 @@ const capBadge = (badge: any) => {
   return badge > 99 ? '99+' : badge;
 };
 
-export const getBadgeForApplication = createSelector(getTabs, tabs => memoize((appId: string) => {
+export const getBadgeForApplication = createSelector(getTabs, tabs => (memoize as any)((appId: string) => {
   const badge =
     tabs
       .filter(tab => getTabApplicationId(tab) === appId)
       .filter(tab => Boolean(getTabBadge(tab)))
       .map(tab => getTabBadge(tab))
-      .reduce(badgeReducer, undefined);
+      .reduce(badgeReducer as any, undefined);
   return capBadge(badge);
 }));
 
@@ -121,7 +122,7 @@ export const getAppBadge = createSelector(
     return applications
       .keySeq()
       .map(applicationId => badgeForApplication(applicationId))
-      .reduce(badgeReducer, null);
+      .reduce(badgeReducer as any, null);
   }
 );
 
@@ -145,7 +146,7 @@ export const getTabsAsList = createSelector(
 
       const detaching = twc ? Boolean(isWebcontentsDetaching(twc)) : false;
       const mountState = twc && getWebcontentsMountState(twc);
-      const isInSubwindow = hasSubwindowsTabId(subwindows, tabId);
+      const isInSubwindow = hasSubwindowsTabId(subwindows as any, tabId);
 
       return tab.merge(Immutable.Map({
         loadTab,
@@ -205,10 +206,10 @@ export const getApplicationDescription = createSelector(
     const identity = getIdentityById(state, identityId);
     if (!identity) return null;
 
-    let description = identity.getIn(['profileData', 'email'], null);
+    let description = (identity as any).getIn(['profileData', 'email'], null);
 
     if (!description) {
-      description = identity.get('email', null);
+      description = (identity as any).get('email', null);
     }
 
     return `Connected as ${description}`;
@@ -250,7 +251,7 @@ export const getFirstApplicationWithAttachedActiveTab = (state: StationState) =>
   getApplications(state)
     .filter(application => {
       const tabId = getApplicationActiveTab(application);
-      return !hasSubwindowsTabId(state, tabId);
+      return !hasSubwindowsTabId(getSubwindows(state) as any, tabId);
     })
     .first();
 
@@ -261,14 +262,14 @@ export const orderedManifestsUrls = createSelector(
     .map((applicationId: string) => applications.get(applicationId))
     .filter(Boolean) // `dock` can be cleared before `applications`
     .toOrderedSet()
-    .groupBy(getApplicationManifestURL)
+    .groupBy(getApplicationManifestURL as any)
     .map((groupedApps) => getApplicationManifestURL(groupedApps!.first()!))
     .toList()
     .concat(
       applications
         .filter(app => !dock.includes(getApplicationId(app)!))
         .toOrderedSet()
-        .groupBy(getApplicationManifestURL)
+        .groupBy(getApplicationManifestURL as any)
         .map(groupedApps => getApplicationManifestURL(groupedApps!.first()!))
         .toList()
     )

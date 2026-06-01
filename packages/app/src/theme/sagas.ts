@@ -1,9 +1,10 @@
 import { COLORS, getGradients, QUICK_DURATION, QUICK_INTERVAL } from '@getstation/theme';
 import * as log from 'electron-log';
 // @ts-ignore no declaration file
-import ms = require('ms');
+import ms from 'ms';
 import { SagaIterator } from 'redux-saga';
 import { all, call, delay, put, select } from 'redux-saga/effects';
+// @ts-ignore no declaration file
 import { READY } from '../app/duck';
 
 import { periodicTick, takeEveryWitness, takeLatestWitness } from '../utils/sagas';
@@ -28,6 +29,7 @@ const today = new Date();
  * For testing purpose
  */
 function installFakeTime() {
+  // @ts-ignore no declaration file
   const lolex = require('lolex');
   clock = lolex.install({
     now: today,
@@ -155,12 +157,11 @@ function* startColorsTransition({ fromMoment, toMoment, ratio }: BeginColorsTran
   const fromThemeColorScheme = COLORS.get(fromMoment);
   const toThemeColorScheme = COLORS.get(toMoment);
   let cursor = 0;
-  let stopAt: number;
   let duration = toThemeColorScheme.duration;
   const frameInterval = toThemeColorScheme.frameInterval;
 
   const gradients = getGradients(fromThemeColorScheme.colors, toThemeColorScheme.colors, duration, frameInterval);
-  stopAt = gradients.length - 1;
+  const stopAt = gradients.length - 1;
 
   // Okay now that...
   if (ratio !== undefined) {

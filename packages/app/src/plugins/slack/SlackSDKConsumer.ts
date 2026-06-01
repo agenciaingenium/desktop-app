@@ -13,6 +13,7 @@ class SlackSDKConsumer {
    * Get the token of the loaded Slack instances
    */
   getAPITokens(): Promise<SlackToken[]> {
+    // @ts-ignore
     const request = new Promise<SlackToken[]>((resolve, reject) => {
       this.provider.emit('api-token-request', resolve, reject);
     });

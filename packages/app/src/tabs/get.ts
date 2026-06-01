@@ -17,7 +17,7 @@ export const hasTabApplicationId = (tab: StationTabImmutable) => tab.has('applic
 
 export const getTabLoadTab = (tab: StationTabImmutable) => tab.get('loadTab', false);
 
-export const getTabFavoriteId = (tab: StationTabImmutable) => tab.get('favoriteId');
+export const getTabFavoriteId = (tab: StationTabImmutable) => tab.get('favoriteId' as any);
 
 export const getTabFavicons = (tab: StationTabImmutable) => tab.get('favicons', Immutable.List<string>() as any);
 

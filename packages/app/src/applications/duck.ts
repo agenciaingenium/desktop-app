@@ -407,13 +407,13 @@ export default function applications(state: Immutable.Map<string, any> = Immutab
     case ZOOM_IN: {
       const { applicationId } = action;
       if (!state.has(applicationId)) return state;
-      return state.updateIn([applicationId, 'zoomLevel'], 0, zoomLevel => zoomLevel + 0.5);
+      return state.updateIn([applicationId, 'zoomLevel'], 0, zoomLevel => (zoomLevel as number) + 0.5);
     }
 
     case ZOOM_OUT: {
       const { applicationId } = action;
       if (!state.has(applicationId)) return state;
-      return state.updateIn([applicationId, 'zoomLevel'], 0, zoomLevel => zoomLevel - 0.5);
+      return state.updateIn([applicationId, 'zoomLevel'], 0, zoomLevel => (zoomLevel as number) - 0.5);
     }
 
     case RESET_ZOOM: {

@@ -65,7 +65,7 @@ export default class RecentDockIcon extends React.PureComponent<Props, { hovered
     return (
       <div
         ref={innerRef}
-        className={classNames('appcues-subdock-recent')}
+        className={(classNames as any)('appcues-subdock-recent')}
         style={containerStyle}
         onMouseEnter={() => { this.setState({ hovered: true }); onMouseEnter(); }}
         onMouseLeave={() => { this.setState({ hovered: false }); onMouseLeave(); }}

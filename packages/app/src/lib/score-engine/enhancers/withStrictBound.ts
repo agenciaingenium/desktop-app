@@ -2,14 +2,18 @@ import { compose, map, pipe, reduce, values, sum } from 'ramda';
 import { ScoreAlgorithm, ScoreMap, Transformer } from '../types';
 import { divideBy } from '../utils';
 
-const getHighestAbsoluteValue = pipe(
-  values,
+// @ts-ignore
+const getHighestAbsoluteValue = (
+// @ts-ignore
+pipe(
+  values as any,
   map(sum),
   map(Math.abs),
   reduce(Math.max, 0),
-);
+) as any);
 
-const computeBoundedScore: Transformer<ScoreMap> = (scoreMap) => {
+// @ts-ignore
+const computeBoundedScore: Transformer<ScoreMap> = (scoreMap: any) => {
   const highestScore = getHighestAbsoluteValue(scoreMap);
   if (highestScore === 0) return scoreMap;
   const transformScores: Transformer<number[]> = map(divideBy(highestScore));

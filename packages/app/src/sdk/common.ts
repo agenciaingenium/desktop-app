@@ -8,7 +8,7 @@ export abstract class AbstractProvider<C extends Consumer> {
 
   // Let this constructor public to avoid compilation errors
   constructor() {
-    this.consumersObservable = new BehaviorSubject([]);
+    this.consumersObservable = new BehaviorSubject<C[]>([]);
   }
 
   public abstract addConsumer(consumer: C): void;

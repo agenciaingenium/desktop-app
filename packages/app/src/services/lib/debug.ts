@@ -1,11 +1,12 @@
 import { ServicePeerHandler } from './class';
+// @ts-ignore no declaration file
 const throttle = require('lodash.throttle');
 
 export class Debugger {
   warnAfter: number;
 
   protected sph: ServicePeerHandler;
-  protected lastDump: Date;
+  protected lastDump!: Date;
   protected interval: number;
   protected dumpThrottled: this['dump'];
 

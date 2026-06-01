@@ -2,7 +2,7 @@
 import { search } from '@getstation/sdk';
 import { observeOn, distinctUntilChanged, timestamp } from 'rxjs/operators';
 import * as log from 'electron-log';
-import isEmpty = require('is-empty');
+import isEmpty from 'is-empty';
 import { SagaIterator } from 'redux-saga';
 import { delay } from 'redux-saga/effects';
 import { all, call, fork, put, select, getContext } from 'redux-saga/effects';
@@ -84,18 +84,18 @@ function* produceResults(providerResults: Timestamp<SearchSection[]>, query: Tim
   const resultsSyncedWithQuery = (providerResults.timestamp - query.timestamp) > -1;
 
   if (resultsSyncedWithQuery) {
-    const topHitsResults: search.SearchResultItem[] = bxSearchEngine.search(flattenedResults, { query: query.value.value }, TOP_HITS_ITEMS);
+    const topHitsResults: search.SearchResultItem[] = bxSearchEngine.search(flattenedResults as any, { query: query.value.value }, TOP_HITS_ITEMS);
 
     const topHits = {
       sectionKind: 'top-hits',
       sectionName: EMPTY_SECTION,
-      results: topHitsResults.map((result: SearchResultSerialized) => ({ ...result, sectionKind: 'top-hits' })),
+      results: (topHitsResults as any).map((result: SearchResultSerialized) => ({ ...result, sectionKind: 'top-hits' })),
     };
 
-    return yield call(organizeSearchResults, [topHits, ...serializedResults]);
+    return yield call(organizeSearchResults, [topHits, ...serializedResults] as SearchSectionSerialized[]);
   }
 
-  return yield call(organizeSearchResults, serializedResults);
+  return yield call(organizeSearchResults, serializedResults as SearchSectionSerialized[]);
 }
 
 function* sdkSearchProvider(computedResults$: Subject<Pair<SearchSectionSerialized[]>>): SagaIterator {
@@ -116,12 +116,17 @@ function* sdkSearchProvider(computedResults$: Subject<Pair<SearchSectionSerializ
 
   yield takeEveryWitness(
     providerResultsWithQueryChannel,
+    // @ts-ignore nested generator
     function* (providerResultsWithQuery: [Timestamp<SearchSection[]>, Timestamp<search.SearchQuery>]) {
+      // @ts-ignore yield
       const sections: SearchSectionSerialized[] = yield call(produceResults, providerResultsWithQuery[0], providerResultsWithQuery[1]);
+      // @ts-ignore yield
       const historyItems = yield select(getHistoryItems);
+      // @ts-ignore yield
       const historySection = yield call(historyItemsAsLastUsedSection, historyItems.toJS());
 
       yield put(setSearchResults(sections));
+      // @ts-ignore yield
       yield call([computedResults$, computedResults$.next], [sections, [historySection]]);
     }
   );
@@ -133,7 +138,7 @@ function* getActivityEntries(): SagaIterator {
   function* asEntries(
     selector: Selector<StationState, any>,
     converter: Function
-  ) {
+  ): Generator<any, ActivityEntry[], any> {
     const tabsWithApps = yield select(selector);
     const entries: ActivityEntry[] = [];
 

@@ -30,17 +30,17 @@ export default class ConfigProvider extends AbstractProvider<config.ConfigConsum
 
   getConfigData(manifestURL: string): Observable<config.ConfigData[]> {
     const observableState = subscribeStore(this.store);
-    return observableState.pipe(
-      map(getApplications),
-      map(applications => applications.filter(
-        application => getApplicationManifestURL(application) === manifestURL)
+    return (observableState.pipe(
+      map(getApplications as any),
+      map((applications: any) => applications.filter(
+        (application: ApplicationImmutable) => getApplicationManifestURL(application) === manifestURL)
       ),
       distinctUntilChanged(is),
-      map(applications => applications.map((application: ApplicationImmutable) => ({
+      map((applications: any) => applications.map((application: ApplicationImmutable) => ({
         applicationId: application.get('applicationId'),
         subdomain: application.get('subdomain'),
       })).valueSeq().toArray()),
-    );
+    ) as any);
   }
 
   getProviderInterface(consumer: config.ConfigConsumer): config.ConfigProviderInterface {

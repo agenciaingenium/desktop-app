@@ -50,10 +50,12 @@ export const getApplicationsForDock = createSelector([getDock, getApplications, 
     .toOrderedSet()
     .map((appId: string) => applications.get(appId))
     .filter(application => Boolean(application))
+    // @ts-ignore
     .map((application: ApplicationImmutable) => {
       const badge = badgeForApplication(getApplicationId(application));
       const extendedAttrs = { badge };
       if (!application) return;
+      // @ts-ignore
       return application.merge(Immutable.Map(extendedAttrs));
     })
     .toList()

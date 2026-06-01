@@ -1,4 +1,4 @@
-import memoize = require('memoizee');
+import memoize from 'memoizee';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
 import { JAVASCRIPT_INJECTIONS } from '../applications/manifest-provider/const';
@@ -6,7 +6,8 @@ import { JAVASCRIPT_INJECTIONS } from '../applications/manifest-provider/const';
 export const injectJS = memoize(
   async (legacyServiceId: Maybe<string>): Promise<string | undefined> => {
     if (!legacyServiceId) return;
-    const scriptsFiles: string[] = JAVASCRIPT_INJECTIONS[legacyServiceId];
+    // @ts-ignore
+    const scriptsFiles: string[] = JAVASCRIPT_INJECTIONS[legacyServiceId as keyof typeof JAVASCRIPT_INJECTIONS];
 
     if (scriptsFiles) {
       return scriptsFiles.map(

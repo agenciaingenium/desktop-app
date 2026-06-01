@@ -22,6 +22,7 @@ const getManifestURLFromServiceId = (plugins: Immutable.Map<string, any>, servic
 /**
  * Activate services on renderer side
  */
+// @ts-ignore
 const observePluginsActivation = observer(
   getPlugins,
   (_dispatch: Dispatch, plugins: Immutable.Map<string, any>, previousPlugins: Immutable.Map<string, any>) => {
@@ -30,9 +31,11 @@ const observePluginsActivation = observer(
     const previousPluginIds = previousPlugins ? Immutable.Set<string>(pluginsToServiceIds(previousPlugins)) : Immutable.Set<string>();
     const newPluginIds = pluginIds.subtract(previousPluginIds).filter(Boolean);
     for (const serviceId of newPluginIds) {
+      // @ts-ignore
       const manifestURL = getManifestURLFromServiceId(plugins, serviceId);
+      // @ts-ignore
       getServiceRuntimeRenderer(serviceId)
-        .then(runtime => {
+        .then((runtime: any) => {
           if (runtime) {
             const sdk = bxsdk(
               {
