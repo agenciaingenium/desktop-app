@@ -48,7 +48,12 @@ configureStore(actionsEmitter)
     // for debug purpose, gives us a way to easily access the store
     window.stationStore = store;
 
-    render(store);
+    try {
+      render(store);
+    } catch (e) {
+      console.error('[RENDER] caught in configureStore.then:', e);
+      throw e;
+    }
 
     return null;
   })

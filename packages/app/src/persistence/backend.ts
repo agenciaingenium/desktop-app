@@ -109,6 +109,11 @@ export class SingletonStateProxy<S extends Sequelize.Model<any, any>, T extends 
         this.instance = instance;
         return this.toState();
       }).catch((err: any) => {
+        // On a fresh install the table doesn't exist yet — return an empty
+        // state instead of throwing, so the rest of the app can boot.
+        if (err && /no such table/i.test(err.message || '')) {
+          return Immutable.Map();
+        }
         console.error('[persistence] SingletonStateProxy.get failed:', err);
         throw err;
       });
@@ -168,6 +173,9 @@ export class ListStateProxy<S extends Sequelize.Model<any, any>, T extends ListP
         this.instances = instances;
         return this.toState();
       }).catch((err: any) => {
+        if (err && /no such table/i.test(err.message || '')) {
+          return Immutable.List();
+        }
         console.error('[persistence] ListStateProxy.get failed:', err);
         throw err;
       });
@@ -230,6 +238,9 @@ export class MapStateProxy<S extends Sequelize.Model<any, any>, T extends MapPro
         }
         return this.toState();
       }).catch((err: any) => {
+        if (err && /no such table/i.test(err.message || '')) {
+          return Immutable.Map();
+        }
         console.error('[persistence] MapStateProxy.get failed:', err);
         throw err;
       });
@@ -322,6 +333,9 @@ export class KeyValueStateProxy<S extends Sequelize.Model<any, any>, T extends K
         this.instances = instances;
         return this.toState();
       }).catch((err: any) => {
+        if (err && /no such table/i.test(err.message || '')) {
+          return Immutable.Map();
+        }
         console.error('[persistence] KeyValueStateProxy.get failed:', err);
         throw err;
       });
