@@ -137,11 +137,13 @@ export const getTabsAsList = createSelector(
       const twc = tabWebcontents.get(tabId);
       const alreadyLoaded = twc ? Boolean(getWebcontentsId(twc)) : false;
       const doLoad = twc ? Boolean(isWebcontentsWaitingToAttach(twc)) : false;
+      // If no webcontents exist yet, default to true so the webview is created
+      // and can load. Without this, fresh installs or missing tabWebcontents
+      // tables would leave loadTab=false forever, showing the loading screen indefinitely.
+      const loadTab = twc ? (alreadyLoaded || doLoad) : true;
 
       const errorCode = getWebcontentsErrorCode(twc);
       const errorDescription = getWebcontentsErrorDescription(twc);
-      const loadTab = alreadyLoaded || doLoad;
-
       const crashed = Boolean(getWebcontentsCrashed(twc));
 
       const detaching = twc ? Boolean(isWebcontentsDetaching(twc)) : false;
