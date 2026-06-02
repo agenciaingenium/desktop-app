@@ -37,8 +37,9 @@ export class ServicesLink extends ApolloLink {
 }
 
 export function getGQlClient() {
-  // addTypename: false — reactive-graphql doesn't support the __typename meta-field
-  const cache = new InMemoryCache({ addTypename: false });
+  // addTypename: false was removed in Apollo Client 3.14+; reactive-graphql
+  // workaround is in graphql/index.ts which adds __typename to the schema directly
+  const cache = new InMemoryCache();
 
   const link = ApolloLink.from([
     onError(({ graphQLErrors, networkError }) => {
