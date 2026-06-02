@@ -137,7 +137,14 @@ export class AppDockIcon extends React.PureComponent<Props> {
         </g>
       );
     }
-    return null;
+
+    // Fallback: show a colored circle when no icon URL is available
+    return (
+      <g>
+        <rect width="30" height="30" x="8" y="2" rx="15" fill={active ? (themeColor || '#4a90d9') : (themeColor || '#4a4a4a')} />
+        <circle cx="23" cy="17" r="15" fill={active ? (themeColor || '#4a90d9') : '#2a2a2a'} />
+      </g>
+    );
   }
 
   renderSecondaryIcon() {
@@ -187,13 +194,14 @@ export class AppDockIcon extends React.PureComponent<Props> {
   }
 
   render() {
-    const { loading, active, dramaticEnter } = this.props;
+    const { active, dramaticEnter } = this.props;
     const svgClassName = (classNames as any)('app-dock-icon', {
       active,
       'scale-up-animation': dramaticEnter,
     });
 
-    if (loading) return null;
+    // Don't return null while loading - show at least the background circle
+    // so dock icons are always visible
 
     const svgElement = (
       <svg className={svgClassName} xmlns="http://www.w3.org/2000/svg" width="46" height="46" viewBox="0 0 46 38">
