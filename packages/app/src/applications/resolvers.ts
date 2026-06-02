@@ -1,6 +1,6 @@
 import Immutable from 'immutable';
 import { from, of, Observable, BehaviorSubject } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { oc } from 'ts-optchain';
 
 import { applicationLabel, getChromeExtensionId } from '../abstract-application/helpers';
@@ -53,10 +53,15 @@ const resolvers: Resolvers = {
         context.store,
         state => getApplicationById(state, applicationId)
       )
-        .pipe(map(application => {
-          if (!application) throw new Error(`No application with applicationId ${applicationId}`);
-          return application;
-        }), distinctUntilChanged(Immutable.is));
+        .pipe(
+          // Filter out null/undefined — the application may not exist yet in the store
+          // (e.g., during startup before the App Store installation saga runs).
+          // Using filter instead of throwing preserves the Observable chain so it
+          // re-emits once the application appears. Throwing would kill the combineLatest
+          // in reactive-graphql, hanging the entire query forever.
+          filter(application => application != null),
+          distinctUntilChanged(Immutable.is)
+        );
     },
     onApplicationInstalled: (_obj, _args, { pubsub }) => {
       return new Observable(subscriber => {

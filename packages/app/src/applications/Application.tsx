@@ -252,7 +252,11 @@ class ApplicationImpl extends React.PureComponent {
   handleExecuteWebviewMethod(action: ExecuteWebviewMethodAction) {
     const executeWebviewMethod: WebviewMethod = webviewMethods[action.method] || noop;
 
-    if (this.webView) {
+    // Guard against null webview or null underlying DOM element.
+    // The webview ref may exist (ApplicationImpl mounted) but the actual
+    // <webview> DOM element (this.webView.view) may not be created yet
+    // if LazyWebview returned null (loading=true).
+    if (this.webView && this.webView.view) {
       executeWebviewMethod(this.webView);
     }
   }
