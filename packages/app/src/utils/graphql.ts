@@ -38,8 +38,19 @@ export class ServicesLink extends ApolloLink {
 
 export function getGQlClient() {
   // addTypename: false was removed in Apollo Client 3.14+; reactive-graphql
-  // workaround is in graphql/index.ts which adds __typename to the schema directly
-  const cache = new InMemoryCache();
+  // workaround is in graphql/index.ts which adds __typename to the schema directly.
+  // ManifestData and other nested objects lack an `id` field, so Apollo cache
+  // cannot normalize them and throws invariant errors that abort queries.
+  // keyFields: false tells the cache to store them inline (not normalized).
+  const cache = new InMemoryCache({
+    typePolicies: {
+      ManifestData: { keyFields: false },
+      BxMultiInstanceConfig: { keyFields: false },
+      StationStatus: { keyFields: false },
+      BxResource: { keyFields: false },
+      ActivityEntry: { keyFields: false },
+    },
+  });
 
   const link = ApolloLink.from([
     onError(({ graphQLErrors, networkError }) => {
