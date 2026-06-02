@@ -1,4 +1,5 @@
-import { Icon, IconSymbol, roundedBackground, Tooltip } from '@getstation/theme';
+import { Icon, IconSymbol, Tooltip } from '@getstation/theme';
+import { roundedBackground } from '@getstation/theme/dist/jss';
 import React from 'react';
 
 export type Props = {

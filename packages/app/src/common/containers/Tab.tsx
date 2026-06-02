@@ -1,4 +1,4 @@
-import { roundedBackground } from '@getstation/theme';
+import { roundedBackground } from '@getstation/theme/dist/jss';
 import classNames from 'classnames';
 import React from 'react';
 
