@@ -46,5 +46,4 @@ class Tab extends React.PureComponent<Props, { hovered: boolean }> {
   }
 }
 
-// @ts-ignore
-export default (roundedBackground as any)('rgba(255, 255, 255, .1)')(Tab);
+export default Tab;
