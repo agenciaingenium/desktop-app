@@ -43,28 +43,11 @@ export class ApolloLinkServiceImpl extends ApolloLinkService implements RPC.Inte
       throw new Error('redux store is unavailable');
     }
 
-    console.log('[apollo-link-worker] request:', req.operationName);
-
-    const wrappedObs = {
-      onResponse: (res: any) => {
-        console.log('[apollo-link-worker] onResponse:', req.operationName, JSON.stringify(res?.data)?.slice(0, 100));
-        obs.onResponse!(res);
-      },
-      onError: (err: any) => {
-        console.error('[apollo-link-worker] onError:', req.operationName, err?.message);
-        obs.onError!(err);
-      },
-      onComplete: () => {
-        console.log('[apollo-link-worker] onComplete:', req.operationName);
-        obs.onComplete!();
-      },
-    };
-
     return new ServiceSubscription(
       execute(
         this.link!,
         getGQLRequest(req),
-      ).subscribe(wrappedObs.onResponse as any, wrappedObs.onError as any, wrappedObs.onComplete as any),
+      ).subscribe(obs.onResponse as any, obs.onError as any, obs.onComplete as any),
       obs
     );
   }

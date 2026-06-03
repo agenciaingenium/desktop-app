@@ -106,10 +106,7 @@ const resolvers: Resolvers = {
     manifestURL: getApplicationManifestURL,
     manifestData: (application, _, context) =>
       context.manifestProvider.get(getApplicationManifestURL(application))
-        .pipe(map((bxApp: any) => {
-          console.log('[icon-debug] bxApp.manifest keys:', Object.keys(bxApp.manifest || {}), 'name:', bxApp.manifest?.name);
-          return bxApp.manifest;
-        }), distinctUntilChanged()),
+        .pipe(map((bxApp: any) => bxApp.manifest), distinctUntilChanged()),
     isSnoozed: (application, _, context) =>
       subscribeStore(
         context.store,
@@ -210,11 +207,7 @@ const resolvers: Resolvers = {
   },
 
   ManifestData: {
-    interpretedIconURL: (manifest) => {
-      const url = interpretedIconUrl(manifest);
-      console.log('[icon-debug] interpretedIconURL for', (manifest as any)?.name, ':', url, 'manifest.icons:', (manifest as any)?.icons);
-      return url;
-    },
+    interpretedIconURL: (manifest) => interpretedIconUrl(manifest),
     bx_keep_always_loaded: (manifest) =>
       manifest.bx_keep_always_loaded || false, // See https://github.com/mesosphere/reactive-graphql/issues/17
     bx_multi_instance_config: (manifest = {}) => {

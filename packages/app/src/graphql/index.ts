@@ -6,6 +6,7 @@ import { IManifestProvider } from '../applications/manifest-provider/types';
 import ResourceRouterDispatcher from '../resources/ResourceRouterDispatcher';
 import { StationStoreWorker } from '../types';
 import { getAllResolvers } from './allResolvers';
+import { DistinctConsecutiveResultsLink } from './distinctConsecutiveResultsLink';
 
 const typeDefs = require('./schema.graphql');
 
@@ -56,7 +57,7 @@ export const getLink = (contextFn: () => StationGQLContext) => {
   // @ts-ignore
   return ApolloLink.concat(
     // @ts-ignore
-    // new DistinctConsecutiveResultsLink(),
+    new DistinctConsecutiveResultsLink(),
     new ReactiveSchemaLink<StationGQLContext>({
       schema,
       context: contextFn,

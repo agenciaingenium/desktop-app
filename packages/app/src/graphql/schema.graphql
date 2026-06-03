@@ -1,8 +1,4 @@
 type Query {
-  """ Debug ping """
-  ping: String,
-  """ Debug online status """
-  debugOnline: StationStatus,
   """ Is launch at startup enabled or not. """
   autoLaunchEnabled: Boolean,
   """ Hide main menu (Windows, Linux) """

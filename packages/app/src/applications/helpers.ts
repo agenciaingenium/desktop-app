@@ -56,7 +56,7 @@ const formatURL = (urlType: URLType, manifest: BxAppManifest, configData: Config
 };
 
 export const interpretedIconUrl = (manifest: BxAppManifest) => {
-  return normalizeIconUrl(manifest.icons?.[0]?.src) || undefined;
+  return normalizeIconUrl(manifest.icons?.[0]?.src) || normalizeIconUrl((manifest as any).icon) || undefined;
 };
 
 export const normalizeIconUrl = (iconUrl?: string | null): string | null => {

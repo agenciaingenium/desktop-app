@@ -19,7 +19,6 @@ const resolvers: Resolvers = {
   Mutation: {
     installApplication: async (_obj, args, ctx) => {
       const { manifestURL, context: installApplicationContext, configuration } = args.input;
-      console.log('[gql-resolver] installApplication called:', manifestURL);
 
       const installContext: InstallContext = {
         id: installApplicationContext.id,
@@ -28,9 +27,7 @@ const resolvers: Resolvers = {
       };
 
       let identityId: string | undefined;
-      console.log('[gql-resolver] Fetching manifest...');
       const manifest = await getManifestOrTimeout(ctx.manifestProvider, manifestURL);
-      console.log('[gql-resolver] Manifest fetched:', manifest.name);
       const presets = manifest.bx_multi_instance_config?.presets ?? [];
 
       if (isConfigurationEmpty(configuration) && presets.includes(MultiInstanceConfigPreset.GoogleAccount)) {
@@ -44,9 +41,7 @@ const resolvers: Resolvers = {
         customURL: configuration?.customURL ?? undefined,
         identityId,
       };
-      console.log('[gql-resolver] Running installApplication saga...');
       const { applicationId } = await ctx.store.runSaga(installApplication, manifestURL, options).toPromise();
-      console.log('[gql-resolver] Saga done, applicationId:', applicationId);
       return { applicationId };
     },
     onboardingDone: async (_obj, args, context) => {

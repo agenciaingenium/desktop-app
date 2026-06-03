@@ -10,14 +10,11 @@ const ConnectedAppDockIcon = (props: OwnProps) => {
     },
   });
 
-  const iconURL = oc(data).application.manifestData.interpretedIconURL() || undefined;
-  console.log('[dock-icon]', props.applicationId?.slice(0, 8), 'loading:', loading, 'iconURL:', iconURL?.slice(0, 60));
-
   return (
     <AppearingAppDockIcon
       themeColor={oc(data).application.manifestData.theme_color() || undefined}
       loading={loading}
-      iconURL={iconURL}
+      iconURL={oc(data).application.manifestData.interpretedIconURL() || undefined}
       snoozed={oc(data).application.isSnoozed()}
       {...props}
     />

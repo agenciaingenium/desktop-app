@@ -138,29 +138,6 @@ export class BrowserXAppWorker {
       // see apollographql/apollo-client#4322
       queryDeduplication: false,
     });
-
-    // Debug: test Apollo query vs watchQuery
-    setTimeout(() => {
-      console.log('[worker-debug] Testing Apollo query vs watchQuery...');
-      const { gql } = require('@apollo/client');
-      
-      // Test 1: query() with ping (should complete)
-      this.apolloClient.query({ query: gql`{ ping }`, fetchPolicy: 'network-only' })
-        .then((r: any) => console.log('[worker-debug] query(ping) OK:', JSON.stringify(r.data)))
-        .catch((e: any) => console.error('[worker-debug] query(ping) FAIL:', e.message));
-      
-      // Test 2: query() with stationStatus (will hang if Observable never completes)
-      this.apolloClient.query({ query: gql`{ stationStatus { isOnline } }`, fetchPolicy: 'network-only' })
-        .then((r: any) => console.log('[worker-debug] query(stationStatus) OK:', JSON.stringify(r.data)))
-        .catch((e: any) => console.error('[worker-debug] query(stationStatus) FAIL:', e.message));
-      
-      // Test 3: watchQuery with stationStatus (should work even if Observable doesn't complete)
-      const wq = this.apolloClient.watchQuery({ query: gql`{ stationStatus { isOnline } }`, fetchPolicy: 'network-only' });
-      wq.subscribe({
-        next: (r: any) => console.log('[worker-debug] watchQuery(stationStatus) NEXT:', JSON.stringify(r.data)),
-        error: (e: any) => console.error('[worker-debug] watchQuery(stationStatus) ERROR:', e.message),
-      });
-    }, 5000);
   }
 
   initAlertProvider() {

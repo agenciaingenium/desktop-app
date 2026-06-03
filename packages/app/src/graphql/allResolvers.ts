@@ -20,21 +20,5 @@ export function getAllResolvers(): Resolvers {
     appResolvers, autoUpdateResolvers, applicationsResolvers,
     abstractApplicationsResolvers, activityResolvers, tabWebContentResolvers,
     tabsResolvers, resourcesResolvers, favoriteResolver, onboardingResolver,
-    // Debug: test resolvers to diagnose reactive-graphql
-    {
-      Query: {
-        ping: () => 'pong',
-        // Test subscribeStore directly
-        debugOnline: (_obj: any, _args: any, context: any) => {
-          const { subscribeStore } = require('../utils/observable');
-          console.log('[debug-online] resolver called');
-          return subscribeStore(context.store, (state: any) => {
-            const app = state.get('app');
-            console.log('[debug-online] selector called, app type:', typeof app, app?.constructor?.name);
-            return app ? app.toJS() : { isOnline: false };
-          });
-        },
-      },
-    },
   ]);
 }

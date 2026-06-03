@@ -499,8 +499,6 @@ const ApplicationWithGql: React.FC<OuterProps> = (outerProps) => {
     },
   });
 
-  console.log('[ApplicationWithGql]', application.get('applicationId')?.slice(0, 8), 'loading:', gqlLoading, 'data:', !!data);
-
   const gqlProps = React.useMemo((): Partial<OwnProps> => {
     if (!data) return { loading: true };
     const { application: app, stationStatus } = oc(data);
