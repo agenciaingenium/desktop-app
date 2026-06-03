@@ -1,5 +1,6 @@
 import { ThemeTypes } from '@getstation/theme';
-import * as isBlank from 'is-blank';
+// @ts-ignore
+import isBlank from 'is-blank';
 
 import { AppStoreApplicationLogoProps } from './AppStoreApplicationLogo';
 

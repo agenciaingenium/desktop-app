@@ -19,5 +19,8 @@ export const getResults = (state: StationState): Immutable.List<any> =>
   state.getIn(['bang', 'results'], Immutable.List());
 
 export const getResultsJS = createSelector(
-  getResults, results => results.toJS()
+  getResults, results => {
+    if (!results || typeof results.toJS !== 'function') return [];
+    return results.toJS();
+  }
 );

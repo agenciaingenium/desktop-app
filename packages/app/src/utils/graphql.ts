@@ -36,21 +36,31 @@ export class ServicesLink extends ApolloLink {
   }
 }
 
+// addTypename: false was removed in Apollo Client 3.14+; reactive-graphql
+// workaround is in graphql/index.ts which adds __typename to the schema directly.
+// ManifestData and other nested objects lack an `id` field, so Apollo cache
+// cannot normalize them and throws invariant errors that abort queries.
+// keyFields: false tells the cache to store them inline (not normalized).
+// This config MUST be applied to every Apollo client that reads from the
+// cache (renderer and worker), otherwise writes to the worker cache from
+// reactive-graphql queries will throw and abort subscribers.
+// @ts-ignore - TypePolicy.keyFields accepts `false` at runtime; the
+// upstream types do not include it.
+export const typePolicies = {
+  ManifestData: { keyFields: false },
+  BxMultiInstanceConfig: { keyFields: false },
+  StationStatus: { keyFields: false },
+  BxResource: { keyFields: false },
+  ActivityEntry: { keyFields: false },
+};
+
+export function buildCache() {
+  // @ts-ignore - same as above
+  return new InMemoryCache({ typePolicies });
+}
+
 export function getGQlClient() {
-  // addTypename: false was removed in Apollo Client 3.14+; reactive-graphql
-  // workaround is in graphql/index.ts which adds __typename to the schema directly.
-  // ManifestData and other nested objects lack an `id` field, so Apollo cache
-  // cannot normalize them and throws invariant errors that abort queries.
-  // keyFields: false tells the cache to store them inline (not normalized).
-  const cache = new InMemoryCache({
-    typePolicies: {
-      ManifestData: { keyFields: false },
-      BxMultiInstanceConfig: { keyFields: false },
-      StationStatus: { keyFields: false },
-      BxResource: { keyFields: false },
-      ActivityEntry: { keyFields: false },
-    },
-  });
+  const cache = buildCache();
 
   const link = ApolloLink.from([
     onError(({ graphQLErrors, networkError }) => {

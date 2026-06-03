@@ -3,7 +3,8 @@ import { Visibility } from '@src/app-request/duck';
 import * as React from 'react';
 import injectSheet from 'react-jss';
 import * as classNames from 'classnames';
-import * as uuid from 'uuid';
+// @ts-ignore
+import { v4 as uuidv4 } from 'uuid';
 import AppRequestStepsButtons
   from '@src/components/AppStoreContent/AppStoreRequest/AppRequestStepsButtons/AppRequestStepsButtons';
 import AppRequestStepsInput
@@ -127,7 +128,7 @@ export default class AppData extends React.PureComponent<IProps, IState> {
     const selectIconOptions = svgIconsURLs.map((iconUrl: string) => {
       return (
         <div
-          key={uuid.v4()}
+          key={uuidv4()}
           className={classes!.selectItem}
           onClick={() => this.handleChooseIcon(iconUrl)}
         >

@@ -104,18 +104,18 @@ function getBaseConfig(env, argv) {
         {
           test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
           type: 'asset/resource',
-          generator: { filename: 'fonts/[name]--[folder][ext]' },
+          generator: { filename: 'fonts/[name][ext]' },
         },
         {
           test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
           type: 'asset/resource',
-          generator: { filename: 'imgs/[name]--[folder][ext]' },
+          generator: { filename: 'imgs/[name][ext]' },
           parser: { dataUrlCondition: { maxSize: 10240 } },
         },
         {
           test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
           type: 'asset/resource',
-          generator: { filename: 'media/[name]--[folder][ext]' },
+          generator: { filename: 'media/[name][ext]' },
           parser: { dataUrlCondition: { maxSize: 10240 } },
         },
         {

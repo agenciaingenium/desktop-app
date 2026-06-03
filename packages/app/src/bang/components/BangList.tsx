@@ -124,6 +124,10 @@ export default class BangList extends React.PureComponent<Props, State> {
   }
 
   componentDidMount() {
+    if (!Array.isArray(this.props.items)) {
+      this.setState({ collapseSections: {} });
+      return;
+    }
     this.setState({
       collapseSections: this.props.items.reduce((state, item) => {
         (state as any)[item.sectionName] = { collapsed: true };
@@ -136,6 +140,11 @@ export default class BangList extends React.PureComponent<Props, State> {
     const { forEmptyQuery } = this.props;
     if (!forEmptyQuery && this.state && prevProps.items !== this.props.items) {
       const { collapseSections } = this.state;
+
+      if (!Array.isArray(this.props.items)) {
+        this.updateCollapsedSections({});
+        return;
+      }
 
       const nextCollapseSectionsState = this.props.items.reduce(
         (collapseSectionsNewState, item) => {

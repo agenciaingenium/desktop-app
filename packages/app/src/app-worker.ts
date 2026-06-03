@@ -2,7 +2,8 @@
 process.worker = true;
 import './dotenv';
 import { ipcRenderer } from 'electron';
-import { InMemoryCache, NormalizedCacheObject, ApolloClient } from '@apollo/client';
+import { NormalizedCacheObject, ApolloClient } from '@apollo/client';
+import { buildCache } from './utils/graphql';
 import { PubSub } from 'graphql-subscriptions';
 import { updateUI } from './ui/redux-ui-compat';
 // @ts-ignore no declaration file
@@ -130,11 +131,12 @@ export class BrowserXAppWorker {
 
   initApolloClient() {
     // local apollo client
-    // addTypename: false was removed in Apollo Client 3.14+; reactive-graphql workaround
-    // is handled via dataIdFromObject returning undefined for non-cacheable shapes.
+    // The worker's apollo cache also needs the typePolicies for non-normalized
+    // shapes (ManifestData, BxResource, etc.), otherwise writes from
+    // reactive-graphql queries throw invariant errors that abort subscribers.
     this.apolloClient = new ApolloClient({
       link: (services.apolloLink as ApolloLinkServiceImpl).link!,
-      cache: new InMemoryCache(),
+      cache: buildCache(),
       // see apollographql/apollo-client#4322
       queryDeduplication: false,
     });
