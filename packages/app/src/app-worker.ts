@@ -2,7 +2,7 @@
 process.worker = true;
 import './dotenv';
 import { ipcRenderer } from 'electron';
-import { InMemoryCache, NormalizedCacheObject, ApolloClient, gql } from '@apollo/client';
+import { InMemoryCache, NormalizedCacheObject, ApolloClient } from '@apollo/client';
 import { PubSub } from 'graphql-subscriptions';
 import { updateUI } from './ui/redux-ui-compat';
 // @ts-ignore no declaration file
@@ -139,24 +139,32 @@ export class BrowserXAppWorker {
       queryDeduplication: false,
     });
 
-    // Debug: test reactive-graphql directly (bypass Apollo Links)
+    // Debug: test reactive-graphql directly
     setTimeout(() => {
-      const { graphql } = require('@getstation/reactive-graphql');
-      const { schema } = require('./graphql/index');
-      const testAst = require('graphql').parse('{ ping }');
-      console.log('[worker-debug] Testing reactive-graphql directly...');
-      const result$ = graphql(schema, testAst, null, {
-        store: this.store,
-        manifestProvider: this.manifestProvider,
-        resourceRouter: this.resourceRouter,
-        pubsub: this.pubsub,
-      }, {});
-      console.log('[worker-debug] Got Observable, subscribing...');
-      result$.subscribe({
-        next: (val: any) => console.log('[worker-debug] reactive-graphql next:', JSON.stringify(val)),
-        error: (err: any) => console.error('[worker-debug] reactive-graphql error:', err.message),
-        complete: () => console.log('[worker-debug] reactive-graphql complete'),
-      });
+      console.log('[worker-debug] setTimeout fired');
+      try {
+        const reactiveGraphql = require('@getstation/reactive-graphql');
+        console.log('[worker-debug] reactive-graphql loaded, exports:', Object.keys(reactiveGraphql));
+        const { schema } = require('./graphql/index');
+        console.log('[worker-debug] schema loaded, typeMap keys:', Object.keys(schema.getTypeMap()).slice(0, 5));
+        const { parse } = require('graphql');
+        const testAst = parse('{ ping }');
+        console.log('[worker-debug] parsed query, calling graphql...');
+        const result$ = reactiveGraphql.graphql(schema, testAst, null, {
+          store: this.store,
+          manifestProvider: this.manifestProvider,
+          resourceRouter: this.resourceRouter,
+          pubsub: this.pubsub,
+        }, {});
+        console.log('[worker-debug] got result, type:', typeof result$, result$?.constructor?.name);
+        result$.subscribe({
+          next: (val: any) => console.log('[worker-debug] NEXT:', JSON.stringify(val)),
+          error: (err: any) => console.error('[worker-debug] ERROR:', err.message),
+          complete: () => console.log('[worker-debug] COMPLETE'),
+        });
+      } catch (err: any) {
+        console.error('[worker-debug] CAUGHT:', err.message, err.stack);
+      }
     }, 3000);
   }
 
