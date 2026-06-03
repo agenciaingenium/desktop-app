@@ -6,7 +6,6 @@ import { IManifestProvider } from '../applications/manifest-provider/types';
 import ResourceRouterDispatcher from '../resources/ResourceRouterDispatcher';
 import { StationStoreWorker } from '../types';
 import { getAllResolvers } from './allResolvers';
-import { DistinctConsecutiveResultsLink } from './distinctConsecutiveResultsLink';
 
 const typeDefs = require('./schema.graphql');
 
@@ -45,7 +44,7 @@ function addTypenameToSchema(schema: ReturnType<typeof makeExecutableSchema>) {
   return schema;
 }
 
-const schema = addTypenameToSchema(
+export const schema = addTypenameToSchema(
   makeExecutableSchema<StationGQLContext>({ typeDefs, resolvers: getAllResolvers() })
 );
 
