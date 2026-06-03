@@ -18,9 +18,11 @@ import {
   setConfigData,
   UNINSTALL_APPLICATION,
   UninstallApplicationAction,
+  updateApplicationIcon,
 } from '../duck';
 import { BxAppManifest } from '../manifest-provider/bxAppManifest';
 import { MultiInstanceConfigPreset } from '../manifest-provider/types';
+import { interpretedIconUrl } from '../helpers';
 import { getStartURL } from './helpers';
 import { optOutConfirmationFlow } from '../../application-settings/sagas';
 import { getPresets } from '../manifest-provider/helpers';
@@ -69,6 +71,13 @@ export function* installApplication(
   const createAction = createApplication(manifestURL, oc(options).installContext());
   const { applicationId } = createAction;
   yield put(createAction);
+
+  // Store iconURL and themeColor from manifest so dock icons render
+  // without waiting for the GraphQL query to resolve.
+  const iconURL = interpretedIconUrl(manifest);
+  if (iconURL) {
+    yield put(updateApplicationIcon(applicationId, iconURL));
+  }
 
   yield call(setIdentityIfMultiInstanceApplication, applicationId, manifest, options);
 
