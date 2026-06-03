@@ -141,18 +141,18 @@ export class BrowserXAppWorker {
 
     // Debug: test if reactive-graphql queries resolve locally in the worker
     const testPingQuery = gql`query TestPing { ping }`;
+    const testOnlineQuery = gql`query TestOnline { debugOnline { isOnline } }`;
     const testQuery = gql`query TestQuery { stationStatus { isOnline } }`;
-    const testAppsQuery = gql`query TestAppsQuery { applications: listApplications { id name } }`;
     setTimeout(() => {
       this.apolloClient.query({ query: testPingQuery, fetchPolicy: 'network-only' })
         .then(result => console.log('[worker-debug] ping resolved:', JSON.stringify(result.data)))
         .catch(err => console.error('[worker-debug] ping failed:', err.message));
+      this.apolloClient.query({ query: testOnlineQuery, fetchPolicy: 'network-only' })
+        .then(result => console.log('[worker-debug] debugOnline resolved:', JSON.stringify(result.data)))
+        .catch(err => console.error('[worker-debug] debugOnline failed:', err.message));
       this.apolloClient.query({ query: testQuery, fetchPolicy: 'network-only' })
         .then(result => console.log('[worker-debug] stationStatus resolved:', JSON.stringify(result.data)))
         .catch(err => console.error('[worker-debug] stationStatus failed:', err.message));
-      this.apolloClient.query({ query: testAppsQuery, fetchPolicy: 'network-only' })
-        .then(result => console.log('[worker-debug] listApplications resolved:', JSON.stringify(result.data)))
-        .catch(err => console.error('[worker-debug] listApplications failed:', err.message));
     }, 3000);
   }
 
