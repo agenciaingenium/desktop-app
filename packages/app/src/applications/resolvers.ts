@@ -106,7 +106,10 @@ const resolvers: Resolvers = {
     manifestURL: getApplicationManifestURL,
     manifestData: (application, _, context) =>
       context.manifestProvider.get(getApplicationManifestURL(application))
-        .pipe(map(bxApp => bxApp.manifest), distinctUntilChanged()),
+        .pipe(map((bxApp: any) => {
+          console.log('[icon-debug] bxApp.manifest keys:', Object.keys(bxApp.manifest || {}), 'name:', bxApp.manifest?.name);
+          return bxApp.manifest;
+        }), distinctUntilChanged()),
     isSnoozed: (application, _, context) =>
       subscribeStore(
         context.store,
