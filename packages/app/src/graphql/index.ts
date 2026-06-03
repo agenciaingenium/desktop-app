@@ -57,7 +57,7 @@ export const getLink = (contextFn: () => StationGQLContext) => {
   // @ts-ignore
   return ApolloLink.concat(
     // @ts-ignore
-    new DistinctConsecutiveResultsLink(),
+    // new DistinctConsecutiveResultsLink(),
     new ReactiveSchemaLink<StationGQLContext>({
       schema,
       context: contextFn,
