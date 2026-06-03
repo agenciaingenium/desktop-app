@@ -5,5 +5,5 @@ export const isAlwaysLoaded = (manifest: BxAppManifest, appSettings?: Applicatio
   if (appSettings && appSettings.has('alwaysLoaded')) {
     return appSettings.get('alwaysLoaded');
   }
-  return Boolean(manifest.bx_keep_always_loaded);
+  return Boolean(manifest && manifest.bx_keep_always_loaded);
 };
