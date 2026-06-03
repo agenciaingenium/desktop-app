@@ -26,6 +26,13 @@ const modalBodyContentStyle: React.CSSProperties = {
   justifyContent: 'center',
 };
 
+const hintValueStyle: React.CSSProperties = {
+  width: '100%',
+  fontStyle: 'italic',
+  opacity: 0.7,
+  marginTop: 10,
+};
+
 class RemoveModalConfirmation extends React.Component<Props> {
   static defaultProps: DefaultProps = {
     allInstancesRemoved: false,
