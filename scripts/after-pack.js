@@ -15,6 +15,16 @@ exports.default = async function(context) {
   const unpackedUuidPkg = path.join(resourcesDir, 'app.asar.unpacked', 'node_modules', 'uuid', 'package.json');
   patchUuidPackageJson(unpackedUuidPkg);
 
+  // Auto-copy to /Applications for faster testing
+  if (context.electronPlatformName === 'darwin') {
+    const appSrc = path.join(appOutDir, 'Station.app');
+    const appDest = '/Applications/Station.app';
+    console.log(`[after-pack] Copying ${appSrc} -> ${appDest}`);
+    fs.removeSync(appDest);
+    fs.copySync(appSrc, appDest);
+    console.log('[after-pack] Done');
+  }
+
   const isLinux = targets.find(target => target.name === 'appImage');
   if (!isLinux) {
     return;

@@ -33,12 +33,9 @@ dmg:
 
 mac:
   target:
-#    - target: dmg
-#      arch:
-#        - universal
-    - target: zip
+    - target: dir
       arch:
-        - universal
+        - arm64
   artifactName: ${productName}.${ext}
   hardenedRuntime: true
   gatekeeperAssess: false
@@ -51,19 +48,19 @@ mac:
     NSMicrophoneUsageDescription: 'Station necesita acceso al micrófono para llamadas y notas de voz dentro de tus aplicaciones.'
     NSAudioCaptureUsageDescription: 'Station necesita capturar audio para llamadas y notas de voz dentro de tus aplicaciones.'
   
-win:
-  target:
-    - nsis
-  artifactName: ${productName}-Setup.${ext}
-  verifyUpdateCodeSignature: false
+# win:
+#   target:
+#     - nsis
+#   artifactName: ${productName}-Setup.${ext}
+#   verifyUpdateCodeSignature: false
 
-linux:
-  target:
-    - AppImage
-    - deb
-    - rpm
-  category: Network
-  artifactName: ${productName}-${arch}.${ext}
+# linux:
+#   target:
+#     - AppImage
+#     - deb
+#     - rpm
+#   category: Network
+#   artifactName: ${productName}-${arch}.${ext}
 
 extraResources:
   - from: '../../.env.production'
