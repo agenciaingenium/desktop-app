@@ -145,18 +145,26 @@ class Presenter extends React.PureComponent<Props, State> {
     const apps = selectedApps;
 
     for (const app of apps) {
-      await installApplication({
-        manifestURL: app.application.bxAppManifestURL,
-        context: {
-          id: app.application.id,
-          platform: Platform.PlatformAppstore,
-          onboardeeApplicationAssignment: undefined,
-        },
-        configuration: app.configuration,
-      });
+      console.log('[onboarding] Installing app:', app.application.name, app.application.bxAppManifestURL);
+      try {
+        await installApplication({
+          manifestURL: app.application.bxAppManifestURL,
+          context: {
+            id: app.application.id,
+            platform: Platform.PlatformAppstore,
+            onboardeeApplicationAssignment: undefined,
+          },
+          configuration: app.configuration,
+        });
+        console.log('[onboarding] Installed OK:', app.application.name);
+      } catch (err) {
+        console.error('[onboarding] Failed to install:', app.application.name, err);
+      }
     }
 
+    console.log('[onboarding] All apps installed, calling onboardingDone');
     await onboardingDone(apps.length, undefined);
+    console.log('[onboarding] onboardingDone resolved');
   }
 
   renderDockIcons = () => {

@@ -18,19 +18,23 @@ function* doOnboardingIfNecessary() {
   yield put(updateUI('onboarding', 'onboardingType', OnboardingType.Regular));
 
   // Wait for app store step to be finished before continuing
+  console.log('[onboarding-saga] Waiting for APP_STORE_STEP_FINISHED...');
   yield take(APP_STORE_STEP_FINISHED);
+  console.log('[onboarding-saga] APP_STORE_STEP_FINISHED received');
   yield put(setShowLogin(false));
 
   yield put(setLoadingScreenVisibility(true));
 
   // let's navigate to the first application of the dock
   const applicationId: string = yield select(getFirstApplicationIdInDock);
+  console.log('[onboarding-saga] Navigating to first app:', applicationId);
   yield putResolve(changeSelectedApp(applicationId, 'app-installation'));
 
   yield delay(ms('3sec'));
   yield put(setLoadingScreenVisibility(false));
 
   yield put(markOnboardingAsDone());
+  console.log('[onboarding-saga] Onboarding done');
 }
 
 export default function* main(): SagaIterator {
