@@ -209,7 +209,7 @@ const resolvers: Resolvers = {
   ManifestData: {
     interpretedIconURL: (manifest) => {
       const url = interpretedIconUrl(manifest);
-      console.log('[icon-debug] interpretedIconURL for', (manifest as any)?.name, ':', url);
+      console.log('[icon-debug] interpretedIconURL for', (manifest as any)?.name, ':', url, 'manifest.icons:', (manifest as any)?.icons);
       return url;
     },
     bx_keep_always_loaded: (manifest) =>
