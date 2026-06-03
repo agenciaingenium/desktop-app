@@ -245,6 +245,11 @@ class ElectronWebview extends React.Component<ElectronWebviewProps, {}> {
         }
       }
     });
+    // initialSrc is excluded from the attribute loop above (since it's renamed
+    // to 'src') but the webview needs it to load. Set it directly.
+    if (this.props.initialSrc) {
+      webview.setAttribute('src', this.props.initialSrc);
+    }
     if (this.props.className) {
       webview.setAttribute('class', this.props.className);
     }
