@@ -17,15 +17,14 @@ import onboardingResolver from '../onboarding/resolvers';
  */
 export function getAllResolvers(): Resolvers {
   return mergeResolvers([
-    appResolvers,
-    autoUpdateResolvers,
-    applicationsResolvers,
-    abstractApplicationsResolvers,
-    activityResolvers,
-    tabWebContentResolvers,
-    tabsResolvers,
-    resourcesResolvers,
-    favoriteResolver,
-    onboardingResolver,
+    appResolvers, autoUpdateResolvers, applicationsResolvers,
+    abstractApplicationsResolvers, activityResolvers, tabWebContentResolvers,
+    tabsResolvers, resourcesResolvers, favoriteResolver, onboardingResolver,
+    // Debug: ultra-simple resolver to test reactive-graphql
+    {
+      Query: {
+        ping: () => 'pong',
+      },
+    },
   ]);
 }

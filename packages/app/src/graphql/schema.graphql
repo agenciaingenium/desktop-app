@@ -1,4 +1,6 @@
 type Query {
+  """ Debug ping """
+  ping: String,
   """ Is launch at startup enabled or not. """
   autoLaunchEnabled: Boolean,
   """ Hide main menu (Windows, Linux) """
