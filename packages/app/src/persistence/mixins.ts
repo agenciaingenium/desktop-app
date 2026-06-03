@@ -268,19 +268,9 @@ class extends ListProxy<T> {
   // @ts-ignore
   static async createAll(state: Immutable.Map<string, any>) {
     // @ts-ignore
-    const m = await this.mapStateToObject(state);
+    const items = await this.mapStateToArray(state);
     // @ts-ignore
-    const keyValues = Object.entries(m as any).reduce(
-      (previous: any, [k, v]: [string, any]) => {
-        return [...previous, ...Object.entries(v).map(([k2, v2]: [string, any]) =>
-          // @ts-ignore
-          this.getObjectToInsert(k, k2, v2)
-        )];
-      },
-      [] as any
-    );
-    // @ts-ignore
-    await lock.acquire('db', () => model.bulkCreate(keyValues));
+    await lock.acquire('db', () => model.bulkCreate(items));
     // @ts-ignore
     return await this.getAll();
   }
