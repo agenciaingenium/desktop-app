@@ -1,6 +1,5 @@
 import * as React from 'react';
 import injectSheet from 'react-jss';
-import * as _ from 'lodash';
 import * as classNames from 'classnames';
 import AppStoreApplication from '@src/components/AppStoreContent/AppStoreApplicationItem/AppStoreApplication';
 import { ContextEnvPlatform } from '@src/app';

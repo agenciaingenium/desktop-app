@@ -1,7 +1,7 @@
 // @ts-ignore
 import isBlank from 'is-blank';
 // @ts-ignore
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { SagaIterator } from 'redux-saga';
 import { delay } from 'redux-saga/effects';
 import { all, call, getContext, put, putResolve, race, select } from 'redux-saga/effects';

@@ -1,5 +1,7 @@
+// @ts-ignore
 import * as React from 'react';
-import * as _ from 'lodash';
+// @ts-ignore
+import _ from 'lodash';
 import * as classNames from 'classnames';
 import injectSheet from 'react-jss';
 import AppStoreAllAppsList from '@src/components/AppStoreContent/AppStoreAllAppsList/AppStoreAllAppsList';

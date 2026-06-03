@@ -41,6 +41,9 @@ export const changeAppItemPosition = (applicationId: string, index: number) => (
 
 // Reducer
 export default function reducer(state: StationDockImmutable = Immutable.List() as any, action: DockActions): StationDockImmutable {
+  if (!Immutable.List.isList(state)) {
+    state = Immutable.List(state as any) as StationDockImmutable;
+  }
   switch (action.type) {
     case ADD_APP_ITEM:
       return state.includes(action.applicationId) ?
@@ -55,10 +58,19 @@ export default function reducer(state: StationDockImmutable = Immutable.List() a
       return state;
     }
 
-    case CHANGE_APP_ITEM_POSITION:
+    case CHANGE_APP_ITEM_POSITION: {
+      const currentIndex = state.indexOf(action.applicationId);
+      if (currentIndex === -1) {
+        return state;
+      }
+      const nextIndex = Math.max(0, Math.min(action.index, state.size - 1));
+      if (currentIndex === nextIndex) {
+        return state;
+      }
       return state
-        .remove(state.indexOf(action.applicationId))
-        .insert(action.index, action.applicationId) as StationDockImmutable;
+        .remove(currentIndex)
+        .insert(nextIndex, action.applicationId) as StationDockImmutable;
+    }
 
     default:
       return state;
