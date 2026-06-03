@@ -207,7 +207,11 @@ const resolvers: Resolvers = {
   },
 
   ManifestData: {
-    interpretedIconURL: (manifest) => interpretedIconUrl(manifest),
+    interpretedIconURL: (manifest) => {
+      const url = interpretedIconUrl(manifest);
+      console.log('[icon-debug] interpretedIconURL for', (manifest as any)?.name, ':', url);
+      return url;
+    },
     bx_keep_always_loaded: (manifest) =>
       manifest.bx_keep_always_loaded || false, // See https://github.com/mesosphere/reactive-graphql/issues/17
     bx_multi_instance_config: (manifest = {}) => {
