@@ -139,33 +139,33 @@ export class BrowserXAppWorker {
       queryDeduplication: false,
     });
 
-    // Debug: test reactive-graphql directly
+    // Debug: test if reactive-graphql queries resolve
     setTimeout(() => {
       console.log('[worker-debug] setTimeout fired');
       try {
-        const reactiveGraphql = require('@getstation/reactive-graphql');
-        console.log('[worker-debug] reactive-graphql loaded, exports:', Object.keys(reactiveGraphql));
+        const testQuery = require('graphql').parse('{ ping }');
+        console.log('[worker-debug] parsed query');
+        const rg = require('@getstation/reactive-graphql');
+        console.log('[worker-debug] reactive-graphql loaded');
         const { schema } = require('./graphql/index');
-        console.log('[worker-debug] schema loaded, typeMap keys:', Object.keys(schema.getTypeMap()).slice(0, 5));
-        const { parse } = require('graphql');
-        const testAst = parse('{ ping }');
-        console.log('[worker-debug] parsed query, calling graphql...');
-        const result$ = reactiveGraphql.graphql(schema, testAst, null, {
+        console.log('[worker-debug] schema loaded');
+        const result$ = rg.graphql(schema, testQuery, null, {
           store: this.store,
           manifestProvider: this.manifestProvider,
           resourceRouter: this.resourceRouter,
           pubsub: this.pubsub,
         }, {});
-        console.log('[worker-debug] got result, type:', typeof result$, result$?.constructor?.name);
-        result$.subscribe({
-          next: (val: any) => console.log('[worker-debug] NEXT:', JSON.stringify(val)),
-          error: (err: any) => console.error('[worker-debug] ERROR:', err.message),
-          complete: () => console.log('[worker-debug] COMPLETE'),
-        });
+        console.log('[worker-debug] got observable, subscribing...');
+        const sub = result$.subscribe(
+          (val: any) => console.log('[worker-debug] NEXT:', JSON.stringify(val)),
+          (err: any) => console.error('[worker-debug] ERROR:', err.message, err.stack),
+          () => console.log('[worker-debug] COMPLETE'),
+        );
+        console.log('[worker-debug] subscribed, sub:', typeof sub);
       } catch (err: any) {
-        console.error('[worker-debug] CAUGHT:', err.message, err.stack);
+        console.error('[worker-debug] CAUGHT:', err.message);
       }
-    }, 3000);
+    }, 5000);
   }
 
   initAlertProvider() {
