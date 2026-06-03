@@ -1,6 +1,6 @@
 import { Modal } from '@getstation/theme';
 import Immutable from 'immutable';
-import * as pluralize from 'pluralize';
+import pluralize from 'pluralize';
 import React from 'react';
 import List from '../../../common/components/List';
 import { ListItemType } from '../../../common/components/ListItem';
@@ -35,7 +35,7 @@ class RemoveModalConfirmation extends React.Component<Props> {
     onCancel: () => { },
   };
 
-  getInstanceTypeWording = () => (pluralize as any)(this.props.instanceTypeWording, (this.props.instancesToRemove as any).size);
+  getInstanceTypeWording = () => pluralize(this.props.instanceTypeWording, (this.props.instancesToRemove as any).size);
 
   getPluralForm = () => (this.props.instancesToRemove as any).size > 1;
 

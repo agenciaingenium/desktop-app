@@ -1,4 +1,4 @@
-import * as pluralize from 'pluralize';
+import pluralize from 'pluralize';
 import { compact } from 'ramda-adjunct';
 import React from 'react';
 import List from '../../../common/components/List';
@@ -84,7 +84,7 @@ class ListInstances extends React.Component<Props> {
       // @ts-ignore
       <List
         iconSize={25}
-        title={(pluralize as any)(instanceTypeWording)}
+        title={pluralize(instanceTypeWording)}
         items={items}
       />
     );
