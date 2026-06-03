@@ -139,32 +139,27 @@ export class BrowserXAppWorker {
       queryDeduplication: false,
     });
 
-    // Debug: test if reactive-graphql queries resolve
+    // Debug: test Apollo query vs watchQuery
     setTimeout(() => {
-      console.log('[worker-debug] setTimeout fired');
-      try {
-        const testQuery = require('graphql').parse('{ ping }');
-        console.log('[worker-debug] parsed query');
-        const rg = require('@getstation/reactive-graphql');
-        console.log('[worker-debug] reactive-graphql loaded');
-        const { schema } = require('./graphql/index');
-        console.log('[worker-debug] schema loaded');
-        const result$ = rg.graphql(schema, testQuery, null, {
-          store: this.store,
-          manifestProvider: this.manifestProvider,
-          resourceRouter: this.resourceRouter,
-          pubsub: this.pubsub,
-        }, {});
-        console.log('[worker-debug] got observable, subscribing...');
-        const sub = result$.subscribe(
-          (val: any) => console.log('[worker-debug] NEXT:', JSON.stringify(val)),
-          (err: any) => console.error('[worker-debug] ERROR:', err.message, err.stack),
-          () => console.log('[worker-debug] COMPLETE'),
-        );
-        console.log('[worker-debug] subscribed, sub:', typeof sub);
-      } catch (err: any) {
-        console.error('[worker-debug] CAUGHT:', err.message);
-      }
+      console.log('[worker-debug] Testing Apollo query vs watchQuery...');
+      const { gql } = require('@apollo/client');
+      
+      // Test 1: query() with ping (should complete)
+      this.apolloClient.query({ query: gql`{ ping }`, fetchPolicy: 'network-only' })
+        .then((r: any) => console.log('[worker-debug] query(ping) OK:', JSON.stringify(r.data)))
+        .catch((e: any) => console.error('[worker-debug] query(ping) FAIL:', e.message));
+      
+      // Test 2: query() with stationStatus (will hang if Observable never completes)
+      this.apolloClient.query({ query: gql`{ stationStatus { isOnline } }`, fetchPolicy: 'network-only' })
+        .then((r: any) => console.log('[worker-debug] query(stationStatus) OK:', JSON.stringify(r.data)))
+        .catch((e: any) => console.error('[worker-debug] query(stationStatus) FAIL:', e.message));
+      
+      // Test 3: watchQuery with stationStatus (should work even if Observable doesn't complete)
+      const wq = this.apolloClient.watchQuery({ query: gql`{ stationStatus { isOnline } }`, fetchPolicy: 'network-only' });
+      wq.subscribe({
+        next: (r: any) => console.log('[worker-debug] watchQuery(stationStatus) NEXT:', JSON.stringify(r.data)),
+        error: (e: any) => console.error('[worker-debug] watchQuery(stationStatus) ERROR:', e.message),
+      });
     }, 5000);
   }
 
