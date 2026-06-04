@@ -47,30 +47,6 @@ export const hydrateDock = (applicationIds: string[]): HydrateDockAction => ({
   applicationIds,
 });
 
-// Thunk: if the dock state is empty (e.g. the redux state was not
-// rehydrated from the dock table on startup), repopulate it with the
-// visible application ids in their current order, then perform the
-// move. This makes drag-to-reorder work even when the dock starts
-// empty because of a stale or missing DB row.
-export const moveIconAndMaybeHydrate = (applicationId: string, index: number) => (dispatch: any, getState: any) => {
-  const state = getState();
-  const dock = state.get('dock');
-  if (!dock || (Immutable.List.isList(dock) && dock.size === 0)) {
-    const applications = state.get('applications');
-    if (applications && typeof applications.valueSeq === 'function') {
-      const visibleIds = applications
-        .valueSeq()
-        .map((app: any) => app.get && app.get('applicationId'))
-        .filter(Boolean)
-        .toArray();
-      if (visibleIds.length > 0) {
-        dispatch(hydrateDock(visibleIds));
-      }
-    }
-  }
-  dispatch(changeAppItemPosition(applicationId, index));
-};
-
 // Reducer
 export default function reducer(state: StationDockImmutable = Immutable.List() as any, action: DockActions): StationDockImmutable {
   if (!Immutable.List.isList(state)) {
@@ -98,14 +74,9 @@ export default function reducer(state: StationDockImmutable = Immutable.List() a
     }
 
     case CHANGE_APP_ITEM_POSITION: {
-      let currentIndex = state.indexOf(action.applicationId);
-      // Dock state is empty when the user reinstalls or the persist
-      // rehydration did not load the dock table; in that case the
-      // selector falls back to showing all installed applications.
-      // Allow the move to proceed by appending the missing appId at
-      // the end, so the dock becomes ordered on the next render.
+      const currentIndex = state.indexOf(action.applicationId);
       if (currentIndex === -1) {
-        return state.push(action.applicationId) as StationDockImmutable;
+        return state;
       }
       const nextIndex = Math.max(0, Math.min(action.index, state.size - 1));
       if (currentIndex === nextIndex) {

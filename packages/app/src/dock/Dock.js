@@ -3,6 +3,8 @@ import classNames from 'classnames';
 import memoize from 'memoizee';
 import mod from 'mod-op';
 import PropTypes from 'prop-types';
+// @ts-ignore no declaration file
+import { INTERNAL_APPLICATIONS } from '../applications/manifest-provider/const';
 import { findIndex, prop, propEq, tail } from 'ramda';
 import React from 'react';
 import { findDOMNode } from 'react-dom';
@@ -44,7 +46,8 @@ import DockItem from './components/DockItem';
 import KeyboardShortcuts from './components/KeyboardShortcuts';
 import DockIconDragLayer from './DockIconDragLayer';
 import * as dockActions from './duck';
-import { getApplicationsForDock } from './selectors';
+import { getApplicationsForDock, getDock } from './selectors';
+import { getApplications } from '../applications/selectors';
 import { isDarwin } from '../utils/process';
 import DockWrapper from './components/DockWrapper';
 import DockTopSection from './components/DockTopSection';
@@ -126,6 +129,33 @@ class DockImpl extends React.PureComponent {
     this.onIconOverStateChange = this.onIconOverStateChange.bind(this);
     this.onClickOutsideSubdock = this.onClickOutsideSubdock.bind(this);
     this.onSubdockOverStateChange = this.onSubdockOverStateChange.bind(this);
+  }
+
+  componentDidMount() {
+    // If the persisted dock state is empty (e.g. redux-persist did not
+    // rehydrate the dock table), populate it from the applications
+    // state so drag-to-reorder works. The selector's fallback path
+    // makes the dock visible without this, but moves are no-ops
+    // because the applicationId is not in the dock.
+    const { installedApplications, hydrateDockFromState, dock } = this.props;
+    if (!hydrateDockFromState) return;
+    // Only hydrate if the dock is actually empty (or not a List)
+    const dockEmpty = !dock || (typeof dock.size === 'number' && dock.size === 0);
+    if (!dockEmpty) return;
+    if (installedApplications && typeof installedApplications.size === 'number' && installedApplications.size > 0) {
+      const visibleIds = installedApplications
+        .map((app) => {
+          if (!app || typeof app.get !== 'function') return undefined;
+          const manifestURL = app.get('manifestURL');
+          if (INTERNAL_APPLICATIONS.includes(manifestURL)) return undefined;
+          return app.get('applicationId');
+        })
+        .filter(Boolean)
+        .toArray();
+      if (visibleIds.length > 0) {
+        hydrateDockFromState(visibleIds);
+      }
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -556,6 +586,8 @@ const Dock = compose(
   connect(
     (state) => ({
       applications: getApplicationsForDock(state),
+      installedApplications: getApplications(state),
+      dock: getDock(state),
       activeApplicationId: getActiveApplicationId(state),
       highlightedItemId: getUIRecentSubdockHighlightedItemId(state),
       isRecentSubdockVisible: getUIRecentSubdockIsVisible(state),
@@ -573,7 +605,8 @@ const Dock = compose(
     (dispatch) => bindActionCreators({
       changeSelectedApp,
       ...appActions,
-      changeTabPositionIndex: dockActions.moveIconAndMaybeHydrate,
+      changeTabPositionIndex: dockActions.changeAppItemPosition,
+      hydrateDockFromState: dockActions.hydrateDock,
       onOverStateChange: (applicationId) => setSubdockApplication(applicationId),
       showRecentSubdock: () => updateUI('recentSubdock', 'isVisible', true),
       hideRecentSubdock: () => updateUI('recentSubdock', 'isVisible', false),

@@ -48,19 +48,20 @@ export const getFirstApplicationIdInDock = (state: StationState) => state.get('d
 
 export const getApplicationsForDock = createSelector([getDock, getApplications, getBadgeForApplication],
   (dock, applications, badgeForApplication) => {
+    const isInternal = (app: ApplicationImmutable | undefined) =>
+      !!app && INTERNAL_APPLICATIONS.includes(getApplicationManifestURL(app));
+
     const dockApplications = dock
       .toOrderedSet()
       .map((appId: string) => applications.get(appId))
-      .filter(application => Boolean(application))
+      .filter((application: ApplicationImmutable | undefined) => Boolean(application) && !isInternal(application))
       .toList();
 
     const applicationsToRender = dockApplications.size > 0
       ? dockApplications
       : applications
         .valueSeq()
-        .filter((application: ApplicationImmutable) =>
-          !INTERNAL_APPLICATIONS.includes(getApplicationManifestURL(application))
-        )
+        .filter((application: ApplicationImmutable) => !isInternal(application))
         .toList();
 
     return applicationsToRender
