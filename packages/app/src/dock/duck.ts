@@ -55,6 +55,8 @@ export default function reducer(state: StationDockImmutable = Immutable.List() a
   switch (action.type) {
     case HYDRATE_DOCK: {
       const ids = action.applicationIds.filter(Boolean);
+      // eslint-disable-next-line no-console
+      console.log('[dock-reducer] HYDRATE_DOCK received with', ids.length, 'ids, current size:', state.size);
       if (ids.length === 0) return state;
       const newState = Immutable.List(ids) as StationDockImmutable;
       return newState;

@@ -2,7 +2,8 @@ import * as React from 'react';
 import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
-import * as uuid from 'uuid';
+// @ts-ignore
+import { v4 as uuidv4 } from 'uuid';
 import { flowRight as compose } from 'lodash';
 import { findApplicationByName } from '@src/api';
 import {
@@ -128,7 +129,7 @@ class AppRequestImpl extends React.Component<Props, IState> {
     this.setState({
       step: Steps.AppName,
       request: { ...AppRequestImpl.defaultState.request, name: searchStringAfterEnterPress || '' },
-      formSessionId: uuid.v4(),
+      formSessionId: uuidv4(),
     });
   }
 

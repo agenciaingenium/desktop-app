@@ -138,6 +138,8 @@ class DockImpl extends React.PureComponent {
     // makes the dock visible without this, but moves are no-ops
     // because the applicationId is not in the dock.
     const { installedApplications, hydrateDockFromState, dock } = this.props;
+    // eslint-disable-next-line no-console
+    console.log('[Dock.mount] dock.size:', dock && dock.size, 'apps.size:', installedApplications && installedApplications.size, 'has hydrate:', !!hydrateDockFromState);
     if (!hydrateDockFromState) return;
     // Only hydrate if the dock is actually empty (or not a List)
     const dockEmpty = !dock || (typeof dock.size === 'number' && dock.size === 0);
@@ -152,6 +154,8 @@ class DockImpl extends React.PureComponent {
         })
         .filter(Boolean)
         .toArray();
+      // eslint-disable-next-line no-console
+      console.log('[Dock.mount] hydrating dock with', visibleIds.length, 'ids:', visibleIds);
       if (visibleIds.length > 0) {
         hydrateDockFromState(visibleIds);
       }
