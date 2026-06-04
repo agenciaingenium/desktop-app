@@ -1,7 +1,8 @@
 import Immutable from 'immutable';
 import createCachedSelector from 're-reselect';
 import { createSelector } from 'reselect';
-import { getApplicationId } from '../applications/get';
+import { getApplicationId, getApplicationManifestURL } from '../applications/get';
+import { INTERNAL_APPLICATIONS } from '../applications/manifest-provider/const';
 import { getApplications, getBadgeForApplication } from '../applications/selectors';
 import { ApplicationImmutable, StationApplication } from '../applications/types';
 import { getOrderedFavoritesForApplicationId } from '../ordered-favorites/selectors';
@@ -46,17 +47,31 @@ export const getRecentTabsAndFavoritesForApplication = createCachedSelector(
 export const getFirstApplicationIdInDock = (state: StationState) => state.get('dock').first();
 
 export const getApplicationsForDock = createSelector([getDock, getApplications, getBadgeForApplication],
-  (dock, applications, badgeForApplication) => dock
-    .toOrderedSet()
-    .map((appId: string) => applications.get(appId))
-    .filter(application => Boolean(application))
-    // @ts-ignore
-    .map((application: ApplicationImmutable) => {
-      const badge = badgeForApplication(getApplicationId(application));
-      const extendedAttrs = { badge };
-      if (!application) return;
+  (dock, applications, badgeForApplication) => {
+    const dockApplications = dock
+      .toOrderedSet()
+      .map((appId: string) => applications.get(appId))
+      .filter(application => Boolean(application))
+      .toList();
+
+    const applicationsToRender = dockApplications.size > 0
+      ? dockApplications
+      : applications
+        .valueSeq()
+        .filter((application: ApplicationImmutable) =>
+          !INTERNAL_APPLICATIONS.includes(getApplicationManifestURL(application))
+        )
+        .toList();
+
+    return applicationsToRender
       // @ts-ignore
-      return application.merge(Immutable.Map(extendedAttrs));
-    })
-    .toList()
+      .map((application: ApplicationImmutable) => {
+        const badge = badgeForApplication(getApplicationId(application));
+        const extendedAttrs = { badge };
+        if (!application) return;
+        // @ts-ignore
+        return application.merge(Immutable.Map(extendedAttrs));
+      })
+      .toList();
+  }
 );

@@ -22,11 +22,7 @@ export function start() {
     if (!handler) {
       return new Response(new Blob([`Handler not found for ${req.url}`]), { status: 404 });
     }
-    if (!parsedUrl.pathname) {
-      return new Response(new Blob([`Empty path in ${req.url}`]), { status: 404 });
-    }
-
-    if (parsedUrl.pathname !== '/') {
+    if (parsedUrl.pathname && parsedUrl.pathname !== '/') {
       const fileUrl = `${dirname(handler.filePath)}/${parsedUrl.pathname.substring(1)}`;
       return net.fetch(pathToFileURL(fileUrl).toString());
     }
