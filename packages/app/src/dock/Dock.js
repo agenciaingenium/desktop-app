@@ -63,6 +63,9 @@ const bottomSectionStyle = {
 
 const onTrafficLightClose = () => window.station.window.close();
 
+// eslint-disable-next-line no-console
+console.log('[Dock] module loaded');
+
 class DockImpl extends React.PureComponent {
   static propTypes = {
     applications: ImmutablePropTypes.list.isRequired,
@@ -132,6 +135,8 @@ class DockImpl extends React.PureComponent {
   }
 
   componentDidMount() {
+    // eslint-disable-next-line no-console
+    console.log('[Dock.mount] fired!');
     // If the persisted dock state is empty (e.g. redux-persist did not
     // rehydrate the dock table), populate it from the applications
     // state so drag-to-reorder works. The selector's fallback path
@@ -140,6 +145,19 @@ class DockImpl extends React.PureComponent {
     const { installedApplications, hydrateDockFromState, dock } = this.props;
     // eslint-disable-next-line no-console
     console.log('[Dock.mount] dock.size:', dock && dock.size, 'apps.size:', installedApplications && installedApplications.size, 'has hydrate:', !!hydrateDockFromState);
+    if (dock && dock.toJS) {
+      // eslint-disable-next-line no-console
+      console.log('[Dock.mount] dock contents:', JSON.stringify(dock.toJS()));
+    }
+    if (installedApplications && typeof installedApplications.values === 'function') {
+      // eslint-disable-next-line no-console
+      const appIds = installedApplications
+        .values()
+        .map((a) => (a && a.get ? a.get('applicationId') : undefined))
+        .filter(Boolean)
+        .toArray();
+      console.log('[Dock.mount] appIds:', JSON.stringify(appIds));
+    }
     if (!hydrateDockFromState) return;
     // Only hydrate if the dock is actually empty (or not a List)
     const dockEmpty = !dock || (typeof dock.size === 'number' && dock.size === 0);
@@ -440,6 +458,8 @@ class DockImpl extends React.PureComponent {
   }
 
   handleMoveIcon = (applicationId, index) => {
+    // eslint-disable-next-line no-console
+    console.log('[Dock.move] appId:', applicationId, 'to index:', index);
     const { changeTabPositionIndex } = this.props;
     changeTabPositionIndex(applicationId, index);
   };

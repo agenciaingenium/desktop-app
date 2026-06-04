@@ -77,6 +77,8 @@ export default function reducer(state: StationDockImmutable = Immutable.List() a
 
     case CHANGE_APP_ITEM_POSITION: {
       const currentIndex = state.indexOf(action.applicationId);
+      // eslint-disable-next-line no-console
+      console.log('[dock-reducer] CHANGE_APP_ITEM_POSITION appId:', action.applicationId, 'index:', action.index, 'currentIndex:', currentIndex, 'state.size:', state.size);
       if (currentIndex === -1) {
         return state;
       }
