@@ -573,7 +573,7 @@ const Dock = compose(
     (dispatch) => bindActionCreators({
       changeSelectedApp,
       ...appActions,
-      changeTabPositionIndex: dockActions.changeAppItemPosition,
+      changeTabPositionIndex: dockActions.moveIconAndMaybeHydrate,
       onOverStateChange: (applicationId) => setSubdockApplication(applicationId),
       showRecentSubdock: () => updateUI('recentSubdock', 'isVisible', true),
       hideRecentSubdock: () => updateUI('recentSubdock', 'isVisible', false),
