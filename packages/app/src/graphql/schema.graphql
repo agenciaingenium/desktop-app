@@ -183,6 +183,7 @@ type Application {
   name: String,
   appstoreApplicationId: String,
   iconURL: String,
+  customIconURL: String,
   manifestURL: String!,
   manifestData: ManifestData!,
   isSnoozed: Boolean,
