@@ -6,10 +6,14 @@ exports.default = async function(context) {
 
   const { appOutDir, targets } = context;
 
+  // The dev build emits "Station Dev.app" so it can live side-by-side with
+  // the production "Station.app" in /Applications without clobbering it.
+  const appName = process.env.STATION_DEV === '1' ? 'Station Dev.app' : 'Station.app';
+
   const resourcesDir = path.join(
     appOutDir,
     context.electronPlatformName === 'darwin'
-      ? 'Station.app/Contents/Resources'
+      ? `${appName}/Contents/Resources`
       : 'resources'
   );
   const unpackedUuidPkg = path.join(resourcesDir, 'app.asar.unpacked', 'node_modules', 'uuid', 'package.json');
@@ -17,8 +21,8 @@ exports.default = async function(context) {
 
   // Auto-copy to /Applications for faster testing
   if (context.electronPlatformName === 'darwin') {
-    const appSrc = path.join(appOutDir, 'Station.app');
-    const appDest = '/Applications/Station.app';
+    const appSrc = path.join(appOutDir, appName);
+    const appDest = `/Applications/${appName}`;
     console.log(`[after-pack] Copying ${appSrc} -> ${appDest}`);
     fs.removeSync(appDest);
     fs.copySync(appSrc, appDest);

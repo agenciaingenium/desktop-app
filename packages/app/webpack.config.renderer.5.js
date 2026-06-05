@@ -187,6 +187,9 @@ function getEnvDefinePlugin(isProd) {
     STATION_REACT_PERF: JSON.stringify(dotenvVars.STATION_REACT_PERF || process.env.STATION_REACT_PERF),
     // Google OAuth
     GOOGLE_CLIENT_ID: JSON.stringify(process.env.GOOGLE_CLIENT_ID),
+    // The dev build uses this to surface the app name to the renderer
+    // (so error logs, devtools breadcrumbs, etc. identify the build).
+    STATION_APP_NAME_OVERRIDE: JSON.stringify(process.env.STATION_APP_NAME_OVERRIDE || ''),
   };
 
   const defines = {};

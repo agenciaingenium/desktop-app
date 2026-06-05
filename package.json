@@ -16,8 +16,11 @@
   "scripts": {
     "postinstall": "node scripts/patch-uuid-exports.js",
     "build": "yarn workspaces foreach --all --topological run build",
+    "build:dev": "STATION_DEV=1 STATION_PRODUCT_NAME=\"Station Dev\" STATION_APP_NAME_OVERRIDE=\"Station Dev\" STATION_OUTPUT_DIR=\"../../release-dev\" yarn workspaces foreach --all --topological run build",
     "clean": "yarn workspaces foreach --all run clean && rimraf release",
+    "clean:dev": "STATION_DEV=1 STATION_OUTPUT_DIR=\"../../release-dev\" yarn workspaces foreach --all run clean && rimraf release-dev",
     "release": "yarn clean && yarn workspaces foreach --all --topological run release",
+    "release:dev": "yarn clean:dev && STATION_DEV=1 STATION_PRODUCT_NAME=\"Station Dev\" STATION_APP_NAME_OVERRIDE=\"Station Dev\" STATION_OUTPUT_DIR=\"../../release-dev\" yarn workspaces foreach --all --topological run release",
     "dev": "yarn workspaces foreach --all --topological run dev",
     "lint": "yarn workspaces foreach --all --topological run lint",
     "test": "yarn workspaces foreach --all run test",

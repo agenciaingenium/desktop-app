@@ -75,6 +75,7 @@ module.exports = (env, argv) => {
     plugins: [
       new webpack.DefinePlugin({
         'process.env.GOOGLE_CLIENT_ID': JSON.stringify(process.env.GOOGLE_CLIENT_ID),
+        'process.env.STATION_APP_NAME_OVERRIDE': JSON.stringify(process.env.STATION_APP_NAME_OVERRIDE || ''),
       }),
       new StripSourceMapSupportFromPreloadsPlugin(),
       new CopyWebpackPlugin({

@@ -12,6 +12,16 @@ import { getUrlToLoad } from './utils/dev';
 import { isPackaged } from './utils/env';
 import { registerStationIpcHandlers } from './main/ipc-handlers';
 
+// Allow the build to override the app name (e.g. "Station Dev" for a
+// parallel dev install that uses a different userData directory).
+// Must run before any other call that depends on the app name (e.g.
+// before `app.getPath('userData')` is used by the SQLite backend).
+const overrideName = process.env.STATION_APP_NAME_OVERRIDE;
+if (overrideName && typeof overrideName === 'string') {
+  app.setName(overrideName);
+  app.setPath('userData', path.join(app.getPath('appData'), overrideName));
+}
+
 bootServices(); // all side effects related to services (in main process)
 
 // Register station preload bridge IPC handlers
