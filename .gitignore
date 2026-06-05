@@ -46,6 +46,7 @@ dist/
 .cache/
 .tsnode-cache/
 release/
+release-dev/
 packages/app/src/theme/css/
 /graphql.config.json
 .yarn/install-state.gz
@@ -67,3 +68,4 @@ yalc.lock
 errors
 .claude/
 .claude.json
+release-dev/
