@@ -5,7 +5,7 @@ appId: org.getstation.DesktopApp
 # coexist with the production install without overwriting its SQLite db,
 # cookies, dock order, or any user state. Set automatically by the
 # `yarn build:dev` / `yarn release:dev` scripts.
-productName: ${env.STATION_PRODUCT_NAME}
+productName: Station Dev
 
 publish:
   provider: 'github'
@@ -20,7 +20,7 @@ afterPack: '../../scripts/after-pack.js'
 # afterSign: '../../scripts/notarize.js'
 
 directories:
-  output: ${env.STATION_OUTPUT_DIR}
+  output: ../../release-dev
 
 protocols:
   name: Station
