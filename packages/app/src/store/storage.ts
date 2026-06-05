@@ -7,7 +7,7 @@ import storage from '../persistence';
 // does `mergeIn([key], inboundValue)` which, when the slice is a
 // List, *appends* the inbound list to the existing one (instead of
 // replacing it), so rehydrated values are silently duplicated.
-const replaceAllReconciler = (
+export const replaceAllReconciler = (
   state: Immutable.Map<string, any>,
   inboundState: any,
   reducedState: Immutable.Map<string, any>,

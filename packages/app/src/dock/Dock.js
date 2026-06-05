@@ -145,17 +145,41 @@ class DockImpl extends React.PureComponent {
     const { installedApplications, hydrateDockFromState, dock } = this.props;
     // eslint-disable-next-line no-console
     console.log('[Dock.mount] dock.size:', dock && dock.size, 'apps.size:', installedApplications && installedApplications.size, 'has hydrate:', !!hydrateDockFromState);
-    if (dock && dock.toJS) {
+    if (dock && typeof dock.toJS === 'function') {
       // eslint-disable-next-line no-console
       console.log('[Dock.mount] dock contents:', JSON.stringify(dock.toJS()));
     }
-    if (installedApplications && typeof installedApplications.values === 'function') {
+    if (installedApplications && typeof installedApplications.size === 'number' && installedApplications.size > 0) {
       // eslint-disable-next-line no-console
-      const appIds = installedApplications
-        .values()
-        .map((a) => (a && a.get ? a.get('applicationId') : undefined))
-        .filter(Boolean)
-        .toArray();
+      const appIds = [];
+      // installedApplications may be an Immutable.Map (preferred) or a
+      // plain object after rehydration. Try keySeq() first; fall back
+      // to Object.keys() if that fails.
+      try {
+        const keyCollection = typeof installedApplications.keySeq === 'function'
+          ? installedApplications.keySeq()
+          : null;
+        if (keyCollection) {
+          keyCollection.forEach((k) => {
+            const a = installedApplications.get(k);
+            if (a && typeof a.get === 'function') {
+              const id = a.get('applicationId');
+              if (id) appIds.push(id);
+            }
+          });
+        } else {
+          Object.keys(installedApplications).forEach((k) => {
+            const a = installedApplications[k];
+            if (a && typeof a.get === 'function') {
+              const id = a.get('applicationId');
+              if (id) appIds.push(id);
+            }
+          });
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('[Dock.mount] failed to read installedApplications', e);
+      }
       console.log('[Dock.mount] appIds:', JSON.stringify(appIds));
     }
     if (!hydrateDockFromState) return;

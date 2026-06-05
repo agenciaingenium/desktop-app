@@ -82,9 +82,3 @@ files:
     to: 'static/social-network'
   - from: 'src/static/animations'
     to: 'static/animations'
-
-# Provide an empty stub so electron-updater doesn't ENOENT on first read.
-# The actual update flow is gated by STATION_NO_CHECK_FOR_UPDATE in the
-# main process; this file just needs to exist when auto-updater starts.
-extraMetadata:
-  main: 'main.js'

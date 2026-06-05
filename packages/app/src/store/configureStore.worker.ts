@@ -22,6 +22,7 @@ import rootReducer from '../reducers';
 import rootSaga from '../sagas';
 import { handleError } from '../services/api/helpers';
 import services from '../services/servicesManager';
+import { replaceAllReconciler } from './storage';
 import { StationStoreWorker } from '../types';
 import { isPackaged } from '../utils/env';
 import { namespace } from './const';
@@ -132,7 +133,7 @@ export function configureStore(bxApp: BrowserXAppWorker) {
   );
 
   const enhancer = composeEnhancers(
-    autoRehydrate(),
+    autoRehydrate({ stateReconciler: replaceAllReconciler as any }),
     applyMiddleware(thunk, sagaMiddleware, forwardToClients)
   );
 
