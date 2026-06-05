@@ -122,6 +122,9 @@ export const Application = db.define(
     iconURL: {
       type: Sequelize.STRING,
     },
+    customIconPath: {
+      type: Sequelize.TEXT,
+    },
     // todo(app-323): remove `serviceId`
     serviceId: {
       type: Sequelize.STRING,

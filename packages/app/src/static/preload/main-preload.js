@@ -66,6 +66,10 @@ const IPC = {
   CLIPBOARD_WRITE_TEXT: 'station:clipboard-writeText',
   CLIPBOARD_READ_TEXT: 'station:clipboard-readText',
 
+  // Custom dock icon
+  APPLICATIONS_PICK_CUSTOM_ICON: 'station:applications-pickCustomIcon',
+  APPLICATIONS_REMOVE_CUSTOM_ICON: 'station:applications-removeCustomIcon',
+
   // getGlobal
   GET_GLOBAL: 'station:getGlobal',
 

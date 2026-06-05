@@ -102,7 +102,19 @@ const resolvers: Resolvers = {
       }
       return null;
     },
-    iconURL: (application) => application.get('iconURL') || null,
+    iconURL: (application) => {
+      // Prefer the user-chosen custom icon (file:// URL) if present.
+      // Otherwise fall back to whatever the application record has
+      // (manifest URL on install, or whatever the runtime mutates).
+      const customPath = application.get('customIconPath');
+      if (customPath) return `file://${customPath}`;
+      return application.get('iconURL') || null;
+    },
+    customIconURL: (application) => {
+      const customPath = application.get('customIconPath');
+      if (!customPath) return null;
+      return `file://${customPath}`;
+    },
     manifestURL: getApplicationManifestURL,
     manifestData: (application, _, context) =>
       context.manifestProvider.get(getApplicationManifestURL(application))
