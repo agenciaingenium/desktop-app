@@ -38,8 +38,12 @@ export const resetCustomApplicationIcon = (applicationId: string): ResetCustomIc
 declare const window: any;
 
 function* pickCustomIcon(action: PickCustomIconAction): SagaIterator {
+  // eslint-disable-next-line no-console
+  console.log('[pickCustomIcon-saga] action received', action);
   const { applicationId } = action;
   const application = yield select(getApplicationById, applicationId);
+  // eslint-disable-next-line no-console
+  console.log('[pickCustomIcon-saga] application found:', !!application);
   if (!application) return;
 
   // Open the file picker in the main process. It copies the chosen
@@ -50,6 +54,8 @@ function* pickCustomIcon(action: PickCustomIconAction): SagaIterator {
     IPC_PICK_CUSTOM_ICON,
     applicationId,
   );
+  // eslint-disable-next-line no-console
+  console.log('[pickCustomIcon-saga] destPath:', destPath);
   if (!destPath) return;
 
   yield put(setCustomApplicationIcon(applicationId, destPath));

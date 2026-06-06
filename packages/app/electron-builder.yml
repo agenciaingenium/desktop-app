@@ -1,11 +1,11 @@
-appId: org.getstation.DesktopApp
+appId: __STATION_APP_ID__
 
 # When STATION_DEV=1 is set in the environment, build a parallel "Station Dev"
 # bundle with a separate userData directory so the development build can
 # coexist with the production install without overwriting its SQLite db,
 # cookies, dock order, or any user state. Set automatically by the
 # `yarn build:dev` / `yarn release:dev` scripts.
-productName: Station Dev
+productName: __STATION_PRODUCT_NAME__
 
 publish:
   provider: 'github'

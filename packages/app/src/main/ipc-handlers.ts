@@ -259,8 +259,12 @@ export function registerStationIpcHandlers() {
   // responsible for dispatching the SET_CUSTOM_ICON_PATH action that
   // persists the path to the SQLite db.
   ipcMain.handle('station:applications-pickCustomIcon', async (event, applicationId: string) => {
+    // eslint-disable-next-line no-console
+    console.log('[pickCustomIcon] handler called for', applicationId);
     if (!applicationId) return null;
     const win = getSenderWindow(event);
+    // eslint-disable-next-line no-console
+    console.log('[pickCustomIcon] sender window:', win ? win.id : 'none');
     const result = await dialog.showOpenDialog(win || undefined as any, {
       title: 'Choose a custom icon',
       properties: ['openFile'],
@@ -268,6 +272,8 @@ export function registerStationIpcHandlers() {
         { name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'svg', 'webp', 'gif', 'ico'] },
       ],
     });
+    // eslint-disable-next-line no-console
+    console.log('[pickCustomIcon] dialog result:', result.canceled, result.filePaths);
     if (result.canceled || result.filePaths.length === 0) return null;
     const sourcePath = result.filePaths[0];
     try {
@@ -276,9 +282,12 @@ export function registerStationIpcHandlers() {
       fs.mkdirSync(iconsDir, { recursive: true });
       const destPath = path.join(iconsDir, `${applicationId}${ext}`);
       fs.copyFileSync(sourcePath, destPath);
+      // eslint-disable-next-line no-console
+      console.log('[pickCustomIcon] copied to', destPath);
       return destPath;
     } catch (err) {
-      console.error('[custom-icon] failed to copy', err);
+      // eslint-disable-next-line no-console
+      console.error('[pickCustomIcon] failed to copy', err);
       return null;
     }
   });
