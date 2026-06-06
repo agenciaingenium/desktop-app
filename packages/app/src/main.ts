@@ -145,19 +145,30 @@ const initWorker = () => {
 
 /**
  * Redirect userData so the dev build does not collide with the
- * production install. The dev build is built with a different
+ * production install.
+ *
+ * Production keeps the historical `Stationv2/` path. The dev
+ * build (Station Dev.app) is built with a different
  * `appId` (`org.getstation.DesktopApp.dev`) which makes macOS pick
  * `Station Dev/` for its userData automatically; the explicit
  * setPath below is a belt-and-suspenders fallback for Windows/Linux
- * where userData follows productName. Production keeps the
- * historical `Stationv2/` path so existing users do not lose
- * their state.
+ * where userData follows productName, and for older macOS that
+ * ignores the appId change.
+ *
+ * We detect "is this the dev build?" by reading
+ * \`STATION_APP_NAME_OVERRIDE\`, which is set to "Station Dev" by
+ * the \`yarn build:dev\` / \`yarn release:dev\` scripts and
+ * substituted into the main bundle by webpack DefinePlugin.
+ * Using \`app.getName()\` is NOT reliable: it returns the
+ * package.json \`name\` field, not the bundle name, so it does
+ * not change between prod and dev builds.
  */
 const overrideUserDataPath = () => {
   if (process.env.OVERRIDE_USER_DATA_PATH) {
     const userDataPath = path.join(app.getPath('appData'), process.env.OVERRIDE_USER_DATA_PATH);
     app.setPath('userData', userDataPath);
-  } else if (app.getName() === 'Station Dev') {
+  } else if (process.env.STATION_APP_NAME_OVERRIDE) {
+    // Dev build: use a folder that matches the productName.
     const userDataPath = path.join(app.getPath('appData'), 'Station Dev');
     app.setPath('userData', userDataPath);
   } else {
