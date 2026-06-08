@@ -308,7 +308,7 @@ export class SubwindowProxy extends ListProxyMixin({
     }
     return l;
   },
-  mapArrayToState: async obj => (Immutable.Set(obj as any) as Immutable.Set<any>).map((elt: any) => elt.tabId).toList() as Immutable.List<any>,
+  mapArrayToState: async obj => (Immutable.Set(obj as any) as Immutable.Set<any>).map((elt: any) => elt.tabId) as any,
 }) {
 }
 
