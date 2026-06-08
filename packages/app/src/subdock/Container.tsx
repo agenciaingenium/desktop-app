@@ -7,6 +7,11 @@ import { Maybe } from 'graphql/jsutils/Maybe';
 
 import { createNewEmptyTab, installApplication, navigateToApplicationTabAutomatically, toggleNotifications } from '../applications/duck';
 import { getApplicationActiveTab } from '../applications/get';
+// Custom-icon action creators live in the customIcon saga module
+// because they are dispatched in response to user gestures (right-
+// click "Change icon" in the subdock). Importing them here keeps
+// the dispatch wiring local to the subdock.
+import { pickCustomApplicationIcon, resetCustomApplicationIcon } from '../applications/sagas/customIcon';
 import { getTabById } from '../tabs/selectors';
 import { getTabURL } from '../tabs/get';
 import { getApplicationById as getApplicationByIdSelector, getNotificationsEnabled } from '../applications/selectors';
@@ -57,6 +62,9 @@ interface DispatchProps {
   toggleNotifications: () => void,
   openApplicationPreferences: (application: Application) => void,
   onOpenNewTab: () => void,
+  onChangeIcon: (applicationId: string) => void,
+  onResetIcon: (applicationId: string) => void,
+  hasCustomIcon: boolean,
 }
 
 type ConnectedProps = OuterProps & StateProps & DispatchProps;
@@ -102,6 +110,7 @@ const SubdockContainerInner: React.FC<ConnectedProps> = (props) => {
       onSelectFavorite={onSelectFavorite}
       onSelectTab={onSelectTab}
       onCloseTab={onCloseTab}
+      hasCustomIcon={Boolean(application && application.iconURL && (application.iconURL as string).startsWith('file://'))}
     />
   );
 };
@@ -146,6 +155,8 @@ const SubdockContainer = compose(
           }
           return installApplication(application.manifestURL, { navigate: true });
         },
+        onChangeIcon: () => pickCustomApplicationIcon(ownProps.applicationId),
+        onResetIcon: () => resetCustomApplicationIcon(ownProps.applicationId),
       }, dispatch);
     }
   ),

@@ -1,4 +1,4 @@
-appId: org.getstation.DesktopApp
+appId: org.getstation.DesktopApp.dev
 
 # When STATION_DEV=1 is set in the environment, build a parallel "Station Dev"
 # bundle with a separate userData directory so the development build can

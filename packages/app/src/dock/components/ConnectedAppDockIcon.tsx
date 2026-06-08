@@ -14,7 +14,7 @@ const ConnectedAppDockIcon = (props: OwnProps) => {
     <AppearingAppDockIcon
       themeColor={oc(data).application.manifestData.theme_color() || undefined}
       loading={loading}
-      iconURL={oc(data).application.manifestData.interpretedIconURL() || undefined}
+      iconURL={oc(data).application.iconURL() || undefined}
       snoozed={oc(data).application.isSnoozed()}
       {...props}
     />

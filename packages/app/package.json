@@ -1,7 +1,7 @@
 {
   "name": "station-desktop-app",
   "productName": "Station",
-  "version": "3.3.0-b23",
+  "version": "3.3.0-b25",
   "description": "Station",
   "homepage": "https://getstation.com",
   "author": {
@@ -25,6 +25,9 @@
     "build-webpack:webui:dev": "NODE_ENV=development webpack --config webpack.config.webui.js --mode=development",
     "build-webpack:webui:prod": "NODE_ENV=production webpack --config webpack.config.webui.js --mode=production",
     "build-webpack:prod": "yarn run gql-gen && yarn run sass && rimraf dist && yarn run build-webpack:main:prod && yarn run build-webpack:renderer:prod && yarn run build-webpack:webui:prod",
+    "build-webpack:main:prod:dev": "STATION_APP_NAME_OVERRIDE=\"Station Dev\" NODE_ENV=production webpack --config webpack.config.main.5.js --mode=production",
+    "build-webpack:renderer:prod:dev": "STATION_APP_NAME_OVERRIDE=\"Station Dev\" webpack --config webpack.config.renderer.5.js --mode=production",
+    "build-webpack:prod:dev": "STATION_APP_NAME_OVERRIDE=\"Station Dev\" yarn run gql-gen && yarn run sass && rimraf dist && yarn run build-webpack:main:prod:dev && yarn run build-webpack:renderer:prod:dev && yarn run build-webpack:webui:prod",
     "clean": "yarn run clean-gql-gen && rimraf dist",
     "build": "yarn run build-webpack:prod",
     "release": "yarn build && cross-env NODE_ENV=production electron-builder --publish never",

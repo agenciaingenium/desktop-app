@@ -5,6 +5,7 @@ query GetApplicationForSubdock($applicationId: String!) @live @local {
     id,
     appstoreApplicationId,
     iconURL,
+    customIconURL,
     manifestURL,
     onboardeeApplicationAssignment,
     forceShowDescription,

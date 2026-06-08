@@ -7,6 +7,7 @@
 
 import { app, ipcMain, shell, dialog, clipboard, BrowserWindow, webContents } from 'electron';
 import * as fs from 'fs';
+import * as path from 'path';
 import { openExternal } from '../utils/shell';
 
 /**
@@ -248,6 +249,59 @@ export function registerStationIpcHandlers() {
       event.returnValue = true;
     } catch (err) {
       event.returnValue = false;
+    }
+  });
+
+  // ====== Custom dock icon ======
+  // Open a file picker, let the user pick an image, copy it into the
+  // userData/icons/ directory under a stable per-app filename, and
+  // return the absolute path on disk. The renderer (a saga) is
+  // responsible for dispatching the SET_CUSTOM_ICON_PATH action that
+  // persists the path to the SQLite db.
+  ipcMain.handle('station:applications-pickCustomIcon', async (event, applicationId: string) => {
+    // eslint-disable-next-line no-console
+    console.log('[pickCustomIcon] handler called for', applicationId);
+    if (!applicationId) return null;
+    const win = getSenderWindow(event);
+    // eslint-disable-next-line no-console
+    console.log('[pickCustomIcon] sender window:', win ? win.id : 'none');
+    const result = await dialog.showOpenDialog(win || undefined as any, {
+      title: 'Choose a custom icon',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'svg', 'webp', 'gif', 'ico'] },
+      ],
+    });
+    // eslint-disable-next-line no-console
+    console.log('[pickCustomIcon] dialog result:', result.canceled, result.filePaths);
+    if (result.canceled || result.filePaths.length === 0) return null;
+    const sourcePath = result.filePaths[0];
+    try {
+      const ext = path.extname(sourcePath).toLowerCase() || '.png';
+      const iconsDir = path.join(app.getPath('userData'), 'icons');
+      fs.mkdirSync(iconsDir, { recursive: true });
+      const destPath = path.join(iconsDir, `${applicationId}${ext}`);
+      fs.copyFileSync(sourcePath, destPath);
+      // eslint-disable-next-line no-console
+      console.log('[pickCustomIcon] copied to', destPath);
+      return destPath;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[pickCustomIcon] failed to copy', err);
+      return null;
+    }
+  });
+
+  // Delete the per-application custom icon file from disk. Used when
+  // the user resets to the manifest icon.
+  ipcMain.handle('station:applications-removeCustomIcon', async (_event, customIconPath: string) => {
+    if (!customIconPath) return false;
+    try {
+      if (fs.existsSync(customIconPath)) fs.unlinkSync(customIconPath);
+      return true;
+    } catch (err) {
+      console.error('[custom-icon] failed to remove', err);
+      return false;
     }
   });
 }

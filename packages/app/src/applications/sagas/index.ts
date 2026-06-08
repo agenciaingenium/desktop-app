@@ -60,6 +60,7 @@ import {
 import { getNewPageURL } from './helpers';
 import { installApplication, watchLifecyleActions, InstallApplicationReturn } from './lifecycle';
 import { goToStartUrlAfterSetConfigData, updateApplicationIconAfterSetConfigData } from './configData';
+import { watchCustomIconRequests } from './customIcon';
 import { ApplicationImmutable } from '../types';
 
 function* interceptZoomActions({ applicationId }: ZoomActions): SagaIterator {
@@ -218,6 +219,7 @@ function* sagaChangeSelectedApp({ applicationId, markAsActiveTab }: ChangeSelect
 export default function* main() {
   yield all([
     fork(watchLifecyleActions),
+    fork(watchCustomIconRequests),
     takeEveryWitness([ZOOM_IN, ZOOM_OUT, RESET_ZOOM], interceptZoomActions),
     takeEveryWitness(SET_CONFIG_DATA, goToStartUrlAfterSetConfigData),
     takeEveryWitness(SET_CONFIG_DATA, updateApplicationIconAfterSetConfigData),

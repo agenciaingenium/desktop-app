@@ -13,6 +13,9 @@ interface OwnProps {
   notificationsEnabled: boolean | undefined, // TODO: Move this in Notifications resolver
   openApplicationPreferences: (application: GetApplicationStateQuery['application']) => void,
   toggleNotifications: () => void,
+  onChangeIcon: () => void,
+  onResetIcon: () => void,
+  hasCustomIcon: boolean,
 }
 
 type Props = OwnProps;
@@ -38,6 +41,9 @@ class SubdockHead extends React.PureComponent<Props, {}> {
       application,
       notificationsEnabled,
       toggleNotifications,
+      onChangeIcon,
+      onResetIcon,
+      hasCustomIcon,
     } = this.props;
 
     return (
@@ -52,6 +58,20 @@ class SubdockHead extends React.PureComponent<Props, {}> {
         </div>
 
         <div className="l-subdock__actions">
+          <SubdockButton
+            tooltip={hasCustomIcon ? 'Change icon' : 'Set custom icon'}
+            size={24}
+            symbolId={IconSymbol.PENCIL}
+            onClick={onChangeIcon}
+          />
+          {hasCustomIcon &&
+            <SubdockButton
+              tooltip="Reset to default icon"
+              size={24}
+              symbolId={IconSymbol.TRASH}
+              onClick={onResetIcon}
+            />
+          }
           <SubdockButton
             tooltip={notificationsEnabled === false ? 'Enable notifications' : 'Disable notifications'}
             size={24}

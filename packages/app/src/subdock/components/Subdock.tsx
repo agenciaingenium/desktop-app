@@ -37,12 +37,15 @@ interface Props {
   onAddTabAsFavorite: () => any,
   onRemoveFavorite: (favoriteId: string, tabId: string) => any,
   onDetachFavorite: () => any,
-  onCloseTab: (tabId: string) => any,
+  onCloseTab: (tabId: string) => void,
   onOpenNewTab: () => void,
   onClickAddNewInstance: (application: Application, identityNeeded?: boolean) => void,
   openApplicationPreferences: (application: Application) => void,
   toggleNotifications: () => void,
   handleHideSubdock: () => void,
+  onChangeIcon: () => void,
+  onResetIcon: () => void,
+  hasCustomIcon: boolean,
 }
 
 export default class Subdock extends React.PureComponent<Props, {}> {
@@ -52,7 +55,7 @@ export default class Subdock extends React.PureComponent<Props, {}> {
       application, onOverStateChange, notificationsEnabled,
       handleHideSubdock, activeTab, onSelectTab, onDetachTab, onAttachTab, onSelectFavorite, onAddTabAsFavorite,
       onRemoveFavorite, onDetachFavorite, onCloseTab, onClickAddNewInstance, onOpenNewTab, openApplicationPreferences,
-      toggleNotifications,
+      toggleNotifications, onChangeIcon, onResetIcon, hasCustomIcon,
     } = this.props;
 
     const onMouseEnter = () => onOverStateChange(true);
@@ -66,6 +69,9 @@ export default class Subdock extends React.PureComponent<Props, {}> {
           // @ts-ignore
           openApplicationPreferences={openApplicationPreferences}
           toggleNotifications={toggleNotifications}
+          onChangeIcon={onChangeIcon}
+          onResetIcon={onResetIcon}
+          hasCustomIcon={hasCustomIcon}
         />
 
         <div className="subdock-panels" style={panelsStyle}>

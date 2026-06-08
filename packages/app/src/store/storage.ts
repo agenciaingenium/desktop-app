@@ -13,12 +13,16 @@ export const replaceAllReconciler = (
   reducedState: Immutable.Map<string, any>,
   _log: any,
 ) => {
-  const newState = reducedState ? reducedState : Immutable.Map();
+  let newState: Immutable.Map<string, any> = reducedState ? reducedState : Immutable.Map();
   if (!inboundState) return newState;
   Object.keys(inboundState).forEach((key) => {
     if (!state.has(key)) return;
     if (state.get(key) !== reducedState.get(key)) return;
-    newState.set(key, inboundState[key]);
+    if (state.has(key)) {
+      newState = newState.mergeIn([key], inboundState[key]);
+    } else {
+      newState = newState.set(key, inboundState[key]);
+    }
   });
   return newState;
 };
@@ -77,9 +81,6 @@ export default class ApiStorage extends EventEmitter {
       },
       _stateGetter: (state: Immutable.Map<string, any>, key: string) => state.get(key),
       _stateSetter: (state: Immutable.Map<string, any>, key: string, value: any) => state.set(key, value),
-      // Use the custom reconciler that always replaces (not merges)
-      // the inbound substate, so Lists don't get duplicated by
-      // mergeIn's append semantics.
       stateReconciler: replaceAllReconciler,
       storage: this,
     };

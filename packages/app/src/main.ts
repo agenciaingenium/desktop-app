@@ -12,15 +12,13 @@ import { getUrlToLoad } from './utils/dev';
 import { isPackaged } from './utils/env';
 import { registerStationIpcHandlers } from './main/ipc-handlers';
 
-// Allow the build to override the app name (e.g. "Station Dev" for a
-// parallel dev install that uses a different userData directory).
-// Must run before any other call that depends on the app name (e.g.
-// before `app.getPath('userData')` is used by the SQLite backend).
-const overrideName = process.env.STATION_APP_NAME_OVERRIDE;
-if (overrideName && typeof overrideName === 'string') {
-  app.setName(overrideName);
-  app.setPath('userData', path.join(app.getPath('appData'), overrideName));
-}
+// app.setName() only takes effect on the NEXT app launch (per
+// Electron docs), so it cannot be used to redirect userData at
+// runtime. Instead, the dev build is built with a different
+// `appId` (`org.getstation.DesktopApp.dev`) which causes macOS to
+// land its userData at
+// `~/Library/Application Support/Station Dev/` instead of the
+// production `Stationv2/`. This block is kept as documentation.
 
 bootServices(); // all side effects related to services (in main process)
 
@@ -146,14 +144,31 @@ const initWorker = () => {
 };
 
 /**
- * override userData if needed
+ * Redirect userData so the dev build does not collide with the
+ * production install.
+ *
+ * Production keeps the historical `Stationv2/` path. The dev
+ * build (Station Dev.app) is built with a different
+ * `appId` (`org.getstation.DesktopApp.dev`) which makes macOS pick
+ * `Station Dev/` for its userData automatically; the explicit
+ * setPath below is a belt-and-suspenders fallback for Windows/Linux
+ * where userData follows productName, and for older macOS that
+ * ignores the appId change.
+ *
+ * We detect "is this the dev build?" by reading
+ * \`STATION_APP_NAME_OVERRIDE\`, which is set to "Station Dev" by
+ * the \`yarn build:dev\` / \`yarn release:dev\` scripts and
+ * substituted into the main bundle by webpack DefinePlugin.
+ * Using \`app.getName()\` is NOT reliable: it returns the
+ * package.json \`name\` field, not the bundle name, so it does
+ * not change between prod and dev builds.
  */
 const overrideUserDataPath = () => {
   if (process.env.OVERRIDE_USER_DATA_PATH) {
     const userDataPath = path.join(app.getPath('appData'), process.env.OVERRIDE_USER_DATA_PATH);
     app.setPath('userData', userDataPath);
-  } else if (!isPackaged) {
-    app.name = 'Station Dev';
+  } else if (process.env.STATION_APP_NAME_OVERRIDE) {
+    // Dev build: use a folder that matches the productName.
     const userDataPath = path.join(app.getPath('appData'), 'Station Dev');
     app.setPath('userData', userDataPath);
   } else {
